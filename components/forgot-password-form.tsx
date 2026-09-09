@@ -1,17 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button, Card, Form, Input, message } from "antd";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -19,85 +9,70 @@ export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleForgotPassword = async (values: { email: string }) => {
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
+    const redirectTo = typeof window !== "undefined" 
+      ? `${window.location.origin}/auth/update-password` 
+      : "/auth/update-password";
+
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo,
       });
       if (error) throw error;
       setSuccess(true);
+      message.success("Password reset email sent!");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      setError(errorMessage);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={className} {...props}>
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
-            </p>
-          </CardContent>
+        <Card title="Check Your Email" style={{ width: "100%" }}>
+          <p style={{ color: "#8c8c8c" }}>
+            If you registered using your email and password, you will receive
+            a password reset email.
+          </p>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
+        <Card title="Reset Your Password" style={{ width: "100%" }}>
+          <Form onFinish={handleForgotPassword} layout="vertical">
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[
+                { required: true, message: "Please input your email" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
+            >
+              <Input placeholder="m@example.com" type="email" />
+            </Form.Item>
+            {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block loading={isLoading}>
+                Send reset email
+              </Button>
+            </Form.Item>
+          </Form>
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            Already have an account?{" "}
+            <Link href="/auth/login" style={{ marginLeft: 8 }}>
+              Login
+            </Link>
+          </div>
         </Card>
       )}
     </div>

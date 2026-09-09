@@ -1,28 +1,31 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "antd";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
 
 export async function AuthButton() {
   const supabase = await createClient();
 
-  // You can also use getUser() which will be slower.
   const { data } = await supabase.auth.getClaims();
 
   const user = data?.claims;
 
   return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.email}!
+    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <span>Hey, {user.email}!</span>
       <LogoutButton />
     </div>
   ) : (
-    <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
-        <Link href="/auth/login">Sign in</Link>
+    <div style={{ display: "flex", gap: 8 }}>
+      <Button type="default" size="small">
+        <Link href="/auth/login" style={{ textDecoration: "none", color: "inherit" }}>
+          Sign in
+        </Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
-        <Link href="/auth/sign-up">Sign up</Link>
+      <Button type="primary" size="small">
+        <Link href="/auth/sign-up" style={{ textDecoration: "none", color: "inherit" }}>
+          Sign up
+        </Link>
       </Button>
     </div>
   );

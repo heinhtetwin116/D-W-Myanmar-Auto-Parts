@@ -2,9 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 /**
- * Especially important if using Fluid compute: Don't put this client in a
- * global variable. Always create a new client within each function when using
- * it.
+ * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each
+ * function when using it.
  */
 export async function createClient() {
   const cookieStore = await cookies();
@@ -24,11 +23,25 @@ export async function createClient() {
             );
           } catch {
             // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have proxy refreshing
+            // This can be ignored if you have middleware refreshing
             // user sessions.
           }
         },
       },
     },
   );
+}
+
+export async function checkDatabase() {
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("your_table_name").select("*").limit(1);
+
+  if (error) {
+    console.error("Database connection failed:", error.message);
+    return false;
+  }
+
+  console.log("Database is reachable");
+  return true;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "antd";
 
 const CopyIcon = () => (
   <svg
@@ -48,10 +48,11 @@ export function CodeBlock({ code }: { code: string }) {
   return (
     <pre className="bg-muted rounded-md p-6 my-6 relative">
       <Button
-        size="icon"
+        type="default"
+        size="small"
+        shape="circle"
         onClick={copy}
-        variant={"outline"}
-        className="absolute right-2 top-2"
+        style={{ position: "absolute", right: 8, top: 8 }}
       >
         {icon}
       </Button>

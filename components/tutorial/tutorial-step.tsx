@@ -1,4 +1,4 @@
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "antd";
 
 export function TutorialStep({
   title,
@@ -10,18 +10,13 @@ export function TutorialStep({
   return (
     <li className="relative">
       <Checkbox
-        id={title}
-        name={title}
-        className={`absolute top-[3px] mr-2 peer`}
+        className="absolute top-[3px] mr-2"
       />
       <label
-        htmlFor={title}
-        className={`relative text-base text-foreground peer-checked:line-through font-medium`}
+        className="relative text-base text-foreground peer-checked:line-through font-medium"
       >
         <span className="ml-8">{title}</span>
-        <div
-          className={`ml-8 text-sm peer-checked:line-through font-normal text-muted-foreground`}
-        >
+        <div className="ml-8 text-sm peer-checked:line-through font-normal text-muted-foreground">
           {children}
         </div>
       </label>
