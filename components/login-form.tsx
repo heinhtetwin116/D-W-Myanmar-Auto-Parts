@@ -16,7 +16,6 @@ export function LoginForm() {
     e.preventDefault()
     setIsLoading(true)
     
-    // Simulate login
     await new Promise(resolve => setTimeout(resolve, 1500))
     console.log('Login submitted:', formData)
     
@@ -112,7 +111,7 @@ export function LoginForm() {
 
       {/* Sign Up Link */}
       <p className="text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
+        Don&apos;t have an account{' '}
         <Link href="/signup" className="text-accent hover:underline font-semibold">
           Signup
         </Link>
