@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+    email: "",
+    password: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
+    e.preventDefault();
+    setIsLoading(true);
+
     // Simulate login
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    console.log('Login submitted:', formData)
-    
-    setIsLoading(false)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    console.log("Login submitted:", formData);
+
+    setIsLoading(false);
     // Redirect to dashboard after login
     // router.push('/dashboard')
-  }
+  };
 
   return (
     <div className="w-full max-w-md space-y-8">
@@ -60,7 +60,9 @@ export function LoginForm() {
             type="email"
             required
             value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             placeholder="john@example.com"
             className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-foreground text-sm"
           />
@@ -77,14 +79,16 @@ export function LoginForm() {
               onClick={() => setShowPassword(!showPassword)}
               className="text-xs text-accent hover:underline font-medium"
             >
-              {showPassword ? '👁️ Hide' : '👁️ Show'}
+              {showPassword ? "👁️ Hide" : "👁️ Show"}
             </button>
           </div>
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             required
             value={formData.password}
-            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             placeholder="••••••••"
             className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-foreground text-sm"
           />
@@ -92,8 +96,8 @@ export function LoginForm() {
 
         {/* Forgot Password */}
         <div className="text-right">
-          <Link 
-            href="/auth/forgot-password" 
+          <Link
+            href="/auth/forgot-password"
             className="text-xs text-accent hover:underline font-medium"
           >
             Forgot password?
@@ -106,17 +110,20 @@ export function LoginForm() {
           disabled={isLoading}
           className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? "Logging in..." : "Login"}
         </button>
       </form>
 
       {/* Sign Up Link */}
       <p className="text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
-        <Link href="/signup" className="text-accent hover:underline font-semibold">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className="text-accent hover:underline font-semibold"
+        >
           Signup
         </Link>
       </p>
     </div>
-  )
+  );
 }
