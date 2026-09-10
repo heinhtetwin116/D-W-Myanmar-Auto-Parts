@@ -20,7 +20,7 @@ const Hero = () => {
           Example Text
         </h1>
         <p className="text-lg md:text-xl text-gray-200 font-light">
-          Exaxmple Text 2
+          Example Text 2
         </p>
       </div>
     </section>
