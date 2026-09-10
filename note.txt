@@ -1,0 +1,132 @@
+  Only one hook. Here's the full picture:
+  ──────
+  ## What happens before and after git commit + git push
+  ### git commit
+
+    You run: git commit -m "feat: add something"
+
+  Husky intercepts → fires .husky/pre-commit → runs lint-staged
+  lint-staged looks at only your staged files (not the whole codebase) and runs:
+    *.{ts,tsx,js,mjs}          → eslint --fix   (auto-fixes lint issues, re-stages the file)
+    *.{ts,tsx,js,mjs,json,css,md} → prettier --write  (auto-formats, re-stages the file)
+   Outcome                                                                            | What happens
+  ------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------
+   ✅ All pass                                                                        | Commit is created
+   ❌ ESLint finds unfixable errors                                                   | Commit is aborted — you must fix manually
+   ❌ Prettier fails (unlikely with --write)                                          | Commit is aborted
+  │ There is no typecheck in the pre-commit hook — TypeScript errors won't block a commit locally.
+  ──────
+  ### git push
+
+  Nothing runs locally — no pre-push hook exists.
+
+  The push lands on GitHub and triggers two CI workflows in parallel:
+  #### ci.yml — triggered on every push to main / develop
+
+    quality job
+      ├── npm ci
+      ├── eslint .              ← full codebase, not just staged files
+      ├── tsc --noEmit          ← TypeScript check (first time errors are caught!)
+      └── prettier --check .    ← format verification (read-only)
+    
+    build job  (only runs if quality passes)
+      ├── npm ci
+      └── next build            ← full production build with Supabase env vars injected
+  #### codeql.yml — triggered on push to main / develop (if TS/JS files changed)
+
+    analyze job
+      ├── npm ci
+      ├── autobuild             ← CodeQL traces the build
+      └── CodeQL analyze        ← scans for security vulnerabilities
+          reports → GitHub Security tab
+  ──────
+  ### Full timeline
+
+    git commit
+        │
+        └─► pre-commit (husky)
+                └─► lint-staged (staged files only)
+                        ├─ ESLint --fix
+                        └─ Prettier --write
+                                │
+                        ✅ commit created  /  ❌ aborted
+
+    git push
+        │
+        └─► GitHub Actions (ci.yml)
+                ├─► quality: ESLint + tsc + Prettier check
+                └─► build:   next build  (needs quality ✅)
+
+        └─► GitHub Actions (codeql.yml)
+                └─► security scan → GitHub Security tab
+  ──────
+  ### Notable gap
+
+  TypeScript errors can slip into a commit because tsc --noEmit only runs in CI, not in the pre-commit hook. If you want to catch them locally before push, you can add a
+  commit-msg or pre-push hook:
+
+    # .husky/pre-push
+    npx tsc --noEmit
+
+    name: CodeQL Analysis
+
+on:
+  push:
+    branches: [main, development]
+    paths:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.mjs"
+      - ".github/workflows/codeql.yml"
+  pull_request:
+    branches: [main, development]
+    paths:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.mjs"
+      - ".github/workflows/codeql.yml"
+  schedule:
+    - cron: "0 0 * * 0" # Weekly on Sunday at midnight UTC
+
+jobs:
+  analyze:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

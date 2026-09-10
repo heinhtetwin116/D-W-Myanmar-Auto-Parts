@@ -1,29 +1,28 @@
 # Contributing Guide
 
-This document defines the conventions for branching, committing, and submitting changes to this project.
+This document defines the conventions for setting up, branching, committing, and submitting changes to **D&W Myanmar Auto Parts**.
 
-<!-- ## Table of Contents
+## 1. Local Setup
 
-- [Contributing Guide](#contributing-guide)
-  - [Table of Contents](#table-of-contents)
-  - [Branch Naming Convention](#branch-naming-convention)
-    - [Type](#type)
-    - [Short Description](#short-description)
-    - [Examples](#examples)
-  - [Commit Message Convention](#commit-message-convention)
-    - [Type](#type-1)
-    - [Scope](#scope-1)
-    - [Summary](#summary)
-    - [Body (optional)](#body-optional)
-    - [Footer (optional)](#footer-optional)
-    - [Examples](#examples-1)
-    - [Commit Hygiene](#commit-hygiene)
-  - [Pull Request Workflow](#pull-request-workflow)
-  - [Code Style](#code-style)
+```bash
+# 1. Clone the repository
+git clone https://github.com/<org>/D-W-Myanmar-Auto-Parts.git
+cd D-W-Myanmar-Auto-Parts
 
---- -->
+# 2. Install dependencies (uses package-lock.json exactly)
+make install
 
-## 1. Branch Naming Convention
+# 3. Set up environment variables
+cp .env.example .env
+# Fill in NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
+# 4. Start the development server
+make dev
+```
+
+> Husky git hooks are installed automatically as part of `npm ci` via the `prepare` script.
+
+## 2. Branch Naming
 
 Branches follow the pattern:
 
@@ -31,105 +30,112 @@ Branches follow the pattern:
 <type>/<short-description>
 ```
 
-### Type
+### Types
 
 | Type       | Use for                                                        |
 | ---------- | -------------------------------------------------------------- |
-| `ui`       | UI-only work (components, styling, layout) — no backend wiring |
-| `feature`  | New functionality (UI + logic + API integration)               |
+| `ui`       | UI-only work — components, styling, layout (no backend wiring) |
+| `feature`  | New functionality — UI + logic + Supabase integration          |
 | `fix`      | Bug fixes                                                      |
-| `refactor` | Code restructuring with no behavior change                     |
+| `refactor` | Code restructuring with no behaviour change                    |
 | `chore`    | Tooling, dependencies, config, build scripts                   |
 | `docs`     | Documentation only                                             |
 | `test`     | Adding or updating tests                                       |
 
-### Short Description
+### Rules
 
 - Lowercase, kebab-case
-- Concise (3–5 words max)
-- No issue numbers required, but may be appended if useful
+- 3–5 words max
+- Branch off `main`
 
 ### Examples
 
 ```
-ui/students-screen
-ui/header-avatar-size
-feature/teacher-attendance-api
-fix/grid-item-aspect-ratio
-feature/students-crud-endpoints
-fix/jwt-refresh-token-expiry
-chore/upgrade-nestjs-v11
+ui/product-listing-card
+ui/mobile-nav-drawer
+feature/enquiry-form-supabase
+fix/hero-image-overflow
+chore/upgrade-next-15
 docs/contributing-guide
 ```
 
-## 2. Commit Message Convention
+## 3. Commit Message Convention
 
 This project follows **[Conventional Commits](https://www.conventionalcommits.org/)**.
 
 ```
 <type>: <short summary>
 
-[optional body]
+[optional body — explain the why, not the what]
 
-[optional footer(s)]
+[optional footer — e.g. Closes #42]
 ```
 
-### Type
+### Types
 
-Must be one of:
+| Type       | Description                                             |
+| ---------- | ------------------------------------------------------- |
+| `feat`     | A new feature                                           |
+| `fix`      | A bug fix                                               |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `style`    | Formatting or whitespace only (no logic change)         |
+| `docs`     | Documentation only                                      |
+| `test`     | Adding or correcting tests                              |
+| `chore`    | Build process, dependency updates, tooling              |
+| `perf`     | Performance improvements                                |
+| `revert`   | Reverts a previous commit                               |
 
-| Type       | Description                                                  |
-| ---------- | ------------------------------------------------------------ |
-| `feat`     | A new feature                                                |
-| `fix`      | A bug fix                                                    |
-| `refactor` | Code change that neither fixes a bug nor adds a feature      |
-| `style`    | Formatting, whitespace, missing semicolons (no logic change) |
-| `docs`     | Documentation only changes                                   |
-| `test`     | Adding or correcting tests                                   |
-| `chore`    | Build process, dependency updates, tooling                   |
-| `perf`     | Performance improvements                                     |
-| `revert`   | Reverts a previous commit                                    |
-
-### Examples
+### Good examples
 
 ```
-feat: add fixed-height header with larger avatar
+feat: add product enquiry form with Supabase insert
 
-fix: correct grid item aspect ratio using onLayout measurement
+fix: correct mobile nav z-index overlap with hero section
 
-The previous aspect-square approach broke when label text wrapped
-to two lines, stretching the card taller than its width.
+refactor: extract ProductCard into shared components directory
 
-refactor: align Students screen with NativeWind/RNR conventions
+chore: upgrade eslint-config-next to 15.3.1
 
-chore: upgrade @nestjs/core and @nestjs/common to v11
-
-docs: add CONTRIBUTING.md with branch and commit conventions
-
-feat1: add students CRUD endpoints
-
-Closes #42
+docs: update environment variable names in README
 ```
 
-### Commit Hygiene
+### Commit hygiene
 
-- One logical change per commit — avoid bundling unrelated changes
-- Do not commit commented-out code or `console.log` / debug statements
-- Squash WIP commits before opening a PR (interactive rebase is fine)
+- One logical change per commit — do not bundle unrelated changes
+- No commented-out code, `console.log`, or debug statements
+- Squash WIP commits before opening a PR (`git rebase -i`)
 
-## Pull Request Workflow
+## 5. Pull Request Workflow
 
 1. Branch off `main` using the naming convention above.
-2. Keep PRs scoped to a single concern (one screen, one endpoint, one fix).
-3. PR title should follow the same format as a commit message:
+2. Keep PRs **scoped to a single concern** — one feature, one fix, one screen.
+3. PR title follows the same format as a commit message:
    ```
-   feat: add subjects screen
+   feat: add product enquiry form
    ```
-4. PR description should include:
+4. PR description must include:
    - **What** changed and **why**
-   - Screenshots/recordings for UI changes
-   - `// TODO: wire to backend API` markers called out explicitly if mock data is still in use
-5. Ensure the following pass before requesting review:
-   - `npm run lint`
-6. Request review — at least one approval required before merge.
-7. Squash-merge into `main` once approved.
+   - Screenshots or screen recordings for any UI change
+   - Call out any mock/hardcoded data still in use with a `// TODO: wire to API` comment
+5. Before requesting review, ensure all quality gates pass locally:
+   ```bash
+   make check   # runs lint + typecheck + format check
+   ```
+6. At least **one approval** is required before merge.
+7. **Squash-merge** into `main` once approved — keep the commit history clean.
+
+## 6. Code Style
+
+| Tool         | Config file          | What it enforces                |
+| ------------ | -------------------- | ------------------------------- |
+| ESLint       | `eslint.config.mjs`  | Code correctness, Next.js rules |
+| Prettier     | _(default config)_   | Consistent formatting           |
+| TypeScript   | `tsconfig.json`      | Strict type safety              |
+| Tailwind CSS | `tailwind.config.ts` | Design token–based styling      |
+
+### Key rules
+
+- Use **semantic design tokens** from `app/global.css` — do not use raw Tailwind colour classes like `bg-blue-500` or one-off inline styles.
+- No `any` types — use proper TypeScript types or generics.
+- Server Components are the default in the App Router; only opt into `"use client"` when strictly necessary (event handlers, browser APIs, React hooks).
+- Keep components small and single-purpose. Extract shared UI into `components/`.
