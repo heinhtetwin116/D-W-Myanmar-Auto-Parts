@@ -1,65 +1,122 @@
-"use client";
+'use client'
 
-import { createClient } from "@/lib/supabase/client";
-import { Button, Card, Form, Input, message } from "antd";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const [form] = Form.useForm();
+export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
 
-  const handleLogin = async (values: { email: string; password: string }) => {
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-      if (error) throw error;
-      router.push("/protected");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
-      setError(errorMessage);
-      message.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    // Simulate login
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    console.log('Login submitted:', formData)
+    
+    setIsLoading(false)
+    // Redirect to dashboard after login
+    // router.push('/dashboard')
+  }
 
   return (
-    <div className={className} {...props}>
-      <Card title="Login" extra={<Link href="/auth/forgot-password">Forgot your password?</Link>} style={{ width: "100%" }}>
-        <Form form={form} onFinish={handleLogin} layout="vertical">
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: "Please input your email" }]}>
-            <Input placeholder="m@example.com" type="email" />
-          </Form.Item>
-          <Form.Item name="password" label="Password" rules={[{ required: true, message: "Please input your password" }]}>
-            <Input.Password placeholder="Enter password" />
-          </Form.Item>
-          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={isLoading}>
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/sign-up" style={{ marginLeft: 8 }}>
-            Sign up
+    <div className="w-full max-w-md space-y-8">
+      {/* Logo Section */}
+      <div className="flex justify-center">
+        <Image
+          src="/DW_FullLogo.png"
+          alt="Company Logo"
+          width={72}
+          height={72}
+          priority
+          className="h-16 w-auto object-contain"
+        />
+      </div>
+
+      {/* Heading */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-primary font-serif">
+          Welcome Back
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Please login to your account
+        </p>
+      </div>
+
+      {/* Sign In Form */}
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* Email Field */}
+        <div>
+          <label className="block text-sm font-semibold text-primary mb-1">
+            Email address
+          </label>
+          <input
+            type="email"
+            required
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            placeholder="john@example.com"
+            className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-foreground text-sm"
+          />
+        </div>
+
+        {/* Password Field */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-semibold text-primary">
+              Password
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-xs text-accent hover:underline font-medium"
+            >
+              {showPassword ? '👁️ Hide' : '👁️ Show'}
+            </button>
+          </div>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            required
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            placeholder="••••••••"
+            className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-foreground text-sm"
+          />
+        </div>
+
+        {/* Forgot Password */}
+        <div className="text-right">
+          <Link 
+            href="/auth/forgot-password" 
+            className="text-xs text-accent hover:underline font-medium"
+          >
+            Forgot password?
           </Link>
         </div>
-      </Card>
+
+        {/* Login Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+
+      {/* Sign Up Link */}
+      <p className="text-center text-sm text-muted-foreground">
+        Don't have an account?{' '}
+        <Link href="/signup" className="text-accent hover:underline font-semibold">
+          Signup
+        </Link>
+      </p>
     </div>
-  );
+  )
 }
