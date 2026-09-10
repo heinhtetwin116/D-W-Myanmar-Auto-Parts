@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+
+const manrope = Manrope({ 
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${geistSans.variable} ${manrope.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

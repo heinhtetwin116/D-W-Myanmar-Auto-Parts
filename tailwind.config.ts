@@ -10,6 +10,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-manrope)", "sans-serif"], 
+        manrope: ["var(--font-manrope)", "sans-serif"], 
+        geist: ["var(--font-geist-sans)", "sans-serif"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
