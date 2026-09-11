@@ -74,31 +74,38 @@ const Header = () => {
 
           {/* Categories Dropdown */}
           <div
-            className="relative flex items-center"
+            className="relative"
             onMouseEnter={() => setIsCategoryHovered(true)}
             onMouseLeave={() => setIsCategoryHovered(false)}
           >
-            <button className="flex items-center gap-1 hover:text-[#A81C24] transition-colors py-1 cursor-pointer">
-              Categories <ChevronDown size={15} />
+            <button className={`flex items-center gap-1 transition-colors py-4 cursor-pointer ${isCategoryHovered ? 'text-[#A81C24]' : 'hover:text-[#A81C24]'}`}>
+              Categories 
+              <ChevronDown size={15} className={`transition-transform duration-200 ${isCategoryHovered ? 'rotate-180' : ''}`} />
             </button>
-
-            {/* Dropdown Menu */}
             {isCategoryHovered && (
-              <div className="absolute top-full left-0 w-64 bg-white shadow-xl border border-gray-100 rounded-b-lg py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                {categories.map((cat, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/category/${cat.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-[#F4F6F8] hover:text-[#0F172A] transition-colors"
-                  >
-                    <cat.icon size={16} className="text-gray-400" />
-                    {cat.name}
-                  </Link>
-                ))}
+              <div className="absolute top-full left-0 w-[500px] bg-white shadow-2xl border border-gray-100 rounded-b-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                {/* Dropdown Header */}
+                <div className="bg-[#F4F6F8] px-6 py-3 border-b border-gray-100 flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Shop by Category</span>
+                  <Link href="/categories" className="text-xs font-semibold text-[#A81C24] hover:underline">View All</Link>
+                </div>
+                <div className="grid grid-cols-2 gap-1 p-2">
+                  {categories.map((cat, idx) => (
+                    <Link
+                      key={idx}
+                      href={`/category/${cat.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+                      className="group flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-600 hover:bg-[#F4F6F8] hover:text-[#0F172A] transition-all duration-200"
+                    >
+                      <div className="bg-white p-2 rounded-md border border-gray-100 shadow-sm group-hover:border-[#A81C24]/30 group-hover:bg-[#A81C24]/5 transition-colors">
+                        <cat.icon size={16} className="text-gray-400 group-hover:text-[#A81C24] transition-colors" />
+                      </div>
+                      <span className="font-medium">{cat.name}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>
-
           <Link href="/inventory" className="hover:text-[#A81C24] transition-colors">
             Inventory
           </Link>

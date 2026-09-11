@@ -96,7 +96,7 @@ export default function Home() {
         <section className="bg-white py-16 border-t border-gray-200 w-full">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 border-b border-gray-200 pb-4 gap-4">
-              <h2 className="text-2xl font-bold text-[#0F172A]">Latest Products</h2>
+              <h2 className="text-2xl font-bold text-[#0F172A]">New Arrivals</h2>
               <div className="flex flex-wrap gap-4 text-sm font-medium">
                 <button className="text-[#0F172A] bg-[#F4F6F8] px-4 py-1.5 rounded shadow-sm border border-gray-200">New Arrivals</button>
                 <button className="text-gray-500 hover:text-[#0F172A]">Best Sellers</button>
