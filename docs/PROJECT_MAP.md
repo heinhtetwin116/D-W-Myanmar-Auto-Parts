@@ -83,10 +83,11 @@ priorities shift, and log the actual state of each item in `MEMORY.md`.
 ### v1 — Public site
 
 - Marketing/home pages using the D&W design system (retire the starter
-  scaffold pages)
+  scaffold pages) ✅
 - Product & Category data model + ERD finalized in Supabase
-- Public, read-only product catalog (browse/search/filter)
-- Manrope typography and full color/status token set applied consistently
+- Public, read-only product catalog (browse/search/filter) ✅ (local JSON, Supabase migration pending)
+- Manrope typography and full color/status token set applied consistently ✅
+- Multi-language support (Myanmar/English) ✅
 
 ### v2 — Operational features
 
@@ -97,7 +98,6 @@ priorities shift, and log the actual state of each item in `MEMORY.md`.
 ### Later / not yet scoped
 
 - Ordering, quoting, or checkout flows
-- Multi-language support (Myanmar/English)
 - Analytics and reporting
 
 ## Related documents

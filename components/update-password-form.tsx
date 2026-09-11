@@ -4,11 +4,19 @@ import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Form, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+
+interface UpdatePasswordFormProps {
+  locale: "my" | "en";
+  className?: string;
+}
 
 export function UpdatePasswordForm({
+  locale,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: UpdatePasswordFormProps) {
+  const t = useTranslations("auth.update_password");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -23,10 +31,11 @@ export function UpdatePasswordForm({
         password: values.password,
       });
       if (error) throw error;
-      router.push("/protected");
+      message.success(t("success"));
+      router.push(`/${locale}/protected`);
+      router.refresh();
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : t("error");
       setError(errorMessage);
       message.error(errorMessage);
     } finally {
@@ -36,24 +45,26 @@ export function UpdatePasswordForm({
 
   return (
     <div className={className} {...props}>
-      <Card title="Reset Your Password" style={{ width: "100%" }}>
+      <Card title={t("title")} style={{ width: "100%" }}>
         <Form onFinish={handleUpdatePassword} layout="vertical">
           <Form.Item
             name="password"
-            label="New password"
+            label={t("password")}
             rules={[
-              { required: true, message: "Please input your new password" },
-              { min: 8, message: "Password must be at least 8 characters" },
+              { required: true, message: t("password_required") },
+              { min: 8, message: t("password_min_length") },
             ]}
           >
-            <Input.Password placeholder="New password" />
+            <Input.Password placeholder={t("password_placeholder")} />
           </Form.Item>
           {error && (
-            <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+            <div style={{ color: "hsl(var(--destructive))", marginBottom: 16 }}>
+              {error}
+            </div>
           )}
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={isLoading}>
-              Save new password
+              {isLoading ? t("submitting") : t("submit")}
             </Button>
           </Form.Item>
         </Form>
