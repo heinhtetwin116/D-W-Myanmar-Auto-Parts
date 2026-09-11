@@ -41,7 +41,6 @@ const Testimonials = () => {
   return (
     <section className="bg-[#F4F6F8] py-20 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-6">
-
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-[#A81C24] mb-3 block">
@@ -51,8 +50,8 @@ const Testimonials = () => {
             Trusted by Professionals &amp; Enthusiasts
           </h2>
           <p className="text-gray-500 text-sm md:text-base leading-relaxed">
-            Don&apos;t just take our word for it. See what our customers have to say
-            about their experience with D&amp;W Auto Parts.
+            Don&apos;t just take our word for it. See what our customers have to
+            say about their experience with D&amp;W Auto Parts.
           </p>
         </div>
 
@@ -113,10 +112,10 @@ const Testimonials = () => {
         {/* Bottom Trust Indicator */}
         <div className="mt-16 text-center">
           <p className="text-xs text-gray-400 font-medium">
-            Join <span className="font-bold text-[#0F172A]">2,000+</span> happy customers who trust D&amp;W Auto Parts.
+            Join <span className="font-bold text-[#0F172A]">2,000+</span> happy
+            customers who trust D&amp;W Auto Parts.
           </p>
         </div>
-
       </div>
     </section>
   );

@@ -47,7 +47,6 @@ const FAQ = () => {
   return (
     <section className="bg-white py-20 border-t border-gray-200">
       <div className="max-w-4xl mx-auto px-6">
-        
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-[#A81C24] mb-3 flex items-center justify-center gap-2">
@@ -118,14 +117,13 @@ const FAQ = () => {
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-            <p className="text-sm text-gray-500">
-                Still have questions?{" "}
-                <a href="#" className="font-bold text-[#A81C24] hover:underline">
-                    Contact our support team
-                </a>
-            </p>
+          <p className="text-sm text-gray-500">
+            Still have questions?{" "}
+            <a href="#" className="font-bold text-[#A81C24] hover:underline">
+              Contact our support team
+            </a>
+          </p>
         </div>
-
       </div>
     </section>
   );
