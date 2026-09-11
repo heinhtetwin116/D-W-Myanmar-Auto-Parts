@@ -1,8 +1,8 @@
-import { updateSession } from "@/lib/supabase/proxy";
+// import { updateSession } from "@/lib/supabase/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const pathnameHasLocale = locales.some(
@@ -14,7 +14,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
   }
 
-  return await updateSession(request);
+  // Temporarily disabling auth checks to look around
+  // return await updateSession(request);
+  return NextResponse.next();
 }
 
 export const config = {

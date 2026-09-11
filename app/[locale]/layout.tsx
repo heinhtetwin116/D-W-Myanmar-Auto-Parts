@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import "@/app/globals.css";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
 
 const antdLocales = {
@@ -33,38 +35,27 @@ export default async function LocaleLayout({
     ? (locale as Locale)
     : defaultLocale;
 
+  setRequestLocale(validLocale);
+  const messages = await getMessages({ locale: validLocale });
+
   if (!locales.includes(validLocale)) notFound();
 
   return (
-    <html lang={validLocale} suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-sans antialiased flex min-h-screen flex-col">
-        <AntdRegistry>
-          <ConfigProvider locale={antdLocales[validLocale]}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Header locale={validLocale} />
-              <main className="flex-1">{children}</main>
-              <Footer locale={validLocale} />
-            </ThemeProvider>
-          </ConfigProvider>
-        </AntdRegistry>
-      </body>
-    </html>
+    <AntdRegistry>
+      <ConfigProvider locale={antdLocales[validLocale]}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider messages={messages} locale={validLocale}>
+            <Header locale={validLocale} />
+            <main className="flex-1">{children}</main>
+            <Footer locale={validLocale} />
+          </NextIntlClientProvider>
+        </ThemeProvider>
+      </ConfigProvider>
+    </AntdRegistry>
   );
 }

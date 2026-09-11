@@ -1,4 +1,4 @@
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,10 +9,8 @@ import {
   DollarSign,
   Star,
 } from "lucide-react";
-import { Card, Row, Col, Button, Typography, Badge } from "antd";
+import { Card, Row, Col, Button, Badge } from "antd";
 import { createClient } from "@/lib/supabase/server";
-
-const { Title, Text, Paragraph } = Typography;
 
 interface HomePageProps {
   params: Promise<{ locale: "my" | "en" }>;
@@ -51,6 +49,7 @@ async function getStats() {
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const messages = await getMessages({ locale });
   const t = messages;
   const heroT = t.hero;
@@ -99,15 +98,12 @@ export default async function HomePage({ params }: HomePageProps) {
                 ? "20+ နှစ်များ၏ အတွေ့အကြုံ"
                 : "20+ Years of Excellence"}
             </Badge>
-            <Title
-              level={1}
-              className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-foreground mb-6"
-            >
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-foreground mb-6">
               {heroT.title}
-            </Title>
-            <Paragraph className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            </h1>
+            <p className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               {heroT.subtitle}
-            </Paragraph>
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href={`/${locale}/products`}>
                 <Button
@@ -136,19 +132,16 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="section-padding bg-background">
         <div className="container-custom">
           <div className="mx-auto max-w-2xl text-center mb-16">
-            <Title
-              level={2}
-              className="text-3xl lg:text-4xl font-bold text-foreground mb-4"
-            >
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
               {locale === "my"
                 ? "လsiębiorလိုအပ်သော ပစ္စည်းများကို ရွေးချယ်ရန် �ategoriလစ်ထုတ်ပေးရန်"
                 : "Why Choose D&W Auto Parts?"}
-            </Title>
-            <Paragraph className="text-muted-foreground text-lg">
+            </h2>
+            <p className="text-muted-foreground text-lg">
               {locale === "my"
                 ? "ကျွန်ုပ်တို့သည် သင့်အုပ်စနစ်အတွက်ကိုယ်တိုင်သော ပစ္စည်းများကို ရွေးချယ်ပေးရန် စေတနာ့စรั квартиစိတ်ဖြင့်အကူအညီပေးထားသည်။"
                 : "We are committed to helping you find the perfect parts for your vehicle with confidence and ease."}
-            </Paragraph>
+            </p>
           </div>
 
           <Row gutter={[24, 16]} className="gap-8">
@@ -160,12 +153,10 @@ export default async function HomePage({ params }: HomePageProps) {
                       <prop.icon className="text-xl" />
                     </div>
                     <div>
-                      <Title level={4} className="text-foreground mb-2">
-                        {prop.title}
-                      </Title>
-                      <Text className="text-muted-foreground text-sm">
+                      <h4 className="text-foreground mb-2">{prop.title}</h4>
+                      <span className="text-muted-foreground text-sm">
                         {prop.description}
-                      </Text>
+                      </span>
                     </div>
                   </div>
                 </Card>
@@ -179,17 +170,14 @@ export default async function HomePage({ params }: HomePageProps) {
         <div className="container-custom">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-12">
             <div>
-              <Title
-                level={2}
-                className="text-3xl lg:text-4xl font-bold text-foreground mb-2"
-              >
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
                 {featuredT.title}
-              </Title>
-              <Text className="text-muted-foreground">
+              </h2>
+              <span className="text-muted-foreground">
                 {locale === "my"
                   ? "ကျွန်ုပ်တို့ရဲ့ အနည်းဆုံးရောင်းချများနှင့် လူဝယ်များအနေအထားတွင်လည်း အရမ်းထမင့်သော ပစ္စည်းများ"
                   : "Our top-selling and most trusted products"}
-              </Text>
+              </span>
             </div>
             <Link href={`/${locale}/products`} className="mt-4 lg:mt-0">
               <Button type="text" className="text-accent hover:bg-accent/10">
@@ -249,14 +237,11 @@ export default async function HomePage({ params }: HomePageProps) {
                       </div>
                       <div className="p-4 space-y-2">
                         <div className="flex items-center justify-between">
-                          <Title
-                            level={4}
-                            className="text-foreground line-clamp-1 group-hover:text-accent transition-colors"
-                          >
+                          <h4 className="text-foreground line-clamp-1 group-hover:text-accent transition-colors">
                             {locale === "my"
                               ? product.name_my
                               : product.name_en}
-                          </Title>
+                          </h4>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span className="px-2 py-1 bg-muted rounded-full text-xs">
@@ -264,13 +249,13 @@ export default async function HomePage({ params }: HomePageProps) {
                           </span>
                         </div>
                         <div className="flex items-center justify-between pt-2 border-t border-border">
-                          <Text
-                            type="secondary"
-                            strong
+                          <span
+                            // type="secondary"
+                            // strong
                             className="text-xl text-accent"
                           >
                             {product.price.toLocaleString()} {commonT.currency}
-                          </Text>
+                          </span>
                         </div>
                       </div>
                     </Card>
@@ -287,11 +272,11 @@ export default async function HomePage({ params }: HomePageProps) {
                 height={200}
                 className="mx-auto mb-4 opacity-50"
               />
-              <Title level={3} className="text-muted-foreground">
+              <h3 className="text-muted-foreground">
                 {locale === "my"
                   ? "အချိန်နဲ့ ပစ္စည်းများထည့်သွင်းနေပါသည်"
                   : "Products coming soon"}
-              </Title>
+              </h3>
             </div>
           )}
         </div>
@@ -340,12 +325,10 @@ export default async function HomePage({ params }: HomePageProps) {
 
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-custom text-center">
-          <Title level={2} className="text-3xl lg:text-4xl font-bold mb-4">
-            {ctaT.title}
-          </Title>
-          <Paragraph className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4">{ctaT.title}</h2>
+          <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
             {ctaT.subtitle}
-          </Paragraph>
+          </p>
           <Link href={`/${locale}/contact`}>
             <Button
               type="default"
