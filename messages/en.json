@@ -34,6 +34,10 @@
       "in_stock": "In Stock",
       "low_stock": "Low Stock",
       "out_of_stock": "Out of Stock"
+    },
+    "all_categories": "All Categories",
+    "featuredProducts": {
+      "title": "Featured Products"
     }
   },
   "nav": {
@@ -90,6 +94,7 @@
     "phone": "+95 1 234 5678",
     "email": "info@dwautoparts.com.mm",
     "follow_us": "Follow Us",
+    "hours": "Mon - Sat: 9:00 AM - 6:00 PM",
     "copyright": "© 2024 D&W Myanmar Auto Parts. All rights reserved."
   },
   "about": {
@@ -103,6 +108,7 @@
     "vision_title": "Our Vision",
     "vision_description": "To become Myanmar's premier auto parts destination, serving over 80% of the country's automotive parts market.",
     "values_title": "Our Values",
+    "values_description": "Our core values guide every decision we make and every interaction we have.",
     "values": {
       "integrity": {
         "title": "Integrity",
@@ -219,5 +225,100 @@
     "update_success": "Updated successfully",
     "delete_success": "Deleted successfully",
     "delete_confirm": "Are you sure you want to delete this item? This action cannot be undone."
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "show_password": "Show",
+      "hide_password": "Hide",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot password?",
+      "submit": "Login",
+      "submitting": "Signing in...",
+      "no_account": "Don't have an account?",
+      "signup_link": "Sign up"
+    },
+    "signup": {
+      "title": "Sign Up",
+      "subtitle": "Create your account",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "show_password": "Show",
+      "hide_password": "Hide",
+      "password_requirements": "Password requirements:",
+      "requirements": {
+        "lowercase": "One lowercase letter",
+        "uppercase": "One uppercase letter",
+        "number": "One number",
+        "special": "One special character",
+        "min_length": "8+ characters"
+      },
+      "submit": "Get Started!",
+      "submitting": "Creating account...",
+      "has_account": "Already have an account?",
+      "login_link": "Login"
+    },
+    "forgot_password": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email and we'll send you a link to reset your password.",
+      "email": "Email",
+      "email_required": "Please enter your email",
+      "email_invalid": "Please enter a valid email",
+      "submit": "Send reset email",
+      "submitting": "Sending...",
+      "success": "Password reset email sent! Check your inbox.",
+      "back_to_login": "Back to login"
+    },
+    "update_password": {
+      "title": "Update Password",
+      "subtitle": "Enter your new password below.",
+      "password": "New Password",
+      "confirm_password": "Confirm Password",
+      "password_required": "Please enter your new password",
+      "password_min_length": "Password must be at least 8 characters",
+      "password_placeholder": "New password",
+      "submit": "Update Password",
+      "submitting": "Updating...",
+      "success": "Password updated successfully."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "code_error": "Error code",
+      "unspecified": "An unspecified error occurred."
+    }
+  },
+  "features": {
+    "fast_delivery": "Fast Delivery",
+    "fast_delivery_desc": "Delivery within 1-3 days across Myanmar",
+    "support": "24/7 Support",
+    "support_desc": "Premium customer service and technical assistance",
+    "easy_returns": "Easy Returns",
+    "easy_returns_desc": "Free 30-day returns on all orders",
+    "best_price": "Best Price",
+    "best_price_desc": "Direct from manufacturer - lowest prices guaranteed"
+  },
+  "categories": {
+    "all": "All",
+    "engine": "Engine Parts",
+    "brakes": "Brakes",
+    "suspension": "Suspension",
+    "electrical": "Electrical",
+    "filters": "Filters",
+    "lighting": "Lighting",
+    "body": "Body Parts",
+    "fluids": "Fluids & Lubricants",
+    "new_arrivals": "New Arrivals",
+    "best_sellers": "Best Sellers"
+  },
+  "latest_products": {
+    "title": "Latest Products"
+  },
+  "value_props": {
+    "title": "Why Choose D&W Auto Parts?",
+    "subtitle": "We combine carefully curated products with exceptional service to keep your vehicle running at its best with confidence and peace of mind."
   }
 }

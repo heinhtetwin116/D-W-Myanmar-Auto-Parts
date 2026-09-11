@@ -3,8 +3,18 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { message } from "antd";
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  locale: "my" | "en";
+}
+
+export function SignUpForm({ locale }: SignUpFormProps) {
+  const t = useTranslations("auth.signup");
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
@@ -12,6 +22,7 @@ export function SignUpForm() {
     email: "",
     username: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const hasLowercase = /[a-z]/.test(password);
   const hasUppercase = /[A-Z]/.test(password);
@@ -22,11 +33,46 @@ export function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Signup submitted:", { ...formData, password });
+    // Client-side validation
+    if (
+      !hasLowercase ||
+      !hasUppercase ||
+      !hasNumber ||
+      !hasSpecial ||
+      !hasMinLength
+    ) {
+      setError(t("password_requirements"));
+      setIsLoading(false);
+      return;
+    }
 
-    setIsLoading(false);
+    const supabase = createClient();
+
+    try {
+      const { error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: password,
+        options: {
+          data: {
+            username: formData.username,
+          },
+        },
+      });
+
+      if (authError) throw authError;
+
+      message.success(t("submitting"));
+      router.push(`/${locale}/auth/sign-up-success`);
+      router.refresh();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : t("error");
+      setError(errorMessage);
+      message.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,18 +92,16 @@ export function SignUpForm() {
       {/* Heading */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-primary font-serif">
-          Create Account
+          {t("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Get started with your account
-        </p>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {/* Sign Up Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="block text-sm font-semibold text-primary mb-1">
-            Email address
+            {t("email")}
           </label>
           <input
             type="email"
@@ -73,7 +117,7 @@ export function SignUpForm() {
 
         <div>
           <label className="block text-sm font-semibold text-primary mb-1">
-            Username
+            {t("username")}
           </label>
           <input
             type="text"
@@ -90,14 +134,14 @@ export function SignUpForm() {
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="block text-sm font-semibold text-primary">
-              Password
+              {t("password")}
             </label>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-xs text-accent hover:underline font-medium"
             >
-              {showPassword ? "👁️ Hide" : "👁️ Show"}
+              {showPassword ? t("hide_password") : t("show_password")}
             </button>
           </div>
           <input
@@ -113,39 +157,46 @@ export function SignUpForm() {
         {/* Password Requirements */}
         <div className="grid grid-cols-2 gap-y-1 text-xs py-1 text-muted-foreground">
           <span className={hasLowercase ? "text-emerald-600 font-medium" : ""}>
-            • One lowercase
+            • {t("requirements.lowercase")}
           </span>
           <span className={hasSpecial ? "text-emerald-600 font-medium" : ""}>
-            • One special char
+            • {t("requirements.special")}
           </span>
           <span className={hasUppercase ? "text-emerald-600 font-medium" : ""}>
-            • One uppercase
+            • {t("requirements.uppercase")}
           </span>
           <span className={hasMinLength ? "text-emerald-600 font-medium" : ""}>
-            • 8+ characters
+            • {t("requirements.min_length")}
           </span>
           <span className={hasNumber ? "text-emerald-600 font-medium" : ""}>
-            • One number
+            • {t("requirements.number")}
           </span>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="text-sm text-destructive text-center" role="alert">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hex-bloom"
         >
-          {isLoading ? "Creating account..." : "Get Started!"}
+          {isLoading ? t("submitting") : t("submit")}
         </button>
       </form>
 
       {/* Login Link */}
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("has_account")}{" "}
         <Link
-          href="/login"
+          href={`/${locale}/auth/login`}
           className="text-accent hover:underline font-semibold"
         >
-          Login
+          {t("login_link")}
         </Link>
       </p>
     </div>

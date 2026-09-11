@@ -1,204 +1,197 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { MenuOutlined, CloseOutlined, GlobalOutlined } from "@ant-design/icons";
-import { Button, Dropdown, Space } from "antd";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import {
+  Search,
+  Menu,
+  ChevronDown,
+  Settings,
+  Disc,
+  Activity,
+  Filter,
+  Zap,
+  Snowflake,
+  RefreshCw,
+  Car,
+  Droplet,
+  Wrench,
+} from "lucide-react";
 
-interface HeaderProps {
-  locale: "my" | "en";
-}
+const categories = [
+  { name: "Engine", icon: Settings },
+  { name: "Brakes", icon: Disc },
+  { name: "Suspension", icon: Activity },
+  { name: "Filtration", icon: Filter },
+  { name: "Electrical", icon: Zap },
+  { name: "Cooling", icon: Snowflake },
+  { name: "Transmission", icon: RefreshCw },
+  { name: "Body / Exterior", icon: Car },
+  { name: "Oils / Fluids", icon: Droplet },
+  { name: "Tools / Accessories", icon: Wrench },
+];
 
-export function Header({ locale }: HeaderProps) {
-  const t = useTranslations("common");
-  const navT = useTranslations("nav");
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const menuItems = [
-    { key: "home", label: navT("home"), href: `/${locale}/` },
-    { key: "about", label: navT("about"), href: `/${locale}/about` },
-    { key: "products", label: navT("products"), href: `/${locale}/products` },
-    { key: "contact", label: navT("contact"), href: `/${locale}/contact` },
-  ];
-
-  const localeMenuItems = [
-    { key: "my", label: "မြန်မာ 🇲🇲", locale: "my" as const },
-    { key: "en", label: "English 🇺🇸", locale: "en" as const },
-  ];
-
-  const handleLocaleChange = (newLocale: "my" | "en") => {
-    const newPathname = pathname.replace(`/${locale}/`, `/${newLocale}/`);
-    router.push(newPathname);
-  };
+const Header = () => {
+  const [isCategoryHovered, setIsCategoryHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container-custom">
-        <div className="flex h-16 items-center justify-between">
-          <Link
-            href={`/${locale}/`}
-            className="flex items-center space-x-2"
-            aria-label="D&W Myanmar Auto Parts"
-          >
-            <Image
-              src="/DW_FullLogo.png"
-              alt="D&W Myanmar Auto Parts"
-              width={120}
-              height={40}
-              className="h-10 w-auto object-contain"
-            />
-          </Link>
-
-          <nav
-            className="hidden md:flex items-center space-x-8"
-            aria-label="Main navigation"
-          >
-            {menuItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-accent ${
-                  pathname === item.href ||
-                  (item.key !== "home" && pathname.startsWith(item.href))
-                    ? "text-accent"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="hidden md:flex items-center space-x-4">
-            <Dropdown
-              menu={{
-                items: localeMenuItems.map((item) => ({
-                  key: item.key,
-                  label: item.label,
-                  onClick: () => handleLocaleChange(item.locale),
-                })),
-              }}
-              placement="bottomRight"
+    <header className="w-full bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm relative">
+      {/* TOP BAR */}
+      <div className="bg-[#F4F6F8] border-b border-gray-200 text-xs font-medium text-gray-600 relative overflow-hidden hidden md:block">
+        <div className="max-w-7xl mx-auto flex justify-between items-center h-8 px-6 relative z-10">
+          {/* Left Red Banner */}
+          <div className="bg-[#A81C24] text-white flex items-center gap-6 px-6 h-full font-semibold relative before:absolute before:right-[-10px] before:top-0 before:border-l-[10px] before:border-l-[#A81C24] before:border-b-[32px] before:border-b-transparent">
+            <Link
+              href="/about"
+              className="hover:text-gray-200 transition-colors"
             >
-              <Button
-                type="text"
-                className="text-sm font-medium text-foreground hover:text-accent flex items-center gap-1"
-              >
-                <GlobalOutlined className="text-base" />
-                {locale === "my" ? "မြန်မာ" : "English"}
-              </Button>
-            </Dropdown>
-
-            <Space size="small" className="hidden sm:flex">
-              <Link href={`/${locale}/auth/login`}>
-                <Button type="text" className="text-sm font-medium">
-                  {t("login")}
-                </Button>
-              </Link>
-              <Link href={`/${locale}/auth/signup`}>
-                <Button type="primary" className="hex-bloom">
-                  {t("signup")}
-                </Button>
-              </Link>
-            </Space>
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Contacts
+            </Link>
+            <Link
+              href="/track"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Track Order
+            </Link>
           </div>
 
-          <div className="md:hidden flex items-center space-x-2">
-            <Button
-              type="text"
-              size="small"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <MenuOutlined className="text-xl" />
-            </Button>
+          {/* Center Tagline */}
+          <div className="text-[#0F172A] tracking-wider uppercase text-[10px] font-bold">
+            Auto Parts for Cars
+          </div>
+
+          {/* Right Dark Navy Banner */}
+          <div className="bg-[#0F172A] text-white flex items-center gap-4 px-6 h-full relative before:absolute before:left-[-10px] before:top-0 before:border-r-[10px] before:border-r-[#0F172A] before:border-b-[32px] before:border-b-transparent">
+            <span>
+              Currency: <strong className="text-gray-300">USD</strong>
+            </span>
+            <span>
+              Language: <strong className="text-gray-300">EN</strong>
+            </span>
           </div>
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background">
-          <div className="container-custom py-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <Button
-                type="text"
-                size="small"
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-label="Close menu"
-              >
-                <CloseOutlined className="text-xl" />
-              </Button>
-            </div>
-            <nav
-              className="flex flex-col space-y-2"
-              aria-label="Mobile navigation"
-            >
-              {menuItems.map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className={`text-base font-medium px-2 py-2 rounded-md ${
-                    pathname === item.href ||
-                    (item.key !== "home" && pathname.startsWith(item.href))
-                      ? "bg-accent/10 text-accent"
-                      : "text-muted-foreground"
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-              <Dropdown
-                menu={{
-                  items: localeMenuItems.map((item) => ({
-                    key: item.key,
-                    label: item.label,
-                    onClick: () => handleLocaleChange(item.locale),
-                  })),
-                }}
-                placement="bottomRight"
-              >
-                <Button
-                  type="text"
-                  className="w-full justify-start text-sm font-medium text-foreground"
-                >
-                  <GlobalOutlined className="mr-2" />
-                  {t("language")}: {locale === "my" ? "မြန်မာ" : "English"}
-                </Button>
-              </Dropdown>
-              <Link
-                href={`/${locale}/auth/login`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button
-                  type="text"
-                  className="w-full justify-start text-sm font-medium text-foreground"
-                >
-                  {t("login")}
-                </Button>
-              </Link>
-              <Link
-                href={`/${locale}/auth/signup`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button
-                  type="primary"
-                  className="w-full justify-start hex-bloom"
-                >
-                  {t("signup")}
-                </Button>
-              </Link>
-            </div>
+      {/* 2. MAIN HEADER */}
+      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4 relative">
+        {/* Left Side Navigation */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#0F172A] flex-1">
+          <Link href="/" className="hover:text-[#A81C24] transition-colors">
+            Home
+          </Link>
+
+          {/* Categories Dropdown */}
+          <div
+            className="relative flex items-center"
+            onMouseEnter={() => setIsCategoryHovered(true)}
+            onMouseLeave={() => setIsCategoryHovered(false)}
+          >
+            <button className="flex items-center gap-1 hover:text-[#A81C24] transition-colors py-1 cursor-pointer">
+              Categories <ChevronDown size={15} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isCategoryHovered && (
+              <div className="absolute top-full left-0 w-64 bg-white shadow-xl border border-gray-100 rounded-b-lg py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                {categories.map((cat, idx) => (
+                  <Link
+                    key={idx}
+                    href={`/category/${cat.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-[#F4F6F8] hover:text-[#0F172A] transition-colors"
+                  >
+                    <cat.icon size={16} className="text-gray-400" />
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Link
+            href="/inventory"
+            className="hover:text-[#A81C24] transition-colors"
+          >
+            Inventory
+          </Link>
+          <Link
+            href="/auth/login"
+            className="hover:text-[#A81C24] transition-colors"
+          >
+            Account
+          </Link>
+        </nav>
+
+        {/* Center Logo Slot */}
+        <div className="flex-shrink-0 flex items-center justify-center relative z-30">
+          <Link
+            href="/"
+            aria-label="D and W Auto Parts Home"
+            className="relative group"
+          >
+            {imgError ? (
+              <span className="text-2xl font-black tracking-tight text-[#0F172A]">
+                DW<span className="text-[#A81C24]">PARTS</span>
+              </span>
+            ) : (
+              <div className="relative w-36 h-28 -my-6 flex items-center justify-center transition-transform hover:scale-105">
+                <Image
+                  src="/DW_FullLogo.png"
+                  alt="D&W Auto Parts Logo"
+                  fill
+                  className="object-contain drop-shadow-md"
+                  priority
+                  onError={() => setImgError(true)}
+                />
+              </div>
+            )}
+          </Link>
+        </div>
+
+        {/* Right Side My Account */}
+        <div className="flex items-center justify-end gap-6 flex-1">
+          <Link
+            href="/auth/login"
+            className="flex items-center gap-2 text-sm font-semibold text-[#0F172A] hover:text-[#A81C24] transition-colors"
+          >
+            <Menu size={18} />
+            <span className="hidden sm:inline">My Account</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ANGLED BOTTOM SEARCH TAB */}
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-5 z-20 hidden md:block">
+        <div
+          className="bg-white px-8 py-1.5 shadow-md flex items-center justify-center border-b border-x border-gray-200"
+          style={{
+            clipPath: "polygon(0 0, 100% 0, 86% 100%, 14% 100%)",
+            width: "440px",
+          }}
+        >
+          <div className="relative w-full max-w-xs flex items-center">
+            <Car size={16} className="text-gray-400 mr-2 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Search by..."
+              className="w-full bg-transparent border-b border-gray-300 text-xs py-0.5 pr-6 focus:outline-none focus:border-[#A81C24] transition-colors text-gray-800 placeholder-gray-400"
+            />
+            <Search
+              size={14}
+              className="absolute right-0 text-gray-400 cursor-pointer hover:text-[#A81C24] transition-colors"
+            />
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
-}
+};
+
+export default Header;

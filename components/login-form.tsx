@@ -3,26 +3,52 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { message } from "antd";
 
-export function LoginForm() {
+interface LoginFormProps {
+  locale: "my" | "en";
+}
+
+export function LoginForm({ locale }: LoginFormProps) {
+  const t = useTranslations("auth.login");
+  // const commonT = useTranslations('common');
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Login submitted:", formData);
+    const supabase = createClient();
 
-    setIsLoading(false);
-    // Redirect to dashboard after login
-    // router.push('/dashboard')
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (authError) throw authError;
+
+      message.success(t("submitting"));
+      router.push(`/${locale}/protected`);
+      router.refresh();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : t("error");
+      setError(errorMessage);
+      message.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,11 +68,9 @@ export function LoginForm() {
       {/* Heading */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-primary font-serif">
-          Welcome Back
+          {t("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Please login to your account
-        </p>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {/* Sign In Form */}
@@ -54,7 +78,7 @@ export function LoginForm() {
         {/* Email Field */}
         <div>
           <label className="block text-sm font-semibold text-primary mb-1">
-            Email address
+            {t("email")}
           </label>
           <input
             type="email"
@@ -72,14 +96,14 @@ export function LoginForm() {
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="block text-sm font-semibold text-primary">
-              Password
+              {t("password")}
             </label>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-xs text-accent hover:underline font-medium"
             >
-              {showPassword ? "👁️ Hide" : "👁️ Show"}
+              {showPassword ? t("hide_password") : t("show_password")}
             </button>
           </div>
           <input
@@ -94,13 +118,20 @@ export function LoginForm() {
           />
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="text-sm text-destructive text-center" role="alert">
+            {error}
+          </div>
+        )}
+
         {/* Forgot Password */}
         <div className="text-right">
           <Link
-            href="/auth/forgot-password"
+            href={`/${locale}/auth/forgot-password`}
             className="text-xs text-accent hover:underline font-medium"
           >
-            Forgot password?
+            {t("forgot_password")}
           </Link>
         </div>
 
@@ -108,20 +139,20 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hex-bloom"
         >
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? t("submitting") : t("submit")}
         </button>
       </form>
 
       {/* Sign Up Link */}
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("no_account")}{" "}
         <Link
-          href="/signup"
+          href={`/${locale}/auth/sign-up`}
           className="text-accent hover:underline font-semibold"
         >
-          Signup
+          {t("signup_link")}
         </Link>
       </p>
     </div>

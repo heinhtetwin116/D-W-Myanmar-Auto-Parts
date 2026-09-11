@@ -4,12 +4,12 @@ import my_MM from "antd/es/locale/my_MM";
 import en_US from "antd/es/locale/en_US";
 import { ThemeProvider } from "next-themes";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Header";
 
 const antdLocales = {
   my: my_MM,
@@ -50,9 +50,11 @@ export default async function LocaleLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={validLocale}>
-            <Header locale={validLocale} />
+            {/* <Header locale={validLocale} /> */}
+            <Header />
             <main className="flex-1">{children}</main>
-            <Footer locale={validLocale} />
+            {/* <Footer locale={validLocale} /> */}
+            <Footer />
           </NextIntlClientProvider>
         </ThemeProvider>
       </ConfigProvider>
