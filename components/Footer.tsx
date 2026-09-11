@@ -6,7 +6,9 @@ const Footer = () => {
     <footer className="bg-[#0F172A] text-white pt-16 pb-8 mt-auto">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
         <div>
-          <h3 className="text-xl font-bold mb-4 text-[#A81C24]">D&W AUTO PARTS</h3>
+          <h3 className="text-xl font-bold mb-4 text-[#A81C24]">
+            D&W AUTO PARTS
+          </h3>
           <p className="text-gray-400 text-sm leading-relaxed mb-6">
             Your trusted partner for automotive inventory management and
             high-quality replacement parts.
@@ -71,8 +73,7 @@ const Footer = () => {
               Detroit, MI 48201
             </li>
             <li className="flex items-center gap-2">
-              <PhoneCall size={16} className="text-[#A81C24]" /> +95
-              9765006774
+              <PhoneCall size={16} className="text-[#A81C24]" /> +95 9765006774
             </li>
             <li className="flex items-center gap-2">
               <ShieldCheck size={16} className="text-[#A81C24]" />{" "}
@@ -82,8 +83,8 @@ const Footer = () => {
         </div>
       </div>
       <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-        &copy; {new Date().getFullYear()} D&W Auto Parts Inventory Management. All
-        rights reserved.
+        &copy; {new Date().getFullYear()} D&W Auto Parts Inventory Management.
+        All rights reserved.
       </div>
     </footer>
   );
