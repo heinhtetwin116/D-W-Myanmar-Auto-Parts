@@ -12,9 +12,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-manrope)", "sans-serif"], 
-        manrope: ["var(--font-manrope)", "sans-serif"], 
-        geist: ["var(--font-geist-sans)", "sans-serif"],
+        sans: ["var(--font-manrope)", "sans-serif"],
+        // manrope: ["var(--font-manrope)", "sans-serif"],
+        // geist: ["var(--font-geist-sans)", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -46,6 +46,18 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        critical: {
+          DEFAULT: "hsl(var(--critical))",
+          foreground: "hsl(var(--critical-foreground))",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

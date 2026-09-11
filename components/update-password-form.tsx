@@ -19,11 +19,14 @@ export function UpdatePasswordForm({
     setError(null);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password: values.password });
+      const { error } = await supabase.auth.updateUser({
+        password: values.password,
+      });
       if (error) throw error;
       router.push("/protected");
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      const errorMessage =
+        error instanceof Error ? error.message : "An error occurred";
       setError(errorMessage);
       message.error(errorMessage);
     } finally {
@@ -45,7 +48,9 @@ export function UpdatePasswordForm({
           >
             <Input.Password placeholder="New password" />
           </Form.Item>
-          {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+          {error && (
+            <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          )}
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={isLoading}>
               Save new password

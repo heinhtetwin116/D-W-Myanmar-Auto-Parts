@@ -22,7 +22,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           In Stock: {product.stock}
         </span>
       </div>
-      
+
       <div className="space-y-1 flex-grow">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
           {product.code}

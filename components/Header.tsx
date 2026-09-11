@@ -41,12 +41,26 @@ const Header = () => {
       {/* TOP BAR */}
       <div className="bg-[#F4F6F8] border-b border-gray-200 text-xs font-medium text-gray-600 relative overflow-hidden hidden md:block">
         <div className="max-w-7xl mx-auto flex justify-between items-center h-8 px-6 relative z-10">
-          
           {/* Left Red Banner */}
           <div className="bg-[#A81C24] text-white flex items-center gap-6 px-6 h-full font-semibold relative before:absolute before:right-[-10px] before:top-0 before:border-l-[10px] before:border-l-[#A81C24] before:border-b-[32px] before:border-b-transparent">
-            <Link href="/about" className="hover:text-gray-200 transition-colors">About Us</Link>
-            <Link href="/contact" className="hover:text-gray-200 transition-colors">Contacts</Link>
-            <Link href="/track" className="hover:text-gray-200 transition-colors">Track Order</Link>
+            <Link
+              href="/about"
+              className="hover:text-gray-200 transition-colors"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Contacts
+            </Link>
+            <Link
+              href="/track"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Track Order
+            </Link>
           </div>
 
           {/* Center Tagline */}
@@ -56,16 +70,18 @@ const Header = () => {
 
           {/* Right Dark Navy Banner */}
           <div className="bg-[#0F172A] text-white flex items-center gap-4 px-6 h-full relative before:absolute before:left-[-10px] before:top-0 before:border-r-[10px] before:border-r-[#0F172A] before:border-b-[32px] before:border-b-transparent">
-            <span>Currency: <strong className="text-gray-300">USD</strong></span>
-            <span>Language: <strong className="text-gray-300">EN</strong></span>
+            <span>
+              Currency: <strong className="text-gray-300">USD</strong>
+            </span>
+            <span>
+              Language: <strong className="text-gray-300">EN</strong>
+            </span>
           </div>
-
         </div>
       </div>
 
       {/* 2. MAIN HEADER */}
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4 relative">
-        
         {/* Left Side Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#0F172A] flex-1">
           <Link href="/" className="hover:text-[#A81C24] transition-colors">
@@ -99,34 +115,44 @@ const Header = () => {
             )}
           </div>
 
-          <Link href="/inventory" className="hover:text-[#A81C24] transition-colors">
+          <Link
+            href="/inventory"
+            className="hover:text-[#A81C24] transition-colors"
+          >
             Inventory
           </Link>
-          <Link href="/auth/login" className="hover:text-[#A81C24] transition-colors">
+          <Link
+            href="/auth/login"
+            className="hover:text-[#A81C24] transition-colors"
+          >
             Account
           </Link>
         </nav>
 
         {/* Center Logo Slot */}
         <div className="flex-shrink-0 flex items-center justify-center relative z-30">
-        <Link href="/" aria-label="D and W Auto Parts Home" className="relative group">
+          <Link
+            href="/"
+            aria-label="D and W Auto Parts Home"
+            className="relative group"
+          >
             {imgError ? (
-            <span className="text-2xl font-black tracking-tight text-[#0F172A]">
+              <span className="text-2xl font-black tracking-tight text-[#0F172A]">
                 DW<span className="text-[#A81C24]">PARTS</span>
-            </span>
+              </span>
             ) : (
-            <div className="relative w-36 h-28 -my-6 flex items-center justify-center transition-transform hover:scale-105">
+              <div className="relative w-36 h-28 -my-6 flex items-center justify-center transition-transform hover:scale-105">
                 <Image
-                src="/DW_FullLogo.png"
-                alt="D&W Auto Parts Logo"
-                fill
-                className="object-contain drop-shadow-md"
-                priority
-                onError={() => setImgError(true)}
+                  src="/DW_FullLogo.png"
+                  alt="D&W Auto Parts Logo"
+                  fill
+                  className="object-contain drop-shadow-md"
+                  priority
+                  onError={() => setImgError(true)}
                 />
-            </div>
+              </div>
             )}
-        </Link>
+          </Link>
         </div>
 
         {/* Right Side My Account */}
@@ -157,7 +183,10 @@ const Header = () => {
               placeholder="Search by..."
               className="w-full bg-transparent border-b border-gray-300 text-xs py-0.5 pr-6 focus:outline-none focus:border-[#A81C24] transition-colors text-gray-800 placeholder-gray-400"
             />
-            <Search size={14} className="absolute right-0 text-gray-400 cursor-pointer hover:text-[#A81C24] transition-colors" />
+            <Search
+              size={14}
+              className="absolute right-0 text-gray-400 cursor-pointer hover:text-[#A81C24] transition-colors"
+            />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ start: ## Start the production server (requires a prior build)
 	npm run start
 
 lint: ## Lint with ESLint
-	npm run lint
+	npm run lint -- --ignore-pattern ".next/**"
 
 typecheck: ## Type-check with TypeScript (no emit)
 	npx tsc --noEmit

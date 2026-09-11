@@ -8,7 +8,7 @@ const Hero = () => {
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: "url('/example_image.png')",
-          backgroundColor: "#0F172A", 
+          backgroundColor: "#0F172A",
         }}
       >
         <div className="absolute inset-0 bg-[#0F172A]/70"></div>

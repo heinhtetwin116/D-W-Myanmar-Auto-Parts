@@ -17,7 +17,12 @@ export function DeployButton() {
 
 function VercelIcon() {
   return (
-    <svg viewBox="0 0 76 65" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 12 }}>
+    <svg
+      viewBox="0 0 76 65"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width: 14, height: 12 }}
+    >
       <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" />
     </svg>
   );

@@ -18,19 +18,24 @@ export function ForgotPasswordForm({
     setIsLoading(true);
     setError(null);
 
-    const redirectTo = typeof window !== "undefined" 
-      ? `${window.location.origin}/auth/update-password` 
-      : "/auth/update-password";
+    const redirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/auth/update-password`
+        : "/auth/update-password";
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        values.email,
+        {
+          redirectTo,
+        },
+      );
       if (error) throw error;
       setSuccess(true);
       message.success("Password reset email sent!");
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      const errorMessage =
+        error instanceof Error ? error.message : "An error occurred";
       setError(errorMessage);
       message.error(errorMessage);
     } finally {
@@ -43,8 +48,8 @@ export function ForgotPasswordForm({
       {success ? (
         <Card title="Check Your Email" style={{ width: "100%" }}>
           <p style={{ color: "#8c8c8c" }}>
-            If you registered using your email and password, you will receive
-            a password reset email.
+            If you registered using your email and password, you will receive a
+            password reset email.
           </p>
         </Card>
       ) : (
@@ -60,9 +65,16 @@ export function ForgotPasswordForm({
             >
               <Input placeholder="m@example.com" type="email" />
             </Form.Item>
-            {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+            {error && (
+              <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+            )}
             <Form.Item>
-              <Button type="primary" htmlType="submit" block loading={isLoading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={isLoading}
+              >
                 Send reset email
               </Button>
             </Form.Item>
