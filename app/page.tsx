@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/hero";
 import ProductCard, { Product } from "@/components/ProductCard";
 import Footer from "@/components/Footer";
+import Testimonials from "@/components/testimonials";
 import { Truck, PhoneCall, ShieldCheck, Tag } from "lucide-react";
 
 // --- DUMMY DATA ---
@@ -45,29 +46,29 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="text-[#A81C24]"><Truck size={32} strokeWidth={1.5} /></div>
               <div>
-                <h4 className="font-bold text-[#0F172A] text-sm">Delivery</h4>
-                <p className="text-xs text-gray-500">Within 1 - 2 Days</p>
+                <h4 className="font-bold text-[#0F172A] text-sm">Fast Delivery</h4>
+                <p className="text-xs text-gray-500">Within 1 - 2 Business Days</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-[#A81C24]"><PhoneCall size={32} strokeWidth={1.5} /></div>
               <div>
-                <h4 className="font-bold text-[#0F172A] text-sm">Phone No.</h4>
-                <p className="text-xs text-gray-500">+ 95 9 765006774 <br></br> + 95 9 455096809</p>
+                <h4 className="font-bold text-[#0F172A] text-sm">Customer Support</h4>
+                <p className="text-xs text-gray-500">+ 95 9 765006774 | + 95 9 455096809</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-[#A81C24]"><ShieldCheck size={32} strokeWidth={1.5} /></div>
               <div>
                 <h4 className="font-bold text-[#0F172A] text-sm">Trusted Suppliers</h4>
-                <p className="text-xs text-gray-500">Reliable and Verified Partners</p>
+                <p className="text-xs text-gray-500">100% Genuine Auto Parts</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-[#A81C24]"><Tag size={32} strokeWidth={1.5} /></div>
               <div>
-                <h4 className="font-bold text-[#0F172A] text-sm">Since</h4>
-                <p className="text-xs text-gray-500">1997</p>
+                <h4 className="font-bold text-[#0F172A] text-sm">Established</h4>
+                <p className="text-xs text-gray-500">Serving Drivers Since 1997</p>
               </div>
             </div>
           </div>
@@ -111,6 +112,8 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <Testimonials />
 
       {/* Footer */}
       <Footer />

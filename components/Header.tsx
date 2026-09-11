@@ -17,6 +17,7 @@ import {
   Car,
   Droplet,
   Wrench,
+  FileText, // Added for the quote button
 } from "lucide-react";
 
 const categories = [
@@ -44,9 +45,9 @@ const Header = () => {
           
           {/* Left Red Banner */}
           <div className="bg-[#A81C24] text-white flex items-center gap-6 px-6 h-full font-semibold relative before:absolute before:right-[-10px] before:top-0 before:border-l-[10px] before:border-l-[#A81C24] before:border-b-[32px] before:border-b-transparent">
-            <Link href="/about" className="hover:text-gray-200 transition-colors">About Us</Link>
-            <Link href="/contact" className="hover:text-gray-200 transition-colors">Contacts</Link>
-            <Link href="/track" className="hover:text-gray-200 transition-colors">Track Order</Link>
+            <Link href="#" className="hover:text-gray-200 transition-colors">About Us</Link>
+            <Link href="#" className="hover:text-gray-200 transition-colors">Contacts</Link>
+            <Link href="#" className="hover:text-gray-200 transition-colors">Track Order</Link>
           </div>
 
           {/* Center Tagline */}
@@ -67,9 +68,12 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4 relative">
         
         {/* Left Side Navigation */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#0F172A] flex-1">
-          <Link href="/" className="hover:text-[#A81C24] transition-colors">
+        <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-[#0F172A] flex-1">
+          <Link href="#" className="hover:text-[#A81C24] transition-colors">
             Home
+          </Link>
+          <Link href="#" className="hover:text-[#A81C24] transition-colors">
+            Catalog
           </Link>
 
           {/* Categories Dropdown */}
@@ -84,16 +88,15 @@ const Header = () => {
             </button>
             {isCategoryHovered && (
               <div className="absolute top-full left-0 w-[500px] bg-white shadow-2xl border border-gray-100 rounded-b-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                {/* Dropdown Header */}
                 <div className="bg-[#F4F6F8] px-6 py-3 border-b border-gray-100 flex justify-between items-center">
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Shop by Category</span>
-                  <Link href="/categories" className="text-xs font-semibold text-[#A81C24] hover:underline">View All</Link>
+                  <Link href="#" className="text-xs font-semibold text-[#A81C24] hover:underline">View All</Link>
                 </div>
                 <div className="grid grid-cols-2 gap-1 p-2">
                   {categories.map((cat, idx) => (
                     <Link
                       key={idx}
-                      href={`/category/${cat.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+                      href="#"
                       className="group flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-600 hover:bg-[#F4F6F8] hover:text-[#0F172A] transition-all duration-200"
                     >
                       <div className="bg-white p-2 rounded-md border border-gray-100 shadow-sm group-hover:border-[#A81C24]/30 group-hover:bg-[#A81C24]/5 transition-colors">
@@ -106,11 +109,12 @@ const Header = () => {
               </div>
             )}
           </div>
-          <Link href="/inventory" className="hover:text-[#A81C24] transition-colors">
+          
+          <Link href="#" className="hover:text-[#A81C24] transition-colors">
             Inventory
           </Link>
-          <Link href="/auth/login" className="hover:text-[#A81C24] transition-colors">
-            Account
+          <Link href="#" className="hover:text-[#A81C24] transition-colors">
+            Blogs
           </Link>
         </nav>
 
@@ -136,14 +140,25 @@ const Header = () => {
         </Link>
         </div>
 
-        {/* Right Side My Account */}
-        <div className="flex items-center justify-end gap-6 flex-1">
+        {/* Right Side Actions */}
+        <div className="flex items-center justify-end gap-5 flex-1">
+          {/* My Account Link */}
           <Link
-            href="/auth/login"
+            href="#"
             className="flex items-center gap-2 text-sm font-semibold text-[#0F172A] hover:text-[#A81C24] transition-colors"
           >
             <Menu size={18} />
             <span className="hidden sm:inline">My Account</span>
+          </Link>
+
+          {/* Request a Quote Button (Added) */}
+          <Link
+            href="#"
+            className="flex items-center gap-2 bg-[#A81C24] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#8a161d] transition-colors shadow-sm hover:shadow-md"
+          >
+            <FileText size={16} />
+            <span className="hidden lg:inline">Request a Quote</span>
+            <span className="lg:hidden">Quote</span>
           </Link>
         </div>
       </div>
