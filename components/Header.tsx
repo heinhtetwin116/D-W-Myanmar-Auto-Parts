@@ -50,7 +50,7 @@ const Header = () => {
           </div>
 
           {/* Center Tagline */}
-          <div className="text-[#0F172A] tracking-wider uppercase text-[10px] font-bold">
+          <div className="absolute left-1/2 -translate-x-1/2 text-[#0F172A] tracking-wider uppercase text-[10px] font-bold whitespace-nowrap">
             Auto Parts for Cars
           </div>
 
@@ -112,7 +112,7 @@ const Header = () => {
         <Link href="/" aria-label="D and W Auto Parts Home" className="relative group">
             {imgError ? (
             <span className="text-2xl font-black tracking-tight text-[#0F172A]">
-                DW<span className="text-[#A81C24]">PARTS</span>
+                D&W<span className="text-[#A81C24]">PARTS</span>
             </span>
             ) : (
             <div className="relative w-36 h-28 -my-6 flex items-center justify-center transition-transform hover:scale-105">
