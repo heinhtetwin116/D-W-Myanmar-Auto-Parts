@@ -18,12 +18,18 @@ export async function AuthButton() {
   ) : (
     <div style={{ display: "flex", gap: 8 }}>
       <Button type="default" size="small">
-        <Link href="/auth/login" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link
+          href="/auth/login"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           Sign in
         </Link>
       </Button>
       <Button type="primary" size="small">
-        <Link href="/auth/sign-up" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link
+          href="/auth/sign-up"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           Sign up
         </Link>
       </Button>
