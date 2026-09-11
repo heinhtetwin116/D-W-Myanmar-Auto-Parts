@@ -5,6 +5,7 @@ import ProductCard, { Product } from "@/components/ProductCard";
 import Footer from "@/components/Footer";
 import Testimonials from "@/components/testimonials";
 import { Truck, PhoneCall, ShieldCheck, Tag } from "lucide-react";
+import FAQ from "@/components/FAQ";
 
 // --- DUMMY DATA ---
 const featuredProducts: Product[] = [
@@ -112,6 +113,8 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <FAQ />
 
       <Testimonials />
 

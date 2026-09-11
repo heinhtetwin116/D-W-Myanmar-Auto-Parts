@@ -8,6 +8,7 @@ export function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [password, setPassword] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -21,6 +22,9 @@ export function SignUpForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!agreedToTerms) return
+
     setIsLoading(true)
     
     await new Promise(resolve => setTimeout(resolve, 1500))
@@ -125,9 +129,47 @@ export function SignUpForm() {
           </span>
         </div>
 
+        {/* Terms & Conditions Checkbox */}
+        <div className="flex items-start gap-3 pt-2">
+          <div className="flex items-center h-5">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              required
+              className="peer h-4 w-4 shrink-0 rounded border border-gray-300 text-accent focus:ring-2 focus:ring-accent focus:ring-offset-1 cursor-pointer appearance-none checked:bg-accent checked:border-accent relative transition-colors"
+            />
+            {/* Custom Checkmark Icon (appears only when checked via peer) */}
+            <svg
+              className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 left-[3px] top-[3px] transition-opacity"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none">
+            I agree to the{' '}
+            <Link href="/terms" className="text-accent hover:underline font-semibold">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="text-accent hover:underline font-semibold">
+              Privacy Policy
+            </Link>
+          </label>
+        </div>
+
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !agreedToTerms}
           className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Creating account...' : 'Get Started!'}
