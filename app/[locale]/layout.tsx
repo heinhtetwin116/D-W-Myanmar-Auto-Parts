@@ -9,7 +9,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const antdLocales = {
   my: my_MM,
@@ -45,7 +45,7 @@ export default async function LocaleLayout({
       <ConfigProvider locale={antdLocales[validLocale]}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="white"
           enableSystem
           disableTransitionOnChange
         >
