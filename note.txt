@@ -1,3 +1,50 @@
+  ## FIX TYPOGRAPHY
+  const fs = require("fs");
+const path = require("path");
+
+const filePath = path.join(__dirname, "app/[locale]/page.tsx");
+let content = fs.readFileSync(filePath, "utf8");
+
+// Restore original content from git first to avoid double replacement mess
+const { execSync } = require("child_process");
+execSync("git checkout -- app/[locale]/page.tsx");
+content = fs.readFileSync(filePath, "utf8");
+
+// Remove Typography import and destructuring
+content = content.replace(/, Typography/, "");
+content = content.replace(
+  /const \{ Title, Text, Paragraph \} = Typography;\n/,
+  "",
+);
+
+// Replace <Title level={X} ...>...</Title>
+// We can use a regex loop
+while (/<Title[^>]*level=\{([1-6])\}[^>]*>([\s\S]*?)<\/Title>/.test(content)) {
+  content = content.replace(
+    /<Title([^>]*)level=\{([1-6])\}([^>]*)>([\s\S]*?)<\/Title>/g,
+    (match, before, level, after, inner) => {
+      return `<h${level}${before}${after}>${inner}</h${level}>`;
+    },
+  );
+}
+
+// Replace <Paragraph ...>...</Paragraph>
+content = content.replace(
+  /<Paragraph([^>]*)>([\s\S]*?)<\/Paragraph>/g,
+  "<p$1>$2</p>",
+);
+
+// Replace <Text ...>...</Text>
+content = content.replace(
+  /<Text([^>]*)>([\s\S]*?)<\/Text>/g,
+  "<span$1>$2</span>",
+);
+
+fs.writeFileSync(filePath, content);
+console.log("Fixed Typography in page.tsx");
+
+  
+## CODE QUALITY CHECK CI WORKFLOW
   Only one hook. Here's the full picture:
   ──────
   ## What happens before and after git commit + git push
@@ -67,6 +114,11 @@
 
     # .husky/pre-push
     npx tsc --noEmit
+
+
+
+    
+## CODE QUALITY CHECK CI
 
     name: CodeQL Analysis
 

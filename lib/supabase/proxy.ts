@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
+import { locales } from "@/lib/i18n";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -47,15 +48,24 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
+  // Build locale-aware auth path patterns
+  const authPathPatterns = locales.flatMap((locale) => [
+    `/${locale}/auth`,
+    `/${locale}/login`,
+  ]);
+
+  const isAuthPath = authPathPatterns.some((pattern) =>
+    request.nextUrl.pathname.startsWith(pattern),
+  );
+
+  if (request.nextUrl.pathname !== "/" && !user && !isAuthPath) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    // Find the locale from the pathname
+    const locale =
+      locales.find((l) => request.nextUrl.pathname.startsWith(`/${l}/`)) ||
+      "my";
+    url.pathname = `/${locale}/auth/login`;
     return NextResponse.redirect(url);
   }
 

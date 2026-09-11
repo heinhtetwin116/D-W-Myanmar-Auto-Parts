@@ -1,0 +1,324 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "contact": "Contact",
+    "admin": "Admin",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "profile": "Profile",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "view": "View",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "language": "Language",
+    "myanmar": "Myanmar",
+    "english": "English",
+    "currency": "MMK",
+    "stock": {
+      "in_stock": "In Stock",
+      "low_stock": "Low Stock",
+      "out_of_stock": "Out of Stock"
+    },
+    "all_categories": "All Categories",
+    "featuredProducts": {
+      "title": "Featured Products"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "D&W Myanmar Auto Parts",
+    "subtitle": "Premium quality auto parts at competitive prices. Find the right parts for your vehicle with confidence.",
+    "cta_primary": "Browse Products",
+    "cta_secondary": "About Us"
+  },
+  "valueProps": {
+    "quality": {
+      "title": "Quality Assured",
+      "description": "Only parts meeting international standards and rigorous testing"
+    },
+    "price": {
+      "title": "Competitive Pricing",
+      "description": "Direct from manufacturers to you at the best prices"
+    },
+    "warranty": {
+      "title": "Warranty Protection",
+      "description": "Comprehensive warranty and support on all purchases"
+    },
+    "delivery": {
+      "title": "Fast Delivery",
+      "description": "Nationwide delivery across Myanmar within days"
+    }
+  },
+  "featuredProducts": {
+    "title": "Featured Products",
+    "view_all": "View All Products"
+  },
+  "trustIndicators": {
+    "customers": "Happy Customers",
+    "products": "Product Varieties",
+    "years": "Years of Experience",
+    "locations": "Delivery Locations"
+  },
+  "cta": {
+    "title": "Looking for the right part for your vehicle?",
+    "subtitle": "Browse our extensive catalog or contact our experts for personalized recommendations.",
+    "button": "Contact Us"
+  },
+  "footer": {
+    "company_name": "D&W Myanmar Auto Parts",
+    "description": "Your trusted partner for premium quality auto parts in Myanmar. Committed to excellence since 2004.",
+    "quick_links": "Quick Links",
+    "contact_info": "Contact Information",
+    "address": "No. 123, Auto Parts Street, Yangon, Myanmar",
+    "phone": "+95 1 234 5678",
+    "email": "info@dwautoparts.com.mm",
+    "follow_us": "Follow Us",
+    "hours": "Mon - Sat: 9:00 AM - 6:00 PM",
+    "copyright": "© 2024 D&W Myanmar Auto Parts. All rights reserved."
+  },
+  "about": {
+    "hero_title": "About D&W Myanmar Auto Parts",
+    "hero_subtitle": "Over 20 years of excellence in providing premium auto parts solutions",
+    "story_title": "Our Story",
+    "story_description": "D&W Myanmar Auto Parts was founded in 2004 in Yangon with a vision to provide premium quality auto parts to the Myanmar market. Starting at a time when quality parts were scarce, we recognized the critical importance of reliable components for vehicle safety and performance.",
+    "story_description2": "Today, we stand as one of Myanmar's leading auto parts suppliers, partnering with renowned manufacturers and serving customers nationwide with an extensive catalog of genuine and OEM parts.",
+    "mission_title": "Our Mission",
+    "mission_description": "To provide Myanmar's automotive community with premium quality parts at competitive prices, backed by exceptional service.",
+    "vision_title": "Our Vision",
+    "vision_description": "To become Myanmar's premier auto parts destination, serving over 80% of the country's automotive parts market.",
+    "values_title": "Our Values",
+    "values_description": "Our core values guide every decision we make and every interaction we have.",
+    "values": {
+      "integrity": {
+        "title": "Integrity",
+        "description": "Upholding honesty and ethical practices in all business dealings"
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "Delivering consistent excellence in every product we supply"
+      },
+      "customer": {
+        "title": "Customer Focus",
+        "description": "Putting our customers' needs at the heart of everything we do"
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "Embracing new technologies and continuous improvement"
+      }
+    },
+    "team_title": "Our Team",
+    "team_description": "Our team comprises experienced automotive engineers and sales professionals dedicated to helping you find the right parts.",
+    "location_title": "Our Locations",
+    "location_description": "With showrooms in Yangon and Mandalay, plus nationwide delivery, we're always within reach."
+  },
+  "products": {
+    "title": "Auto Parts Catalog",
+    "subtitle": "Browse our extensive range of quality parts for all vehicle makes and models",
+    "categories": "Categories",
+    "all_categories": "All Categories",
+    "stock_status": "Stock Status",
+    "all_status": "All Status",
+    "price_range": "Price Range",
+    "search_placeholder": "Search by part name, number, or keyword...",
+    "table": {
+      "image": "Image",
+      "name": "Part Name",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "actions": "Actions"
+    },
+    "detail": {
+      "specs": "Specifications",
+      "description": "Description",
+      "enquire": "Enquire to Buy",
+      "back_to_catalog": "Back to Catalog",
+      "related_products": "Related Products"
+    },
+    "no_results": "No products found matching your criteria"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have questions about our products? Need a quote? We're here to help.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "product": "Product (Optional)",
+      "select_product": "Select a product (optional)",
+      "message": "Message",
+      "message_placeholder": "Tell us about your requirements...",
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": "Your message has been sent successfully. We'll get back to you soon!",
+      "error": "Failed to send message. Please try again."
+    },
+    "info": {
+      "title": "Contact Information",
+      "address": "No. 123, Auto Parts Street, Yangon, Myanmar",
+      "phone": "+95 1 234 5678",
+      "email": "info@dwautoparts.com.mm",
+      "hours": "Mon - Sat: 9:00 AM - 6:00 PM"
+    }
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "enquiries": "Enquiries",
+    "product_list": "Product List",
+    "create_product": "Create Product",
+    "edit_product": "Edit Product",
+    "category_list": "Category List",
+    "create_category": "Create Category",
+    "edit_category": "Edit Category",
+    "enquiry_list": "Enquiry List",
+    "enquiry_detail": "Enquiry Detail",
+    "fields": {
+      "name_my": "Name (Myanmar)",
+      "name_en": "Name (English)",
+      "slug": "Slug",
+      "description_my": "Description (Myanmar)",
+      "description_en": "Description (English)",
+      "category": "Category",
+      "price": "Price (MMK)",
+      "currency": "Currency",
+      "stock_status": "Stock Status",
+      "image_url": "Image URL",
+      "is_active": "Active",
+      "is_featured": "Featured",
+      "specs": "Specifications (JSON)",
+      "sort_order": "Sort Order",
+      "status": "Status"
+    },
+    "actions": {
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View",
+      "back": "Back"
+    }
+  },
+  "messages": {
+    "create_success": "Created successfully",
+    "update_success": "Updated successfully",
+    "delete_success": "Deleted successfully",
+    "delete_confirm": "Are you sure you want to delete this item? This action cannot be undone."
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "show_password": "Show",
+      "hide_password": "Hide",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot password?",
+      "submit": "Login",
+      "submitting": "Signing in...",
+      "no_account": "Don't have an account?",
+      "signup_link": "Sign up"
+    },
+    "signup": {
+      "title": "Sign Up",
+      "subtitle": "Create your account",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "show_password": "Show",
+      "hide_password": "Hide",
+      "password_requirements": "Password requirements:",
+      "requirements": {
+        "lowercase": "One lowercase letter",
+        "uppercase": "One uppercase letter",
+        "number": "One number",
+        "special": "One special character",
+        "min_length": "8+ characters"
+      },
+      "submit": "Get Started!",
+      "submitting": "Creating account...",
+      "has_account": "Already have an account?",
+      "login_link": "Login"
+    },
+    "forgot_password": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email and we'll send you a link to reset your password.",
+      "email": "Email",
+      "email_required": "Please enter your email",
+      "email_invalid": "Please enter a valid email",
+      "submit": "Send reset email",
+      "submitting": "Sending...",
+      "success": "Password reset email sent! Check your inbox.",
+      "back_to_login": "Back to login"
+    },
+    "update_password": {
+      "title": "Update Password",
+      "subtitle": "Enter your new password below.",
+      "password": "New Password",
+      "confirm_password": "Confirm Password",
+      "password_required": "Please enter your new password",
+      "password_min_length": "Password must be at least 8 characters",
+      "password_placeholder": "New password",
+      "submit": "Update Password",
+      "submitting": "Updating...",
+      "success": "Password updated successfully."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "code_error": "Error code",
+      "unspecified": "An unspecified error occurred."
+    }
+  },
+  "features": {
+    "fast_delivery": "Fast Delivery",
+    "fast_delivery_desc": "Delivery within 1-3 days across Myanmar",
+    "support": "24/7 Support",
+    "support_desc": "Premium customer service and technical assistance",
+    "easy_returns": "Easy Returns",
+    "easy_returns_desc": "Free 30-day returns on all orders",
+    "best_price": "Best Price",
+    "best_price_desc": "Direct from manufacturer - lowest prices guaranteed"
+  },
+  "categories": {
+    "all": "All",
+    "engine": "Engine Parts",
+    "brakes": "Brakes",
+    "suspension": "Suspension",
+    "electrical": "Electrical",
+    "filters": "Filters",
+    "lighting": "Lighting",
+    "body": "Body Parts",
+    "fluids": "Fluids & Lubricants",
+    "new_arrivals": "New Arrivals",
+    "best_sellers": "Best Sellers"
+  },
+  "latest_products": {
+    "title": "Latest Products"
+  },
+  "value_props": {
+    "title": "Why Choose D&W Auto Parts?",
+    "subtitle": "We combine carefully curated products with exceptional service to keep your vehicle running at its best with confidence and peace of mind."
+  }
+}

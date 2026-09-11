@@ -4,11 +4,19 @@ import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Form, Input, message } from "antd";
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+
+interface ForgotPasswordFormProps {
+  locale: "my" | "en";
+  className?: string;
+}
 
 export function ForgotPasswordForm({
+  locale,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: ForgotPasswordFormProps) {
+  const t = useTranslations("auth.forgot_password");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,19 +26,23 @@ export function ForgotPasswordForm({
     setIsLoading(true);
     setError(null);
 
-    const redirectTo = typeof window !== "undefined" 
-      ? `${window.location.origin}/auth/update-password` 
-      : "/auth/update-password";
+    const redirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/${locale}/auth/update-password`
+        : `/${locale}/auth/update-password`;
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        values.email,
+        {
+          redirectTo,
+        },
+      );
       if (error) throw error;
       setSuccess(true);
-      message.success("Password reset email sent!");
+      message.success(t("success"));
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : t("error");
       setError(errorMessage);
       message.error(errorMessage);
     } finally {
@@ -41,36 +53,45 @@ export function ForgotPasswordForm({
   return (
     <div className={className} {...props}>
       {success ? (
-        <Card title="Check Your Email" style={{ width: "100%" }}>
-          <p style={{ color: "#8c8c8c" }}>
-            If you registered using your email and password, you will receive
-            a password reset email.
+        <Card title={t("success")} style={{ width: "100%" }}>
+          <p style={{ color: "hsl(var(--muted-foreground))" }}>
+            {t("success")}
           </p>
         </Card>
       ) : (
-        <Card title="Reset Your Password" style={{ width: "100%" }}>
+        <Card title={t("title")} style={{ width: "100%" }}>
           <Form onFinish={handleForgotPassword} layout="vertical">
             <Form.Item
               name="email"
-              label="Email"
+              label={t("email")}
               rules={[
-                { required: true, message: "Please input your email" },
-                { type: "email", message: "Please enter a valid email" },
+                { required: true, message: t("email_required") },
+                { type: "email", message: t("email_invalid") },
               ]}
             >
               <Input placeholder="m@example.com" type="email" />
             </Form.Item>
-            {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+            {error && (
+              <div
+                style={{ color: "hsl(var(--destructive))", marginBottom: 16 }}
+              >
+                {error}
+              </div>
+            )}
             <Form.Item>
-              <Button type="primary" htmlType="submit" block loading={isLoading}>
-                Send reset email
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={isLoading}
+              >
+                {isLoading ? t("submitting") : t("submit")}
               </Button>
             </Form.Item>
           </Form>
           <div style={{ marginTop: 16, textAlign: "center" }}>
-            Already have an account?{" "}
-            <Link href="/auth/login" style={{ marginLeft: 8 }}>
-              Login
+            <Link href={`/${locale}/auth/login`} style={{ marginLeft: 8 }}>
+              {t("back_to_login")}
             </Link>
           </div>
         </Card>
