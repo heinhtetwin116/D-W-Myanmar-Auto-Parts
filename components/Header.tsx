@@ -56,7 +56,7 @@ const Header = () => {
 
           {/* Right Dark Navy Banner */}
           <div className="bg-[#0F172A] text-white flex items-center gap-4 px-6 h-full relative before:absolute before:left-[-10px] before:top-0 before:border-r-[10px] before:border-r-[#0F172A] before:border-b-[32px] before:border-b-transparent">
-            <span>Currency: <strong className="text-gray-300">USD</strong></span>
+            <span>Currency: <strong className="text-gray-300">MMK</strong></span>
             <span>Language: <strong className="text-gray-300">EN</strong></span>
           </div>
 
@@ -154,7 +154,7 @@ const Header = () => {
             <Car size={16} className="text-gray-400 mr-2 flex-shrink-0" />
             <input
               type="text"
-              placeholder="Search by..."
+              placeholder="Search by OEM No, Brand, Category"
               className="w-full bg-transparent border-b border-gray-300 text-xs py-0.5 pr-6 focus:outline-none focus:border-[#A81C24] transition-colors text-gray-800 placeholder-gray-400"
             />
             <Search size={14} className="absolute right-0 text-gray-400 cursor-pointer hover:text-[#A81C24] transition-colors" />
