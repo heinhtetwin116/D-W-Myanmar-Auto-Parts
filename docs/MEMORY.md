@@ -49,17 +49,22 @@ changes (see `AGENTS.md` → Documentation maintenance).
 - Products catalog (`app/[locale]/products/page.tsx`) — Client-side filtering (category, stock status, search, price range), pagination, responsive grid from local JSON (15 products, 8 categories)
 - Shared layout components: `Header` (logo, nav, locale switcher, auth buttons), `Footer` (company info, links, contact, social)
 
-**Domain data**
+**Domain data & ERPNext integration (Phase C milestone: schema + manual sync)**
 
-- Local product data at `data/products.json` — 15 products across 8 categories with Myanmar/English translations, specs, pricing, stock status
-- No product/category tables, migrations, or ERD exist in Supabase yet.
+- ERPNext client (`lib/erpnext/client.ts`) — typed REST API wrapper with token auth, pagination, field selection
+- Catalog schema (`supabase/migrations/20260912_000000_create_catalog_schema.sql`) — categories, products, sync_runs tables with RLS (public read-enabled, server-write)
+- Catalog types (`lib/erpnext/types.ts`) — `Category`, `Product`, `SyncRun`, ERPNext DocType refs
+- Typed queries (`lib/erpnext/queries.ts`) — getCategories, getProducts, getProductById, getProductCount (never raw `.from(...).select(...)`)
+- Manual sync (`lib/erpnext/sync.ts`) — idempotent upsert by erpnext_id, records sync_runs, preserves last successful snapshot on failure
+- Sync endpoint (`app/api/catalog/sync/route.ts`) — POST to trigger manual sync; TODO: add auth check (require admin role or bearer token)
+- Products page (`app/[locale]/products/page.tsx`) — reads from Supabase catalog; pagination, filter support, i18n-ready
 
 ## Known gaps (open, not yet fixed)
 
 1. **Product detail page** (`app/[locale]/products/[slug]/page.tsx`) not yet created.
 2. **Contact page** (`app/[locale]/contact/page.tsx`) — scaffold only, form submit not wired.
 3. **Admin area** (`app/[locale]/admin/*`) not yet scaffolded (Phase C).
-4. **Products catalog uses local JSON** — needs migration to Supabase queries (Phase C).
+4. **Product catalog component** (`components/product-catalog.tsx`) — not yet implemented; referenced by `app/[locale]/products/page.tsx`.
 5. **`PRD.md` referenced but not created.** `AGENTS.md` instructs reading
    `docs/PRD.md` before implementation; the file does not exist yet.
 6. **ORM decision undecided.** `.env.example` reserves `DATABASE_URL` "for
@@ -69,12 +74,9 @@ changes (see `AGENTS.md` → Documentation maintenance).
    `CODING_GUIDELINES.md` → Testing contracts).
 8. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-
-9. **ERPNext catalog integration is the next implementation milestone.**
-   ERPNext `Item` and `Item Group` records are the upstream source; the first
-   delivery is a manually triggered server-side sync into a Supabase catalog
-   mirror. Exact custom field names for bilingual content and actual stock are
-   still awaiting confirmation from the ERPNext instance.
+9. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
+10. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
+11. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
 
 ## Decisions recorded
 
@@ -106,7 +108,7 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Last entry:**
+**Current session (2026-09-12):**
 
 - What changed:
   - Updated `AGENTS.md`, `ARCHITECTURE.md`, `CODING_GUIDELINES.md`, and
