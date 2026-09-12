@@ -6,13 +6,7 @@
 
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ERPNextClient } from "./client";
-import {
-  Category,
-  Product,
-  SyncRun,
-  ERPNextItemGroup,
-  ERPNextItem,
-} from "./types";
+import { Category, Product, ERPNextItemGroup, ERPNextItem } from "./types";
 
 interface SyncOptions {
   pageSize?: number; // Number of items to fetch per paginated request

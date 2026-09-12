@@ -46,8 +46,9 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 - Home page (`app/[locale]/page.tsx`) — Hero, Features bar, Value Props, Featured Products (from Supabase), Latest Products, Trust Indicators, CTA
 - About page (`app/[locale]/about/page.tsx`) — Hero, Company story, Mission/Vision/Values, Team, Locations
-- Products catalog (`app/[locale]/products/page.tsx`) — Client-side filtering (category, stock status, search, price range), pagination, responsive grid from local JSON (15 products, 8 categories)
-- Shared layout components: `Header` (logo, nav, locale switcher, auth buttons), `Footer` (company info, links, contact, social)
+- Products catalog (`app/[locale]/products/page.tsx` + `components/product-catalog.tsx`) — Server Component fetches Supabase via typed queries; client island for search/category/stock filters + pagination (12/page); antd-first, i18n-ready
+- Product detail (`app/[locale]/products/[slug]/page.tsx`, slug = product id) — image, category tag, stock badge, MMK price, specs table, related products, `notFound()` on missing/disabled
+- Shared layout components: `Header`, `Footer` (`components/layout/`, default exports, no locale prop yet)
 
 **Domain data & ERPNext integration (Phase C milestone: schema + manual sync)**
 
@@ -61,22 +62,20 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Known gaps (open, not yet fixed)
 
-1. **Product detail page** (`app/[locale]/products/[slug]/page.tsx`) not yet created.
-2. **Contact page** (`app/[locale]/contact/page.tsx`) — scaffold only, form submit not wired.
-3. **Admin area** (`app/[locale]/admin/*`) not yet scaffolded (Phase C).
-4. **Product catalog component** (`components/product-catalog.tsx`) — not yet implemented; referenced by `app/[locale]/products/page.tsx`.
-5. **`PRD.md` referenced but not created.** `AGENTS.md` instructs reading
+1. **Contact page** (`app/[locale]/contact/page.tsx`) — scaffold only, form submit not wired.
+2. **Admin area** (`app/[locale]/admin/*`) not yet scaffolded (Phase C).
+3. **`PRD.md` referenced but not created.** `AGENTS.md` instructs reading
    `docs/PRD.md` before implementation; the file does not exist yet.
-6. **ORM decision undecided.** `.env.example` reserves `DATABASE_URL` "for
+4. **ORM decision undecided.** `.env.example` reserves `DATABASE_URL` "for
    ORM," but no ORM is installed and `ARCHITECTURE.md` currently directs
    new tables to be plain Supabase SQL migrations until this is decided.
-7. **No automated tests.** No test runner is configured (see
+5. **No automated tests.** No test runner is configured (see
    `CODING_GUIDELINES.md` → Testing contracts).
-8. **No pre-push type-check.** Only CI catches TypeScript errors; the
+6. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-9. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
-10. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
-11. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
+7. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
+8. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
+9. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
 
 ## Decisions recorded
 
@@ -85,12 +84,18 @@ changes (see `AGENTS.md` → Documentation maintenance).
   there, only the additions listed in Known gaps.
 - New domain tables go through plain Supabase SQL migrations, not an ORM,
   until an ORM decision is explicitly recorded here.
-- The Tailwind + semantic-token UI path (not Ant Design) is the intended
-  long-term direction for D&W-branded screens; antd remains acceptable for
-  data-dense internal UI (tables, complex forms).
+- The AntD-first UI path (ARCHITECTURE.md → "UI layering") is the decided
+  direction for D&W screens: build on antd primitives, Tailwind for layout
+  support. Decided in interview 2026-09-12, superseding the earlier
+  Tailwind-first note.
 - i18n with `next-intl`: Myanmar (my) default, English (en) supported. All UI strings in `messages/my.json` and `messages/en.json`.
-- Products catalog currently reads from local `data/products.json` (Phase B). Will migrate to Supabase in Phase C.
-- Header/Footer components moved to `components/` root with full i18n support (language switcher, locale-aware links).
+- Catalog reads Supabase (`categories`/`products`) via `lib/erpnext/queries.ts`;
+  no local JSON source exists (no `data/` directory). Prior "local JSON" notes
+  were stale.
+- Header/Footer live in `components/layout/` as default exports without locale
+  props; their links are locale-agnostic and need an i18n follow-up.
+- PRs target the `development` branch only (not `main` as WORKFLOW.md previously
+  stated). Decided in interview 2026-09-12.
 - ERPNext integration decisions: server-only credentials, enabled Items only,
   actual stock, `Item.image`, numeric MMK prices, ERPNext source IDs, last
   successful Supabase snapshot on failure, persisted sync logs, and no
@@ -108,7 +113,95 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-12):**
+**Current session (2026-09-12, kebab-case enforcement):**
+
+- What changed:
+  - Installed `eslint-plugin-check-file` (dev dep) and added
+    `check-file/filename-naming-convention` (KEBAB_CASE, error) scoped to
+    `app/`+`components/`+`lib/`, plus `check-file/folder-naming-convention`
+    scoped to `components/`+`lib/` only (leaves Next.js `[locale]`/`[slug]`
+    segments alone; reserved names like `page.tsx` already pass as kebab)
+  - Renamed via `git mv` (exports unchanged, still PascalCase symbols):
+    `ProductCard.tsx`→`product-card.tsx`, `FAQ.tsx`→`faq.tsx`,
+    `layout/Header.tsx`→`layout/header.tsx`, `layout/Footer.tsx`→`layout/footer.tsx`
+  - Updated imports in `app/[locale]/layout.tsx` + `app/[locale]/page.tsx`;
+    fixed stale PascalCase filename refs in AGENTS.md, MEMORY.md, DESIGN_SYSTEM.md
+  - Documented enforcement in `docs/CODING_GUIDELINES.md` (build gate, not style tip)
+  - Left untouched: `components/tutorial/*` (starter-kit scaffold, out of scope);
+    `supabase-logo.tsx` brand SVG; ERPNext type errors (other workstream)
+- Verified: negative test (`components/BadName.tsx` fails lint, then removed);
+  `make lint` 0 errors; `format:check` passes; `git diff --check` clean;
+  `make build` compiles successfully (renames/imports resolve, routes OK) but
+  still fails typecheck on the same 5 pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-12, interview + product detail page):**
+
+- Interview answers recorded: AntD-first UI (ARCHITECTURE wins), product
+  detail page next, Supabase catalog is source of truth, PRs to `development`
+  only.
+- What changed:
+  - Built `components/product-catalog.tsx` (client island: antd Search,
+    category/stock Selects, grid Cards, Pagination; router-driven searchParams)
+    and `app/[locale]/products/page.tsx` (Server Component: typed Supabase
+    queries, Suspense, load-error Empty state) — closes old gap #4
+  - Built `app/[locale]/products/[slug]/page.tsx` (slug = product id):
+    antd Breadcrumb/Card/Descriptions, stock Badge, MMK price, specs table,
+    related products, `notFound()` on missing/disabled
+  - Extended `lib/erpnext/queries.ts` with additive `StockFilter` (+ thresholds
+    mirroring catalog badges) for `getProducts`/`getProductCount`; no existing
+    callers affected
+  - Added `showing`/`of`/`results` i18n keys to `messages/en.json` + `messages/my.json`
+  - Reconciled stale docs: AGENTS (hex vars, font link, actual component paths),
+    MEMORY (Supabase catalog truth, gaps renumbered, AntD-first + development-PR
+    decisions), WORKFLOW (PR flow → development), CODING_GUIDELINES (locale
+    paths, AntD-first UI section, wired-forms claim), ARCHITECTURE (migration
+    exists, confirm-route path, locale route seam), DESIGN_SYSTEM (hex token
+    table, font implementation)
+- Verified: `make lint` 0 errors (only pre-existing `app/layout.tsx`
+  custom-font warning); `make format:check` passes; `git diff --check` clean;
+  `npx tsc --noEmit` reports only the 5 pre-existing ERPNext errors
+  (`lib/erpnext/index.ts` + `lib/erpnext/sync.ts`, verified identical on the
+  clean tree — no regressions; none in new catalog/detail files). `make build`
+  remains blocked by those same pre-existing errors.
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync
+
+**Previous session (2026-09-12, design-token reconciliation):**
+
+- What changed:
+  - Reconciled `app/globals.css` against the brand spec: fixed drifted
+    values to exact spec hex (`--background` #F4F6F8, `--foreground`/`--primary`
+    #0F172A, `--accent`/`--ring` #A81C24, `--success` #10B981, `--warning`
+    #F59E0B, `--critical` #A81C24, `--border` #E2E8F0); previous values were
+    close but inexact (`#f3f5f7`, `#a51d26`, `#16a249`, `#f59f0a`)
+  - Added missing tokens to `:root` (+ shadows in `.dark`): `--shadow-default`,
+    `--shadow-hover`, `--card-padding`, `--button-height-primary/inline`,
+    `--table-row-height/comfortable`
+  - Registered `shadow-default` / `shadow-hover` in `tailwind.config.ts`;
+    removed dead `geist` fontFamily entry (Geist is not loaded anywhere)
+  - Replaced hardcoded hex/raw-palette classes with semantic tokens in
+    `product-card.tsx`, `layout/header.tsx`, `layout/footer.tsx`, `faq.tsx`,
+    `testimonials.tsx`, `hero.tsx`, plus `login-form.tsx`/`sign-up-form.tsx`;
+    left `supabase-logo.tsx` brand SVG untouched
+  - Themed antd `ConfigProvider` in `app/[locale]/layout.tsx` with
+    `colorPrimary: #A81C24`, `borderRadius: 8`, `fontFamily: Manrope`
+  - Verified Manrope: loaded via Google Fonts link in `app/layout.tsx`,
+    applied via `font-sans` → `--font-manrope` on `<body>`, plus antd theme token
+  - Updated `docs/DESIGN_SYSTEM.md` (status/shadow/size tokens, Manrope,
+    Hex Bloom as implemented) and removed stale gap notes
+- Verified: `make lint` passes (0 errors; only the pre-existing
+  `app/layout.tsx` custom-font warning); `make format:check` passes;
+  `npx tsc --noEmit` reports **only** 5 pre-existing errors in
+  `lib/erpnext/index.ts` + `lib/erpnext/sync.ts` — verified identical on
+  the clean tree via `git stash`, so no regressions from this change.
+  Fixed 2 lint errors in ERPNext files (unused `SyncRun` import, unused
+  `request` param) to unblock the lint gate; left their type errors for
+  that workstream.
+- Left open: Product detail page, Contact form backend, Admin CRUD, Supabase
+  schema/migration (Phase C); sync endpoint auth; scheduled sync
+
+**Earlier session (2026-09-12):**
 
 - What changed:
   - Updated `AGENTS.md`, `ARCHITECTURE.md`, `CODING_GUIDELINES.md`, and

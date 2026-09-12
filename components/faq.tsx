@@ -45,17 +45,17 @@ const FAQ = () => {
   };
 
   return (
-    <section className="bg-white py-20 border-t border-gray-200">
+    <section className="bg-card py-20 border-t border-border">
       <div className="max-w-4xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#A81C24] mb-3 flex items-center justify-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 flex items-center justify-center gap-2">
             <HelpCircle size={14} /> Support
           </span>
-          <h2 className="text-3xl md:text-4xl font-black text-[#0F172A] mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4 tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
             Find quick answers to common questions about ordering, shipping, and
             finding the right parts for your vehicle.
           </p>
@@ -69,10 +69,10 @@ const FAQ = () => {
             return (
               <div
                 key={item.id}
-                className={`bg-[#F4F6F8] rounded-2xl border transition-all duration-300 overflow-hidden ${
+                className={`bg-background rounded-2xl border transition-all duration-300 overflow-hidden ${
                   isOpen
-                    ? "border-[#A81C24]/30 shadow-md bg-white"
-                    : "border-transparent hover:border-gray-300"
+                    ? "border-accent/30 shadow-default bg-card"
+                    : "border-transparent hover:border-border"
                 }`}
               >
                 {/* Question Button */}
@@ -83,8 +83,8 @@ const FAQ = () => {
                   <span
                     className={`font-bold text-sm md:text-base pr-4 transition-colors ${
                       isOpen
-                        ? "text-[#A81C24]"
-                        : "text-[#0F172A] group-hover:text-[#A81C24]"
+                        ? "text-accent"
+                        : "text-foreground group-hover:text-accent"
                     }`}
                   >
                     {item.question}
@@ -92,8 +92,8 @@ const FAQ = () => {
                   <div
                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
                       isOpen
-                        ? "bg-[#A81C24] text-white rotate-45"
-                        : "bg-white text-gray-500 shadow-sm border border-gray-200 group-hover:border-[#A81C24]/30 group-hover:text-[#A81C24]"
+                        ? "bg-accent text-accent-foreground rotate-45"
+                        : "bg-card text-muted-foreground shadow-default border border-border group-hover:border-accent/30 group-hover:text-accent"
                     }`}
                   >
                     <Plus size={18} />
@@ -106,7 +106,7 @@ const FAQ = () => {
                     isOpen ? "max-h-96 pb-6 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  <p className="text-gray-500 text-sm leading-relaxed border-t border-gray-100 pt-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed border-t border-border pt-4">
                     {item.answer}
                   </p>
                 </div>
@@ -117,9 +117,9 @@ const FAQ = () => {
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Still have questions?{" "}
-            <a href="#" className="font-bold text-[#A81C24] hover:underline">
+            <a href="#" className="font-bold text-accent hover:underline">
               Contact our support team
             </a>
           </p>

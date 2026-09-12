@@ -14,7 +14,6 @@ export default {
       fontFamily: {
         sans: ["var(--font-manrope)", "sans-serif"],
         manrope: ["var(--font-manrope)", "sans-serif"],
-        geist: ["var(--font-geist-sans)", "sans-serif"],
       },
       colors: {
         background: "var(--background)",
@@ -74,6 +73,10 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        default: "var(--shadow-default)",
+        hover: "var(--shadow-hover)",
       },
     },
   },
