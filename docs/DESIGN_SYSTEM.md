@@ -78,12 +78,6 @@ Radius derivatives already exist in `tailwind.config.ts`:
 `lg = var(--radius)`, `md = radius - 2px`, `sm = radius - 4px`. Use these
 (`rounded-lg`, `rounded-md`, `rounded-sm`) rather than arbitrary values.
 
-## Motion — "Hex Bloom"
-
-A soft radial glow in the Crimson Red accent, triggered on hover/focus of
-primary interactive elements (buttons, active status badges), fading in over
-~150–200ms. Implemented via `.hex-bloom` class in `app/globals.css`.
-
 ## Component conventions
 
 - **Ant Design (antd v6)** provides base interactive primitives (forms,

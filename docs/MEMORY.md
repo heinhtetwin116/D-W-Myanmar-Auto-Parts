@@ -131,4 +131,5 @@ changes (see `AGENTS.md` → Documentation maintenance).
   - Removed duplicate `lib/supabase/middleware.ts` and starter-kit scaffold pages
   - Moved i18n-enabled Header/Footer to `components/` root
 - Verified: `make check` passes (lint + typecheck + format), `git diff --check` passes; lint reports only the existing `app/layout.tsx` custom-font warning
+- Verified: `make check` passes (lint + typecheck + format), `git diff --check` passes; lint reports only the existing `app/layout.tsx` custom-font warning
 - Left open: Product detail page, Contact form backend, Admin CRUD, Supabase schema/migration (Phase C)

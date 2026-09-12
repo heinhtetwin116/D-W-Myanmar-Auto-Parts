@@ -213,7 +213,7 @@ export default function AboutPage() {
           <Row gutter={[24, 16]}>
             {values.map((value, index) => (
               <Col key={index} xs={24} sm={12} lg={6}>
-                <Card className="h-full hover:shadow-lg transition-shadow duration-300 hex-bloom border-border">
+                <Card className="h-full hover:shadow-lg transition-shadow duration-300">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
                       <value.icon className={`text-xl ${value.color}`} />
@@ -276,7 +276,7 @@ export default function AboutPage() {
               <Row gutter={[24, 16]}>
                 {stats.map((stat, index) => (
                   <Col key={index} xs={12} sm={12}>
-                    <Card className="text-center p-6 hover:shadow-md transition-shadow hex-bloom">
+                    <Card className="text-center p-6 hover:shadow-md transition-shadow ">
                       <div className={`text-3xl mb-3 ${stat.color}`}>
                         <stat.icon />
                       </div>
@@ -317,7 +317,7 @@ export default function AboutPage() {
           <Row gutter={[24, 16]}>
             {teamMembers.map((member, index) => (
               <Col key={index} xs={24} sm={12} lg={8}>
-                <Card className="h-full hover:shadow-lg transition-shadow hex-bloom border-border">
+                <Card className="h-full hover:shadow-lg transition-shadow border-border">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-20 h-20 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/50">
                       <UsergroupAddOutlined className="text-3xl" />
@@ -359,7 +359,7 @@ export default function AboutPage() {
           <Row gutter={[24, 16]} justify="center">
             {locations.map((location, index) => (
               <Col key={index} xs={24} lg={10}>
-                <Card className="hover:shadow-lg transition-shadow hex-bloom border-border">
+                <Card className="hover:shadow-lg transition-shadow border-border">
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <Title level={4} className="text-foreground">
