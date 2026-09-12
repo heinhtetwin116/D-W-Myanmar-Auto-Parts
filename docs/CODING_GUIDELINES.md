@@ -71,13 +71,17 @@ an Ant Design/starter-kit UI to a Tailwind + design-token UI:
 ## File & folder conventions
 
 - Routes under `app/`; one `page.tsx` (+ optional `layout.tsx`) per route.
-- Shared UI in `components/`, flat unless a feature grows enough to warrant
-  a subfolder (see `components/tutorial/` as the existing precedent).
+- Shared UI in `components/`, using kebab-case filenames (`product-card.tsx`,
+  `login-form.tsx`) and remaining flat unless a feature grows enough to
+  warrant a subfolder (see `components/tutorial/` as the existing precedent).
 - Supabase access in `lib/supabase/`; any future external service gets its
   own `lib/<service>/` folder with the same client-factory shape
   (`createClient()`), not a grab-bag `lib/api.ts`.
 - Co-locate a component's styles as Tailwind classes in the component
   itself; no separate CSS-module files unless a case genuinely needs them.
+- Use PascalCase for exported React component symbols; use kebab-case only
+  for their filenames. Next.js reserved route filenames such as `page.tsx`,
+  `layout.tsx`, and `route.ts` are exempt.
 
 ## Error handling
 
@@ -97,6 +101,20 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 - New required env vars must be added to `.env.example` with no value, and
   to the CI `build` job's `env:` block in `.github/workflows/ci.yml` if the
   build needs them.
+
+### ERPNext integration
+
+- Use a server-only ERPNext client with token authentication. Never import it
+  into a Client Component and never prefix its URL or token with
+  `NEXT_PUBLIC_`.
+- Keep ERPNext API calls behind a typed wrapper; do not scatter raw `fetch`
+  calls through pages or components.
+- Request explicit fields and paginate ERPNext `Item` and `Item Group` reads.
+- Treat the manual sync as idempotent: upsert by ERPNext source ID, record a
+  `sync_runs` result, and leave the last successful Supabase snapshot intact
+  when an upstream request fails.
+- Do not invent bilingual or stock field names. Confirm them against the
+  target ERPNext instance and document the mapping next to the sync code.
 
 ## Linting, formatting, types
 

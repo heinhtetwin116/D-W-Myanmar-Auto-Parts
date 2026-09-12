@@ -104,6 +104,24 @@ form`).
   together, RLS considered explicitly (not left "off by omission").
 - Test both locales (`/my/...` and `/en/...`) for i18n changes.
 
+### ERPNext catalog sync validation
+
+Before implementing the ERPNext sync, record the target `Item` and `Item
+Group` field mapping, including bilingual fields, enabled status, image URL,
+and the source used for actual stock. The first milestone must be manually
+triggerable and tested against a safe ERPNext environment.
+
+A sync change is not complete until it verifies:
+
+- enabled Items and categories are imported with stable ERPNext source IDs;
+- repeated runs are idempotent;
+- bilingual fields, numeric MMK prices, actual stock, and image URLs map as
+  expected;
+- successful sync counts and failed sync errors are recorded;
+- a failed run leaves the last successful Supabase catalog available; and
+- ERPNext credentials are never present in browser bundles or `NEXT_PUBLIC_`
+  environment variables.
+
 ## Session process (for anyone — human or agent — working in this repo)
 
 Mirrors `AGENTS.md`:

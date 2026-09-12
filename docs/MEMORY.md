@@ -70,6 +70,12 @@ changes (see `AGENTS.md` → Documentation maintenance).
 8. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
 
+9. **ERPNext catalog integration is the next implementation milestone.**
+   ERPNext `Item` and `Item Group` records are the upstream source; the first
+   delivery is a manually triggered server-side sync into a Supabase catalog
+   mirror. Exact custom field names for bilingual content and actual stock are
+   still awaiting confirmation from the ERPNext instance.
+
 ## Decisions recorded
 
 - Design-token values are treated as already-correct and already
@@ -83,12 +89,35 @@ changes (see `AGENTS.md` → Documentation maintenance).
 - i18n with `next-intl`: Myanmar (my) default, English (en) supported. All UI strings in `messages/my.json` and `messages/en.json`.
 - Products catalog currently reads from local `data/products.json` (Phase B). Will migrate to Supabase in Phase C.
 - Header/Footer components moved to `components/` root with full i18n support (language switcher, locale-aware links).
+- ERPNext integration decisions: server-only credentials, enabled Items only,
+  actual stock, `Item.image`, numeric MMK prices, ERPNext source IDs, last
+  successful Supabase snapshot on failure, persisted sync logs, and no
+  scheduling or alert delivery until manual sync is verified.
+- ERPNext source mapping decisions: use `Item` and `Item Group`; store
+  normalized bilingual catalog metadata plus source IDs in Supabase; use
+  numeric MMK prices; keep enquiry actions visual-only for the first sync
+  milestone; and defer scheduled execution and alert delivery until the
+  manual sync is verified.
+- Naming convention decision: all new page and component filenames use
+  kebab-case; Next.js reserved filenames remain `page.tsx`, `layout.tsx`, and
+  `route.ts`; exported React component symbols remain PascalCase. Existing
+  PascalCase component files are legacy exceptions until intentionally renamed
+  with their imports.
 
 ## Session handoff
 
 **Last entry:**
 
 - What changed:
+  - Updated `AGENTS.md`, `ARCHITECTURE.md`, `CODING_GUIDELINES.md`, and
+    `WORKFLOW.md` with the ERPNext catalog integration boundary and validation
+    contract before implementation
+  - Redesigned the products catalog page to match the
+    reference shopping-catalog layout: compact category rail, catalog
+    masthead, four-column desktop grid, status badges, ratings, and add
+    actions using semantic design tokens
+  - Reset catalog pagination when search, category, stock, or sort filters
+    change
   - Added i18n foundation with Myanmar/English locales (`lib/i18n.ts`, `messages/*.json`, `middleware.ts`/`proxy.ts`)
   - Switched font from Geist to Manrope
   - Added status color tokens (success/warning/critical) and Hex Bloom glow effect
@@ -99,5 +128,5 @@ changes (see `AGENTS.md` → Documentation maintenance).
   - Updated `proxy.ts` for locale-aware auth redirects
   - Removed duplicate `lib/supabase/middleware.ts` and starter-kit scaffold pages
   - Moved i18n-enabled Header/Footer to `components/` root
-- Verified: `make check` passes (lint + typecheck + format), `npm run build` succeeds, both Myanmar and English locales render correctly
+- Verified: `make check` passes (lint + typecheck + format), `git diff --check` passes; lint reports only the existing `app/layout.tsx` custom-font warning
 - Left open: Product detail page, Contact form backend, Admin CRUD, Supabase schema/migration (Phase C)

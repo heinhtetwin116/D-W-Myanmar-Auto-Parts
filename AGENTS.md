@@ -2,8 +2,6 @@
 
 **D&W Myanmar Auto Parts** — Next.js 15 (App Router) + Supabase (Auth + Postgres) + Ant Design v6 + Tailwind CSS + next-intl (i18n: Myanmar `my` default, English `en`).
 
----
-
 ## Key Commands
 
 | Command             | Description                                    |
@@ -19,8 +17,6 @@
 | `make reset`        | Clean + reinstall                              |
 
 **Pre-commit**: Husky + lint-staged runs ESLint --fix + Prettier on staged files.
-
----
 
 ## Architecture Notes (Non-obvious)
 
@@ -50,23 +46,29 @@
 - Use `bg-background`, `text-foreground`, `bg-accent`, etc. — **never raw hex or `bg-blue-500`**
 - Status tokens: `--success`, `--warning`, `--critical` (light + dark)
 - Font: Manrope via `next/font/google` in `app/[locale]/layout.tsx`
-- Hex Bloom: `.hex-bloom` class for hover/focus glow on primary actions
 
 ### Component Structure
 
-- `components/` root: `Header`, `Footer`, `ProductCard`, auth forms (all i18n-ready, Ant Design + Tailwind)
+- `components/` root: shared components use kebab-case filenames, such as
+  `header.tsx`, `footer.tsx`, and `product-card.tsx` (all i18n-ready, Ant
+  Design + Tailwind)
 - `app/[locale]/` — all locale-scoped pages
 - `data/products.json` — local product catalog (15 products, 8 categories); Supabase migration pending
 
----
+### Naming Convention
+
+- Use kebab-case for all new page and component filenames, including route
+  files where Next.js does not require a reserved name.
+- Keep Next.js reserved filenames such as `page.tsx`, `layout.tsx`, and
+  `route.ts` unchanged.
+- Use PascalCase for the exported React component symbol; only the filename
+  is kebab-case.
 
 ## Documentation
 
 - **Always read `docs/MEMORY.md` first** — current status, gaps, handoff
 - Other docs in `docs/` are stable references; update `MEMORY.md` for progress
 - `docs/PRD.md` does not exist (see `MEMORY.md` Known gaps)
-
----
 
 ## Definition of Done
 
@@ -75,8 +77,6 @@
 3. Manually verified affected flow
 4. Only semantic design tokens used
 5. Unwired handlers marked `// TODO: wire to API` + called out in PR
-
----
 
 ## Git / Commit
 
