@@ -32,6 +32,8 @@ Setup:
    hooks automatically.
 3. `make dev`.
 
+All routes are under locale prefix: `http://localhost:3000/my/...` or `http://localhost:3000/en/...`
+
 ## Git hooks (local)
 
 `.husky/pre-commit` runs `lint-staged` only:
@@ -60,14 +62,7 @@ Triggered on push/PR to `main` and `development`.
    `next build`, with `NEXT_PUBLIC_SUPABASE_URL` and
    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` injected from repo secrets.
 
-**`codeql.yml`**
-
-- Runs on push/PR touching `*.ts`/`*.tsx`/`*.js`/`*.mjs`, and weekly on a
-  schedule.
-- CodeQL `security-and-quality` analysis; results land in the GitHub
-  Security tab.
-
-Both workflows use Node `20.x`.
+Workflows use Node `20.x`.
 
 ## Branching & commits
 
@@ -90,9 +85,7 @@ Full rules live in `CONTRIBUTION_GUIDELINES.md`; summary:
 form`).
 3. PR description includes: what changed and why, screenshots/recordings
    for UI changes, and a `// TODO: wire to API` comment (plus a callout in
-   the description) for any mock/hardcoded data still in use — e.g. the
-   current `login-form.tsx`/`sign-up-form.tsx` mocked submit handlers fall
-   into this category until they're wired to Supabase.
+   the description) for any mock/hardcoded data still in use.
 4. `make check` must pass locally before requesting review.
 5. At least one approval required.
 6. Squash-merge into `main`.
@@ -109,6 +102,7 @@ form`).
   against `DESIGN_SYSTEM.md`).
 - If a Supabase table/policy changed: schema + migration committed
   together, RLS considered explicitly (not left "off by omission").
+- Test both locales (`/my/...` and `/en/...`) for i18n changes.
 
 ## Session process (for anyone — human or agent — working in this repo)
 

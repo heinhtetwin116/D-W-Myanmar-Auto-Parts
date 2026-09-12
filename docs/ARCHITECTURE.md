@@ -14,25 +14,33 @@ implementation status and gaps, see `MEMORY.md`.
 | UI component library   | **Ant Design (antd v6)**                                          | Used for form controls, cards, dropdowns, etc. Coexists with hand-built Tailwind components — see "UI layering" below. |
 | Database + Auth        | **Supabase** (Postgres, `@supabase/ssr`, `@supabase/supabase-js`) | System of record for identity today; will hold product/category data.                                                  |
 | File storage (planned) | **Amazon S3**                                                     | Not yet integrated. Intended for product images and other media.                                                       |
-| CI                     | **GitHub Actions** (`ci.yml`, `codeql.yml`)                       | Lint/typecheck/format/build + security scanning.                                                                       |
+| CI                     | **GitHub Actions** (`ci.yml`)                                     | Lint/typecheck/format/build + security scanning.                                                                       |
 | Git hooks              | **Husky + lint-staged**                                           | Pre-commit auto-fix/format on staged files only.                                                                       |
+| i18n                   | **next-intl**                                                     | Locale prefix required: `my` (default Myanmar) / `en` English. Middleware handles locale detection.                    |
 
 ## Module boundaries
 
 ```
 app/                      Routes (App Router). Pages + layouts + route handlers.
-  auth/                   Login, sign-up, forgot/update password, email confirm, error page
-  protected/              Authenticated-only area (layout + page)
-  layout.tsx              Root layout: fonts, ThemeProvider, metadata
-  page.tsx                Public home page (currently the starter-kit tutorial page)
+  [locale]/               All locale-scoped routes (my/en)
+    auth/                   Login, sign-up, forgot/update password, error page
+    products/               Catalog + detail pages
+    about/                  About page
+    layout.tsx              Locale layout: providers, Header, Footer
+    page.tsx                Home page
+  api/
+    auth/confirm/route.ts   Email confirmation (locale-aware redirect)
+  layout.tsx              Root layout: redirects to /my
   globals.css             Design tokens (CSS variables) + Tailwind layers
 
 components/               Presentational + client-interactive components
-  tutorial/                 Legacy starter-kit scaffold (see MEMORY.md re: retirement)
-  login-form.tsx           D&W-specific auth UI (Tailwind, not yet wired to Supabase)
-  sign-up-form.tsx         D&W-specific auth UI (Tailwind, not yet wired to Supabase)
-  forgot-password-form.tsx  Starter-kit auth UI (antd, wired to Supabase)
-  update-password-form.tsx  Starter-kit auth UI (antd, wired to Supabase)
+  Header.tsx                i18n-ready header with locale switcher
+  Footer.tsx                i18n-ready footer
+  ProductCard.tsx           Product display card
+  login-form.tsx            D&W-specific auth UI (Tailwind, wired to Supabase)
+  sign-up-form.tsx          D&W-specific auth UI (Tailwind, wired to Supabase)
+  forgot-password-form.tsx  Auth UI (antd, wired to Supabase)
+  update-password-form.tsx  Auth UI (antd, wired to Supabase)
   auth-button.tsx / logout-button.tsx  Session-aware nav controls
   theme-switcher.tsx        Light/dark/system toggle (next-themes)
 
@@ -40,23 +48,25 @@ lib/
   supabase/
     client.ts              Browser Supabase client (Client Components)
     server.ts               Server Supabase client (Server Components/Route Handlers), per-request
-    middleware.ts            Legacy session-refresh helper (see "Known duplication" below)
     proxy.ts                 Current session-refresh helper, used by proxy.ts middleware
+  i18n.ts                   next-intl config (locales, defaultLocale, getRequestConfig)
   utils.ts                  `cn()` class-merge helper, `hasEnvVars` guard
 
-proxy.ts                   Next.js "proxy" (middleware) entry point — route matcher + updateSession
+proxy.ts                   Next.js middleware entry point — locale detection + session refresh
 ```
 
 ## Request / auth data flow
 
 1. **Every non-static request** hits `proxy.ts`, whose `config.matcher`
-   excludes static assets and images.
+   excludes static assets, images, and API routes.
 2. `proxy.ts` calls `updateSession()` (`lib/supabase/proxy.ts`), which:
    - Builds a request-scoped Supabase server client (cookie get/set wired to
      the Next.js request/response).
    - Calls `supabase.auth.getClaims()` to refresh/validate the session.
-   - Redirects unauthenticated users to `/auth/login` for any path other
-     than `/`, `/login*`, `/auth*`.
+   - **Locale detection**: extracts locale from URL prefix (`/my/...`, `/en/...`);
+     if missing, redirects to `/my` (default).
+   - Redirects unauthenticated users to `/{locale}/auth/login` for any path
+     other than `/`, `/{locale}/login*`, `/{locale}/auth*`.
    - Returns the `NextResponse` with refreshed cookies attached — **this
      step must not be skipped or reordered**, or sessions can be randomly
      invalidated.
@@ -71,24 +81,133 @@ proxy.ts                   Next.js "proxy" (middleware) entry point — route ma
    Security policies are expected to gate all table access once
    product/category tables exist.
 
-## UI layering (current, transitional)
+## UI layering
 
-The codebase currently contains **two parallel UI approaches**:
+The UI follows a **D&W-specific Ant Design (`antd`) path**.
 
-- **Starter-kit / Ant Design path** — `forgot-password-form.tsx`,
-  `update-password-form.tsx`, `auth-button.tsx`, and the `tutorial/*`
-  components. These are wired to Supabase and functional, styled with antd
-  primitives (`Card`, `Form`, `Button`, inline styles).
-- **D&W-specific / Tailwind path** — `login-form.tsx`, `sign-up-form.tsx`.
-  These follow the design system (semantic tokens, custom markup, D&W logo)
-  but are **not yet wired to Supabase** — their submit handlers are mocked
-  (`console.log` + `setTimeout`).
+### UI foundation
 
-This is a deliberate, in-progress migration, not two competing standards.
-New auth/account UI should follow the Tailwind path and be wired to the
-`lib/supabase/client.ts` client per the pattern already used in
-`forgot-password-form.tsx`. See `MEMORY.md` for the exact status and
-`CODING_GUIDELINES.md` for the target pattern.
+**Ant Design (`antd v6`)** is the primary UI component library for the application. It provides the base components and interaction patterns used throughout the system, including:
+
+- `Button`
+- `Form`
+- `Input`
+- `Select`
+- `Card`
+- `Dropdown`
+- `Modal`
+- `Table`
+- `Pagination`
+- `Tag`
+- Other standard controls as required
+
+The goal is to use Ant Design primitives consistently rather than creating separate replacements for components that antd already provides.
+
+### D&W-specific UI
+
+D&W-specific components are built **on top of Ant Design** to match the application's design system, branding, and business requirements.
+
+Examples include:
+
+- `Header.tsx`
+- `Footer.tsx`
+- `ProductCard.tsx`
+- Authentication forms
+- Product management components
+- Product/category-specific controls
+- Other domain-specific UI components
+
+These components may compose multiple antd components and add D&W-specific layout, content, behavior, and styling.
+
+### Styling responsibility
+
+**Tailwind CSS** is used for application-specific layout and styling where needed, while Ant Design remains the source of reusable UI primitives.
+
+The layering is:
+
+```text
+D&W Pages / Features
+        ↓
+D&W-specific Components
+        ↓
+Ant Design Components
+        ↓
+Ant Design Design System
+```
+
+For example:
+
+```text
+Product Page
+    ↓
+D&W Product Details
+    ↓
+Card / Button / Tag / Table
+    ↓
+Ant Design
+```
+
+### Component ownership
+
+Use the following rule when deciding where a UI component belongs:
+
+1. **If Ant Design already provides the required component, use antd.**
+2. **If the component represents D&W-specific business functionality, create a D&W-specific component using antd primitives.**
+3. **Do not create a custom component solely to replace an existing antd component without a clear requirement.**
+4. **Keep D&W branding, domain logic, and business-specific composition outside the underlying antd primitives.**
+
+This keeps the UI consistent while allowing D&W-specific screens to have their own identity.
+
+### Authentication UI
+
+Authentication screens should follow the same D&W-specific Ant Design approach.
+
+Auth forms should use Ant Design components such as `Form`, `Input`, `Button`, and related controls, while the surrounding layout, branding, validation behavior, and Supabase integration remain D&W-specific.
+
+The target pattern is:
+
+```text
+D&W Auth Form
+    ↓
+Ant Design Form / Input / Button
+    ↓
+Supabase Client
+```
+
+### Design-system relationship
+
+The D&W design system defines the application's visual language, while Ant Design provides the underlying UI primitives.
+
+D&W-specific requirements such as:
+
+- Brand colors
+- Typography
+- Spacing
+- Border radius
+- Product presentation
+- Status indicators
+- Layout
+- Responsive behavior
+
+should be applied through the D&W layer rather than modifying or replacing the overall Ant Design component architecture.
+
+### Target architecture
+
+The intended UI architecture is:
+
+```text
+┌─────────────────────────────────────┐
+│          D&W Pages / Features       │
+├─────────────────────────────────────┤
+│       D&W-specific Components       │
+├─────────────────────────────────────┤
+│          Ant Design (antd)          │
+├─────────────────────────────────────┤
+│       Tailwind / CSS Utilities      │
+└─────────────────────────────────────┘
+```
+
+**Ant Design is the UI foundation. D&W-specific components provide the product-specific experience on top of it. Tailwind CSS supports custom layout and styling rather than acting as a competing component system.**
 
 ## Persistence
 
@@ -103,15 +222,6 @@ New auth/account UI should follow the Tailwind path and be wired to the
 - **Storage**: none yet. When Amazon S3 is integrated, it should sit behind
   a small `lib/storage/` wrapper (mirroring `lib/supabase/`) so callers
   never touch the AWS SDK directly.
-
-## Known duplication (flag, do not silently "fix")
-
-`lib/supabase/middleware.ts` and `lib/supabase/proxy.ts` implement nearly
-identical `updateSession()` logic; only `proxy.ts` is currently wired into
-`proxy.ts` (the middleware entry point). `middleware.ts` appears to be a
-leftover from renaming Next.js "middleware" to "proxy" in newer Next.js
-versions. Do not delete without confirming nothing still imports it — see
-`MEMORY.md` for tracking.
 
 ## Extension seams
 
