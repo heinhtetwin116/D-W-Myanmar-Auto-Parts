@@ -1,9 +1,9 @@
 // import { getMessages, setRequestLocale } from "next-intl/server";
 import { Truck, Tag, PhoneCall, ShieldCheck } from "lucide-react";
 // import { createClient } from "@/lib/supabase/server";
-import ProductCard, { Product } from "@/components/ProductCard";
+import ProductCard, { Product } from "@/components/product-card";
 import Hero from "@/components/hero";
-import FAQ from "@/components/FAQ";
+import FAQ from "@/components/faq";
 import Testimonials from "@/components/testimonials";
 
 // --- DUMMY DATA ---

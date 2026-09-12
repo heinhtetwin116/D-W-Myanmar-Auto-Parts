@@ -54,6 +54,28 @@ export async function getCategoryById(
 }
 
 /**
+ * Stock availability buckets used by catalog filters.
+ * Thresholds mirror the status badges in `components/product-catalog.tsx`.
+ */
+export type StockFilter = "in_stock" | "low_stock" | "out_of_stock";
+
+function applyStockFilter<
+  T extends {
+    eq: (c: string, v: unknown) => T;
+    gte: (c: string, v: unknown) => T;
+    lte: (c: string, v: unknown) => T;
+  },
+>(query: T, stock: StockFilter): T {
+  if (stock === "in_stock") {
+    return query.gte("stock_quantity", 11);
+  }
+  if (stock === "low_stock") {
+    return query.gte("stock_quantity", 1).lte("stock_quantity", 10);
+  }
+  return query.eq("stock_quantity", 0);
+}
+
+/**
  * Get all enabled products with optional filtering and pagination.
  */
 export async function getProducts(
@@ -61,6 +83,7 @@ export async function getProducts(
   options: {
     categoryId?: string;
     search?: string;
+    stock?: StockFilter;
     limit?: number;
     offset?: number;
   } = {},
@@ -69,6 +92,10 @@ export async function getProducts(
 
   if (options.categoryId) {
     query = query.eq("category_id", options.categoryId);
+  }
+
+  if (options.stock) {
+    query = applyStockFilter(query, options.stock);
   }
 
   if (options.search) {
@@ -137,19 +164,33 @@ export async function getProductsByCategory(
 }
 
 /**
- * Count enabled products (total and by category).
+ * Count enabled products (total and by category/search/stock).
  */
 export async function getProductCount(
   supabase: SupabaseClient,
-  categoryId?: string,
+  options: {
+    categoryId?: string;
+    search?: string;
+    stock?: StockFilter;
+  } = {},
 ): Promise<number> {
   let query = supabase
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("enabled", true);
 
-  if (categoryId) {
-    query = query.eq("category_id", categoryId);
+  if (options.categoryId) {
+    query = query.eq("category_id", options.categoryId);
+  }
+
+  if (options.stock) {
+    query = applyStockFilter(query, options.stock);
+  }
+
+  if (options.search) {
+    query = query.or(
+      `name_en.ilike.%${options.search}%,name_my.ilike.%${options.search}%,sku.ilike.%${options.search}%`,
+    );
   }
 
   const { count, error } = await query;

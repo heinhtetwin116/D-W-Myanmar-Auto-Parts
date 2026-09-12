@@ -80,7 +80,7 @@ Full rules live in `CONTRIBUTION_GUIDELINES.md`; summary:
 
 ## Pull requests
 
-1. Branch off `main`, scoped to a single concern (one feature/fix/screen).
+1. Branch off `development`, scoped to a single concern (one feature/fix/screen).
 2. PR title = a commit-message-shaped summary (`feat: add product enquiry
 form`).
 3. PR description includes: what changed and why, screenshots/recordings
@@ -88,7 +88,7 @@ form`).
    the description) for any mock/hardcoded data still in use.
 4. `make check` must pass locally before requesting review.
 5. At least one approval required.
-6. Squash-merge into `main`.
+6. Squash-merge into `development`.
 
 ## Validation gates (definition of "done enough to open a PR")
 

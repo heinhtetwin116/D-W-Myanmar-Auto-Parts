@@ -10,11 +10,11 @@
 
 import { createClient as createSupabaseServer } from "@/lib/supabase/server";
 import { createERPNextClient, syncCatalogFromERPNext } from "@/lib/erpnext";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs"; // Ensure this runs in Node runtime, not Edge
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // TODO: Verify request origin and authentication
     // For now, allow any POST to this endpoint.

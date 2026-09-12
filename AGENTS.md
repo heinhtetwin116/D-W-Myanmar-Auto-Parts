@@ -42,18 +42,18 @@
 
 ### Design System
 
-- Semantic tokens in `app/globals.css` (HSL CSS variables) → exposed via `tailwind.config.ts`
+- Semantic tokens in `app/globals.css` (hex CSS variables) → exposed via `tailwind.config.ts`
 - Use `bg-background`, `text-foreground`, `bg-accent`, etc. — **never raw hex or `bg-blue-500`**
 - Status tokens: `--success`, `--warning`, `--critical` (light + dark)
-- Font: Manrope via `next/font/google` in `app/[locale]/layout.tsx`
+- Elevation tokens: `shadow-default` / `shadow-hover` (use instead of `shadow-sm`/`shadow-md`)
+- Font: Manrope via Google Fonts `<link>` in `app/layout.tsx`, applied through `font-sans` → `--font-manrope`; antd `ConfigProvider` themed with matching `fontFamily`, `colorPrimary #A81C24`, `borderRadius 8`
 
 ### Component Structure
 
-- `components/` root: shared components use kebab-case filenames, such as
-  `header.tsx`, `footer.tsx`, and `product-card.tsx` (all i18n-ready, Ant
-  Design + Tailwind)
-- `app/[locale]/` — all locale-scoped pages
-- `data/products.json` — local product catalog (15 products, 8 categories); Supabase migration pending
+- `components/layout/`: `Header`, `Footer` (default exports, no locale prop — links are locale-agnostic and need i18n follow-up)
+- `components/` root: `product-card.tsx`, `product-catalog.tsx`, auth forms (Ant Design + Tailwind, i18n-ready where wired)
+- `app/[locale]/` — all locale-scoped pages (`products/`, `products/[slug]/`, `about/`, `auth/*`)
+- Catalog reads Supabase (`categories`/`products` tables) via typed queries in `lib/erpnext/queries.ts` — never raw `.from(...).select(...)` in components
 
 ### Naming Convention
 
