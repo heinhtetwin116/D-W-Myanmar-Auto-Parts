@@ -113,7 +113,30 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-12, interview + product detail page):**
+**Current session (2026-09-12, kebab-case enforcement):**
+
+- What changed:
+  - Installed `eslint-plugin-check-file` (dev dep) and added
+    `check-file/filename-naming-convention` (KEBAB_CASE, error) scoped to
+    `app/`+`components/`+`lib/`, plus `check-file/folder-naming-convention`
+    scoped to `components/`+`lib/` only (leaves Next.js `[locale]`/`[slug]`
+    segments alone; reserved names like `page.tsx` already pass as kebab)
+  - Renamed via `git mv` (exports unchanged, still PascalCase symbols):
+    `ProductCard.tsx`→`product-card.tsx`, `FAQ.tsx`→`faq.tsx`,
+    `layout/Header.tsx`→`layout/header.tsx`, `layout/Footer.tsx`→`layout/footer.tsx`
+  - Updated imports in `app/[locale]/layout.tsx` + `app/[locale]/page.tsx`;
+    fixed stale PascalCase filename refs in AGENTS.md, MEMORY.md, DESIGN_SYSTEM.md
+  - Documented enforcement in `docs/CODING_GUIDELINES.md` (build gate, not style tip)
+  - Left untouched: `components/tutorial/*` (starter-kit scaffold, out of scope);
+    `supabase-logo.tsx` brand SVG; ERPNext type errors (other workstream)
+- Verified: negative test (`components/BadName.tsx` fails lint, then removed);
+  `make lint` 0 errors; `format:check` passes; `git diff --check` clean;
+  `make build` compiles successfully (renames/imports resolve, routes OK) but
+  still fails typecheck on the same 5 pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-12, interview + product detail page):**
 
 - Interview answers recorded: AntD-first UI (ARCHITECTURE wins), product
   detail page next, Supabase catalog is source of truth, PRs to `development`
