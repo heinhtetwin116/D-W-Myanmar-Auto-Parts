@@ -14,7 +14,7 @@ Pairs with `ARCHITECTURE.md` (where things live) and `DESIGN_SYSTEM.md`
   explicitly at the top of the file — keep doing so.
 - Wrap any component that reads dynamic data (`searchParams`, cookies via a
   child, Supabase calls) in `<Suspense>` at the call site, matching the
-  existing pattern in `app/auth/*/page.tsx` and `app/page.tsx`.
+  existing pattern in `app/[locale]/*/page.tsx`.
 - Prefer `async function` Server Components over `useEffect` data fetching
   wherever the data doesn't need client-side interactivity.
 
@@ -34,7 +34,7 @@ Pairs with `ARCHITECTURE.md` (where things live) and `DESIGN_SYSTEM.md`
   4. Surface errors via inline UI state _and_ a toast
      (`message.error(errorMessage)` from antd) — do both, not one or the
      other.
-- Route Handlers that need auth (`app/auth/confirm/route.ts`) use
+- Route Handlers that need auth (`app/api/auth/confirm/route.ts`) use
   `createClient()` from `lib/supabase/server.ts` and redirect via
   `next/navigation`'s `redirect()`, never a manual `Response.redirect`.
 - Any new table access should go through a small typed function colocated
@@ -54,30 +54,42 @@ Pairs with `ARCHITECTURE.md` (where things live) and `DESIGN_SYSTEM.md`
 
 ## UI layer choice
 
-Per `ARCHITECTURE.md` → "UI layering," the project is mid-migration from
-an Ant Design/starter-kit UI to a Tailwind + design-token UI:
+Per `ARCHITECTURE.md` → "UI layering," AntD-first is the decided direction:
 
-- **New auth/account UI**: follow the Tailwind pattern
-  (`login-form.tsx`/`sign-up-form.tsx`), and make sure it's actually wired
-  to Supabase (those two files currently are **not** — don't copy their
-  mocked `handleSubmit` as-is; wire it per the Supabase usage pattern
-  above).
-- **New data-dense UI** (tables, forms with many fields, dropdowns): antd
-  is acceptable and often preferable — just style through the same design
-  tokens where antd exposes theme customization, rather than antd defaults.
-- Don't introduce a third UI approach. If neither antd nor the Tailwind
+- **New UI**: build on antd primitives (`Button`, `Card`, `Form`, `Input`,
+  `Select`, `Table`, `Pagination`, `Tag`, `Descriptions`, `Badge`), styled
+  through semantic design tokens and the `ConfigProvider` theme — see
+  `components/product-catalog.tsx` and `app/[locale]/products/[slug]/page.tsx`
+  for the current pattern.
+- **Auth forms**: `login-form.tsx`/`sign-up-form.tsx` (Tailwind layout +
+  antd `message` toasts) and `forgot-password-form.tsx`/
+  `update-password-form.tsx` (full antd `Form`) are all wired to Supabase.
+- Don't introduce a third UI approach. If neither antd nor the established
   pattern fits, raise it before adding a new dependency.
 
 ## File & folder conventions
 
 - Routes under `app/`; one `page.tsx` (+ optional `layout.tsx`) per route.
-- Shared UI in `components/`, flat unless a feature grows enough to warrant
-  a subfolder (see `components/tutorial/` as the existing precedent).
+- Shared UI in `components/`, using kebab-case filenames (`product-card.tsx`,
+  `login-form.tsx`) and remaining flat unless a feature grows enough to
+  warrant a subfolder (see `components/tutorial/` as the existing precedent).
 - Supabase access in `lib/supabase/`; any future external service gets its
   own `lib/<service>/` folder with the same client-factory shape
   (`createClient()`), not a grab-bag `lib/api.ts`.
 - Co-locate a component's styles as Tailwind classes in the component
   itself; no separate CSS-module files unless a case genuinely needs them.
+- Use PascalCase for exported React component symbols; use kebab-case only
+  for their filenames. Next.js reserved route filenames such as `page.tsx`,
+  `layout.tsx`, and `route.ts` are exempt.
+- **Enforcement:** kebab-case is locked in by ESLint
+  (`eslint-plugin-check-file` in `eslint.config.mjs`), scoped to `app/`,
+  `components/`, and `lib/`. The filename rule fails on any non-kebab
+  `*.ts`/`*.tsx` name, and the folder rule fails on non-kebab folders under
+  `components/` and `lib/`. Violations fail `make lint` / `make check` / CI —
+  this is a build gate, not just a style preference. Next.js reserved names
+  (`page`, `layout`, `route`, …) and dynamic-segment folders (`[locale]`,
+  `[slug]`) are unaffected: reserved names are already valid kebab-case and
+  `app/` folders are not checked.
 
 ## Error handling
 
@@ -92,11 +104,25 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 ## Environment variables
 
 - Guard optional-Supabase-setup UI with `hasEnvVars` (`lib/utils.ts`) —
-  see `EnvVarWarning` usage in `app/page.tsx` — rather than letting
+  see `EnvVarWarning` usage in `app/protected/layout.tsx` — rather than letting
   `createClient()` throw when env vars are missing.
 - New required env vars must be added to `.env.example` with no value, and
   to the CI `build` job's `env:` block in `.github/workflows/ci.yml` if the
   build needs them.
+
+### ERPNext integration
+
+- Use a server-only ERPNext client with token authentication. Never import it
+  into a Client Component and never prefix its URL or token with
+  `NEXT_PUBLIC_`.
+- Keep ERPNext API calls behind a typed wrapper; do not scatter raw `fetch`
+  calls through pages or components.
+- Request explicit fields and paginate ERPNext `Item` and `Item Group` reads.
+- Treat the manual sync as idempotent: upsert by ERPNext source ID, record a
+  `sync_runs` result, and leave the last successful Supabase snapshot intact
+  when an upstream request fails.
+- Do not invent bilingual or stock field names. Confirm them against the
+  target ERPNext instance and document the mapping next to the sync code.
 
 ## Linting, formatting, types
 

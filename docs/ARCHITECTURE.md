@@ -34,9 +34,9 @@ app/                      Routes (App Router). Pages + layouts + route handlers.
   globals.css             Design tokens (CSS variables) + Tailwind layers
 
 components/               Presentational + client-interactive components
-  Header.tsx                i18n-ready header with locale switcher
-  Footer.tsx                i18n-ready footer
-  ProductCard.tsx           Product display card
+  header.tsx                i18n-ready header with locale switcher
+  footer.tsx                i18n-ready footer
+  product-card.tsx          Product display card
   login-form.tsx            D&W-specific auth UI (Tailwind, wired to Supabase)
   sign-up-form.tsx          D&W-specific auth UI (Tailwind, wired to Supabase)
   forgot-password-form.tsx  Auth UI (antd, wired to Supabase)
@@ -109,9 +109,9 @@ D&W-specific components are built **on top of Ant Design** to match the applicat
 
 Examples include:
 
-- `Header.tsx`
-- `Footer.tsx`
-- `ProductCard.tsx`
+- `header.tsx`
+- `footer.tsx`
+- `product-card.tsx`
 - Authentication forms
 - Product management components
 - Product/category-specific controls
@@ -212,22 +212,63 @@ The intended UI architecture is:
 ## Persistence
 
 - **Auth**: fully owned by Supabase Auth (`auth.users`, sessions, email
-  confirmation via `app/auth/confirm/route.ts` using `verifyOtp`).
-- **Domain data (products/categories)**: not yet modeled. `.env.example`
-  reserves a `DATABASE_URL` "for ORM," implying a typed-migration tool
-  (e.g. Prisma or Drizzle) is anticipated but not yet chosen or wired up.
-  Until a decision is recorded here, **new domain tables should be created
-  as plain Supabase SQL migrations** with RLS policies, not assumed to go
-  through an ORM.
+  confirmation via `app/api/auth/confirm/route.ts` using `verifyOtp`).
+- **Domain data (products/categories)**: modeled in
+  `supabase/migrations/20260912_000000_create_catalog_schema.sql`
+  (`categories`, `products`, `sync_runs` tables with RLS: public
+  read-enabled, server-write). Until an ORM decision is recorded in
+  `MEMORY.md`, **new domain tables should be created as plain Supabase SQL
+  migrations** with RLS policies, not assumed to go through an ORM.
 - **Storage**: none yet. When Amazon S3 is integrated, it should sit behind
   a small `lib/storage/` wrapper (mirroring `lib/supabase/`) so callers
   never touch the AWS SDK directly.
 
+## ERPNext catalog integration
+
+ERPNext is the upstream source for catalog data. The first integration uses
+the standard `Item` and `Item Group` DocTypes and reads them through the
+ERPNext REST API with token authentication. The exact custom field names for
+Myanmar/English content and actual stock must be confirmed against the target
+ERPNext instance before implementation.
+
+The intended data flow is:
+
+```text
+ERPNext Item / Item Group
+        |
+        v
+Server-only manual sync
+        |
+        v
+Supabase catalog mirror + sync_runs
+        |
+        v
+Public products pages
+```
+
+- ERPNext URL and token are server-only environment variables.
+- The public catalog reads the last successful Supabase snapshot; browser code
+  must never call ERPNext directly.
+- The mirror stores normalized bilingual product/category data, ERPNext source
+  IDs, numeric MMK prices, actual stock, enabled/published state, image URL,
+  and timestamps.
+- Sync writes are privileged server-side operations. Public catalog tables are
+  exposed only with explicit grants and RLS policies for published reads.
+- A failed sync records an error in `sync_runs` and must not replace the last
+  successful catalog snapshot.
+- The first milestone is a manually triggered sync. Scheduling and operator
+  alert delivery are follow-up work.
+
+The repository currently has no `supabase/` migration directory. When schema
+work begins, use the project's chosen Supabase migration workflow and keep
+catalog tables, indexes, grants, and RLS policies together in the same schema
+change.
+
 ## Extension seams
 
-- **New route group**: add under `app/`, following the existing
+- **New route group**: add under `app/[locale]/`, following the existing
   `layout.tsx` + `page.tsx` pattern; wrap client-only islands in
-  `<Suspense>` as done throughout `app/auth/*`.
+  `<Suspense>` as done throughout `app/[locale]/products/page.tsx`.
 - **New Supabase-backed feature**: add a SQL migration + RLS policy, then a
   typed query function colocated with the feature (do not scatter raw
   `.from(...)` calls through components — wrap them).

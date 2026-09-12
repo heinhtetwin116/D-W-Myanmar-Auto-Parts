@@ -156,19 +156,19 @@ export function SignUpForm({ locale }: SignUpFormProps) {
 
         {/* Password Requirements */}
         <div className="grid grid-cols-2 gap-y-1 text-xs py-1 text-muted-foreground">
-          <span className={hasLowercase ? "text-emerald-600 font-medium" : ""}>
+          <span className={hasLowercase ? "text-success font-medium" : ""}>
             • {t("requirements.lowercase")}
           </span>
-          <span className={hasSpecial ? "text-emerald-600 font-medium" : ""}>
+          <span className={hasSpecial ? "text-success font-medium" : ""}>
             • {t("requirements.special")}
           </span>
-          <span className={hasUppercase ? "text-emerald-600 font-medium" : ""}>
+          <span className={hasUppercase ? "text-success font-medium" : ""}>
             • {t("requirements.uppercase")}
           </span>
-          <span className={hasMinLength ? "text-emerald-600 font-medium" : ""}>
+          <span className={hasMinLength ? "text-success font-medium" : ""}>
             • {t("requirements.min_length")}
           </span>
-          <span className={hasNumber ? "text-emerald-600 font-medium" : ""}>
+          <span className={hasNumber ? "text-success font-medium" : ""}>
             • {t("requirements.number")}
           </span>
         </div>

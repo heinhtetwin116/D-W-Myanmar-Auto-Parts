@@ -30,33 +30,49 @@ surfaced via `tailwind.config.ts` as `success`, `warning`, `critical`
 
 ### Implementation: semantic tokens
 
-Brand colors are implemented as **HSL CSS variables** in `app/globals.css`
+Brand colors are implemented as **hex CSS variables** in `app/globals.css`
 and surfaced to Tailwind via `tailwind.config.ts` (`theme.extend.colors`),
 following the shadcn/ui convention. The existing tokens already map to the
 brand palette above:
 
-| Token                        | Light value (HSL) | Corresponds to                           |
+| Token                        | Light value (hex) | Corresponds to                           |
 | ---------------------------- | ----------------- | ---------------------------------------- |
-| `--background`               | `210 20% 96%`     | Cool Soft Gray base                      |
-| `--foreground` / `--primary` | `222 47% 11%`     | Obsidian (`#0F172A`)                     |
-| `--accent` / `--ring`        | `356 70% 38%`     | Crimson Red (`#A81C24`)                  |
-| `--destructive`              | `0 84.2% 60.2%`   | Error state (distinct from brand accent) |
+| `--background`               | `#F4F6F8`         | Cool Soft Gray base                      |
+| `--foreground` / `--primary` | `#0F172A`         | Obsidian                                 |
+| `--accent` / `--ring`        | `#A81C24`         | Crimson Red                              |
+| `--destructive`              | `#EF4444`         | Error state (distinct from brand accent) |
+| `--success`                  | `#10B981`         | Soft Green                               |
+| `--warning`                  | `#F59E0B`         | Warm Amber                               |
+| `--critical`                 | `#A81C24`         | Accent Crimson                           |
 
 A `.dark` variant of every token is defined in the same file. **Always
 reference tokens** (`bg-background`, `text-primary`, `border-border`,
 `bg-accent text-accent-foreground`, etc.) — never `bg-[#A81C24]` or
 `bg-red-600`.
 
-When adding the status colors, follow the same pattern: define
-`--success`, `--warning`, `--critical` (+ `-foreground` pairs) in both the
-`:root` and `.dark` blocks, then register them under
-`theme.extend.colors` before using them in components.
+### Elevation & sizing tokens
+
+| Token                            | Value                                 | Usage                            |
+| -------------------------------- | ------------------------------------- | -------------------------------- |
+| `--shadow-default`               | `0px 2px 4px rgba(15, 23, 42, 0.06)`  | Default card/component elevation |
+| `--shadow-hover`                 | `0px 8px 16px rgba(15, 23, 42, 0.10)` | Hover elevation                  |
+| `--card-padding`                 | `20px`                                | Internal card padding            |
+| `--button-height-primary`        | `40px`                                | Primary CTA height               |
+| `--button-height-inline`         | `32px`                                | Inline button height             |
+| `--table-row-height`             | `48px`                                | Standard table row height        |
+| `--table-row-height-comfortable` | `56px`                                | Comfortable table row height     |
+
+Shadows are registered in `tailwind.config.ts` as `shadow-default` /
+`shadow-hover`. Use these instead of `shadow-sm` / `shadow-md` / ad-hoc
+`box-shadow` values.
 
 ## Typography
 
 - **Font:** Manrope.
-- **Implementation:** `app/[locale]/layout.tsx` loads `Manrope` via
-  `next/font/google`, exposed as CSS variable `--font-manrope`, applied on `<body>`.
+- **Implementation:** `app/layout.tsx` loads `Manrope` via a Google Fonts
+  `<link>`, applied through Tailwind `font-sans` → `--font-manrope` on
+  `<body>`; antd `ConfigProvider` in `app/[locale]/layout.tsx` passes a
+  matching `fontFamily` theme token so antd components render Manrope too.
 - Headings and primary typography use the Obsidian (`--primary` /
   `--foreground`) token; body copy should default to
   `text-foreground`/`text-muted-foreground` per context.
@@ -85,7 +101,7 @@ Radius derivatives already exist in `tailwind.config.ts`:
   interactive widgets.
 - **Tailwind + semantic tokens** own layout, spacing, and one-off
   composition — and are the target styling approach for new D&W-branded UI
-  (see `Header.tsx`, `Footer.tsx`, `ProductCard.tsx`, `login-form.tsx`,
+  (see `header.tsx`, `footer.tsx`, `product-card.tsx`, `login-form.tsx`,
   `sign-up-form.tsx` for the current direction, and `ARCHITECTURE.md` →
   "UI layering" for status).
 - Do not mix: a given component should be either antd-driven or
@@ -98,5 +114,4 @@ Radius derivatives already exist in `tailwind.config.ts`:
 - `ARCHITECTURE.md` — where tokens live and how the two UI layers coexist.
 - `CODING_GUIDELINES.md` — the "use semantic tokens" rule as an
   implementation-time contract.
-- `MEMORY.md` — tracks the Manrope/Geist mismatch and missing status-color
-  tokens as open gaps.
+- `MEMORY.md` — session handoff and remaining gaps.

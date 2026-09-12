@@ -80,7 +80,7 @@ Full rules live in `CONTRIBUTION_GUIDELINES.md`; summary:
 
 ## Pull requests
 
-1. Branch off `main`, scoped to a single concern (one feature/fix/screen).
+1. Branch off `development`, scoped to a single concern (one feature/fix/screen).
 2. PR title = a commit-message-shaped summary (`feat: add product enquiry
 form`).
 3. PR description includes: what changed and why, screenshots/recordings
@@ -88,7 +88,7 @@ form`).
    the description) for any mock/hardcoded data still in use.
 4. `make check` must pass locally before requesting review.
 5. At least one approval required.
-6. Squash-merge into `main`.
+6. Squash-merge into `development`.
 
 ## Validation gates (definition of "done enough to open a PR")
 
@@ -103,6 +103,24 @@ form`).
 - If a Supabase table/policy changed: schema + migration committed
   together, RLS considered explicitly (not left "off by omission").
 - Test both locales (`/my/...` and `/en/...`) for i18n changes.
+
+### ERPNext catalog sync validation
+
+Before implementing the ERPNext sync, record the target `Item` and `Item
+Group` field mapping, including bilingual fields, enabled status, image URL,
+and the source used for actual stock. The first milestone must be manually
+triggerable and tested against a safe ERPNext environment.
+
+A sync change is not complete until it verifies:
+
+- enabled Items and categories are imported with stable ERPNext source IDs;
+- repeated runs are idempotent;
+- bilingual fields, numeric MMK prices, actual stock, and image URLs map as
+  expected;
+- successful sync counts and failed sync errors are recorded;
+- a failed run leaves the last successful Supabase catalog available; and
+- ERPNext credentials are never present in browser bundles or `NEXT_PUBLIC_`
+  environment variables.
 
 ## Session process (for anyone — human or agent — working in this repo)
 

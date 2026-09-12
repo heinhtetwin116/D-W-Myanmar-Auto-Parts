@@ -15,6 +15,7 @@ make install
 # 3. Set up environment variables
 cp .env.example .env
 # Fill in NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+# ERPNext URL and token credentials are server-only; never use NEXT_PUBLIC_ names.
 
 # 4. Start the development server
 make dev
@@ -139,3 +140,22 @@ docs: update environment variable names in README
 - No `any` types — use proper TypeScript types or generics.
 - Server Components are the default in the App Router; only opt into `"use client"` when strictly necessary (event handlers, browser APIs, React hooks).
 - Keep components small and single-purpose. Extract shared UI into `components/`.
+- Use kebab-case for all new page and component filenames, such as
+  `product-card.tsx` and `login-form.tsx`. Keep Next.js reserved filenames
+  such as `page.tsx`, `layout.tsx`, and `route.ts` unchanged.
+- Use PascalCase for exported React component names even when their filenames
+  are kebab-case.
+
+### ERPNext catalog integration
+
+- Confirm the target ERPNext custom field names for bilingual content and
+  actual stock before implementing schema or sync code.
+- The first integration milestone is a manually triggered sync. Do not add
+  scheduled execution until the manual path is verified.
+- Sync enabled Items only, preserve ERPNext source IDs, and record every sync
+  attempt and result.
+- Use a typed server-only ERPNext client with explicit field selection and
+  pagination. Never scatter raw ERPNext requests through pages or components.
+- A failed sync must leave the last successful Supabase catalog available.
+- Any remaining visual-only enquiry or mock catalog action must be marked
+  `// TODO: wire to API` and called out in the pull request.
