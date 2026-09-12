@@ -155,6 +155,21 @@ export function LoginForm({ locale }: LoginFormProps) {
           {t("signup_link")}
         </Link>
       </p>
+
+      {/* Footer Legal Links */}
+      <div className="pt-6 border-t border-gray-100 flex items-center justify-center gap-4 text-xs text-gray-400">
+        <Link href="/terms" className="hover:text-accent transition-colors">
+          Terms of Service
+        </Link>
+        <span className="w-px h-3 bg-gray-300"></span>
+        <Link href="/privacy" className="hover:text-accent transition-colors">
+          Privacy Policy
+        </Link>
+        <span className="w-px h-3 bg-gray-300"></span>
+        <Link href="/help" className="hover:text-accent transition-colors">
+          Help Center
+        </Link>
+      </div>
     </div>
   );
 }

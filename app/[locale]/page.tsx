@@ -300,13 +300,13 @@ export default async function HomePage() {
   // const latestProductsTransformed = latestProducts.map(transformProduct);
 
   return (
-    <div className="min-h-screen bg-coolgray flex flex-col font-manrope">
+    <div className="min-h-screen flex flex-col font-manrope">
       <main className="flex-grow">
         {/* Hero Section */}
         <Hero />
 
         {/* Features Bar */}
-        <section className="bg-white border-b border-gray-200 py-6">
+        <section className="border-b border-gray-200 py-6">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center gap-4">
               <div className="text-[#A81C24]">
@@ -385,7 +385,7 @@ export default async function HomePage() {
         </section>
 
         {/* Latest Products */}
-        <section className="bg-white py-16 border-t border-gray-200 w-full">
+        <section className="py-16 border-t border-gray-200 w-full">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 border-b border-gray-200 pb-4 gap-4">
               <h2 className="text-2xl font-bold text-[#0F172A]">
@@ -410,241 +410,5 @@ export default async function HomePage() {
         </section>
       </main>
     </div>
-    // <div className="min-h-screen bg-background flex flex-col">
-    //   {/* Hero Section */}
-    //   <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-20 lg:py-32">
-    //     <div className="container-custom">
-    //       <div className="mx-auto max-w-3xl text-center">
-    //         <Badge className="mb-6 hex-bloom" style={{ fontSize: "0.875rem" }}>
-    //           <Star className="mr-1" />
-    //           {locale === "my"
-    //             ? "20+ နှစ်များ၏ အတွေ့အကြုံ"
-    //             : "20+ Years of Excellence"}
-    //         </Badge>
-    //         <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-foreground mb-6">
-    //           {heroT.title}
-    //         </h1>
-    //         <p className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-    //           {heroT.subtitle}
-    //         </p>
-    //         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-    //           <Link href={`/${locale}/products`}>
-    //             <Button
-    //               type="primary"
-    //               size="large"
-    //               className="hex-bloom w-full sm:w-auto gap-2"
-    //             >
-    //               {heroT.cta_primary}
-    //               <ArrowRight />
-    //             </Button>
-    //           </Link>
-    //           <Link href={`/${locale}/about`}>
-    //             <Button
-    //               type="default"
-    //               size="large"
-    //               className="w-full sm:w-auto"
-    //             >
-    //               {heroT.cta_secondary}
-    //             </Button>
-    //           </Link>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </section>
-
-    //   {/* Features Bar */}
-    //   <section className="bg-card border-b border-border py-6">
-    //     <div className="container-custom">
-    //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    //         {features.map((feature, index) => (
-    //           <div key={index} className="flex items-center gap-4">
-    //             <div className="text-accent">
-    //               <feature.icon size={32} strokeWidth={1.5} />
-    //             </div>
-    //             <div>
-    //               <h4 className="font-bold text-primary text-sm">
-    //                 {featuresT[feature.title]}
-    //               </h4>
-    //               <p className="text-xs text-muted-foreground">
-    //                 {featuresT[feature.desc]}
-    //               </p>
-    //             </div>
-    //           </div>
-    //         ))}
-    //       </div>
-    //     </div>
-    //   </section>
-
-    //   {/* Value Props */}
-    //   <section className="section-padding bg-background">
-    //     <div className="container-custom">
-    //       <div className="mx-auto max-w-2xl text-center mb-16">
-    //         <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-    //           {valuePropsPageT.title}
-    //         </h2>
-    //         <p className="text-muted-foreground text-lg">
-    //           {valuePropsPageT.subtitle}
-    //         </p>
-    //       </div>
-
-    //       <Row gutter={[24, 16]} className="gap-8">
-    //         {valueProps.map((prop, index) => (
-    //           <Col key={index} xs={24} sm={12} lg={6}>
-    //             <Card className="h-full hover:shadow-lg transition-shadow duration-300 hex-bloom border-border">
-    //               <div className="flex items-start gap-4">
-    //                 <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-    //                   <prop.icon className="text-xl" />
-    //                 </div>
-    //                 <div>
-    //                   <h4 className="text-foreground mb-2">{prop.title}</h4>
-    //                   <span className="text-muted-foreground text-sm">
-    //                     {prop.description}
-    //                   </span>
-    //                 </div>
-    //               </div>
-    //             </Card>
-    //           </Col>
-    //         ))}
-    //       </Row>
-    //     </div>
-    //   </section>
-
-    //   {/* Featured Products */}
-    //   <section className="section-padding bg-muted/30">
-    //     <div className="container-custom">
-    //       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-8">
-    //         <div>
-    //           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-    //             {featuredT.title}
-    //           </h2>
-    //           <span className="text-muted-foreground">
-    //             {featuredT.subtitle}
-    //           </span>
-    //         </div>
-    //         <Link href={`/${locale}/products`} className="mt-4 lg:mt-0">
-    //           <Button type="text" className="text-accent hover:bg-accent/10">
-    //             {featuredT.view_all}
-    //             <ArrowRight className="ml-1" />
-    //           </Button>
-    //         </Link>
-    //       </div>
-
-    //       {/* Category Tabs */}
-    //       <Tabs
-    //         defaultActiveKey="all"
-    //         className="mb-8"
-    //         items={productCategories.map((cat) => ({
-    //           key: cat.id,
-    //           label: categoriesT[cat.label],
-    //         }))}
-    //       />
-
-    //       {featuredProductsTransformed.length > 0 ? (
-    //         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    //           {featuredProductsTransformed.map((product) => (
-    //             <ProductCard key={product.id} product={product} />
-    //           ))}
-    //         </div>
-    //       ) : (
-    //         <div className="text-center py-16">
-    //           <Image
-    //             src="/placeholder-products.svg"
-    //             alt=""
-    //             width={200}
-    //             height={200}
-    //             className="mx-auto mb-4 opacity-50"
-    //           />
-    //           <h3 className="text-muted-foreground">
-    //             {locale === "my"
-    //               ? "အချိန်နဲ့ ပစ္စည်းများထည့်သွင်းနေပါသည်"
-    //               : "Products coming soon"}
-    //           </h3>
-    //         </div>
-    //       )}
-    //     </div>
-    //   </section>
-
-    //   {/* Latest Products */}
-    //   <section className="bg-card py-16 border-t border-border">
-    //     <div className="container-custom">
-    //       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-8 border-b border-border pb-4 gap-4">
-    //         <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-    //           {latestProductsT.title}
-    //         </h2>
-    //         <Tabs
-    //           defaultActiveKey="new_arrivals"
-    //           items={latestCategories.map((cat) => ({
-    //             key: cat.id,
-    //             label: categoriesT[cat.label],
-    //           }))}
-    //         />
-    //       </div>
-
-    //       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    //         {latestProductsTransformed.map((product) => (
-    //           <ProductCard key={product.id} product={product} />
-    //         ))}
-    //       </div>
-    //     </div>
-    //   </section>
-
-    //   {/* Trust Indicators */}
-    //   <section className="section-padding bg-background">
-    //     <div className="container-custom">
-    //       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-    //         {[
-    //           {
-    //             icon: Star,
-    //             value: stats.customers.toLocaleString(),
-    //             label: trustT.customers,
-    //           },
-    //           {
-    //             icon: CheckCircle,
-    //             value: stats.products.toLocaleString(),
-    //             label: trustT.products,
-    //           },
-    //           { icon: Shield, value: `${stats.years}+`, label: trustT.years },
-    //           {
-    //             icon: Truck,
-    //             value: `${stats.locations}+`,
-    //             label: trustT.locations,
-    //           },
-    //         ].map((stat, index) => (
-    //           <div key={index} className="p-6">
-    //             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-    //               <stat.icon className="text-2xl" />
-    //             </div>
-    //             <div className="text-3xl lg:text-4xl font-bold text-foreground mb-1">
-    //               {stat.value}
-    //             </div>
-    //             <div className="text-sm text-muted-foreground">
-    //               {stat.label}
-    //             </div>
-    //           </div>
-    //         ))}
-    //       </div>
-    //     </div>
-    //   </section>
-
-    //   {/* CTA Section */}
-    //   <section className="section-padding bg-primary text-primary-foreground">
-    //     <div className="container-custom text-center">
-    //       <h2 className="text-3xl lg:text-4xl font-bold mb-4">{ctaT.title}</h2>
-    //       <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-    //         {ctaT.subtitle}
-    //       </p>
-    //       <Link href={`/${locale}/contact`}>
-    //         <Button
-    //           type="default"
-    //           size="large"
-    //           className="bg-background text-foreground hex-bloom border-border hover:bg-background/90"
-    //         >
-    //           {ctaT.button}
-    //           <ArrowRight className="ml-2" />
-    //         </Button>
-    //       </Link>
-    //     </div>
-    //   </section>
-    // </div>
   );
 }

@@ -24,10 +24,9 @@ values — this is a non-negotiable rule (see `AGENTS.md` and
 | Warning / Low Stock     | Warm Amber     | `#F59E0B`                        |
 | Critical / Out of Stock | Accent Crimson | `#A81C24` (same as brand accent) |
 
-> **Gap:** status colors are not yet wired into `app/globals.css` /
-> `tailwind.config.ts` as named tokens. Until they are, do not hardcode
-> these hex values in components — add them as `--success` / `--warning` /
-> `--critical` CSS variables (light + dark) first. Tracked in `MEMORY.md`.
+Status colors are implemented as CSS variables in `app/globals.css` and
+surfaced via `tailwind.config.ts` as `success`, `warning`, `critical`
+(with `-foreground` pairs) for both light and dark modes.
 
 ### Implementation: semantic tokens
 
@@ -55,13 +54,9 @@ When adding the status colors, follow the same pattern: define
 
 ## Typography
 
-- **Proposed font:** Manrope.
-- **Current implementation:** `app/layout.tsx` loads `Geist` via
-  `next/font/google`, **not** Manrope.
-- **Action:** this is a known mismatch (see `MEMORY.md`). When resolved,
-  load Manrope the same way Geist is loaded today (`next/font/google`,
-  exposed as a CSS variable, applied on `<body>`), rather than a `<link>`
-  tag or `@import`.
+- **Font:** Manrope.
+- **Implementation:** `app/[locale]/layout.tsx` loads `Manrope` via
+  `next/font/google`, exposed as CSS variable `--font-manrope`, applied on `<body>`.
 - Headings and primary typography use the Obsidian (`--primary` /
   `--foreground`) token; body copy should default to
   `text-foreground`/`text-muted-foreground` per context.
@@ -85,14 +80,9 @@ Radius derivatives already exist in `tailwind.config.ts`:
 
 ## Motion — "Hex Bloom"
 
-`AGENTS.md` names a motion/glow treatment called **Hex Bloom**, but no
-formal specification exists yet in source material. Until a designer
-supplies one, treat Hex Bloom as: _a soft radial glow in the Crimson Red
-accent, triggered on hover/focus of primary interactive elements (buttons,
-active status badges), fading in over ~150–200ms._ Do not invent new
-motion patterns outside this description without updating this doc first —
-record the real spec here the moment it's available, and remove this
-placeholder note.
+A soft radial glow in the Crimson Red accent, triggered on hover/focus of
+primary interactive elements (buttons, active status badges), fading in over
+~150–200ms. Implemented via `.hex-bloom` class in `app/globals.css`.
 
 ## Component conventions
 
@@ -101,8 +91,9 @@ placeholder note.
   interactive widgets.
 - **Tailwind + semantic tokens** own layout, spacing, and one-off
   composition — and are the target styling approach for new D&W-branded UI
-  (see `login-form.tsx` / `sign-up-form.tsx` for the current direction, and
-  `ARCHITECTURE.md` → "UI layering" for migration status).
+  (see `Header.tsx`, `Footer.tsx`, `ProductCard.tsx`, `login-form.tsx`,
+  `sign-up-form.tsx` for the current direction, and `ARCHITECTURE.md` →
+  "UI layering" for status).
 - Do not mix: a given component should be either antd-driven or
   Tailwind-driven, not both fighting for the same layout.
 - Icons: `lucide-react` (Tailwind path) and `@ant-design/icons` (antd path)
