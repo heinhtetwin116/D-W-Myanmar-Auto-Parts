@@ -4,33 +4,40 @@
 
 @layer base {
   :root {
-    --background: #f3f5f7;
-    --foreground: #0f1729;
+    --background: #f4f6f8;
+    --foreground: #0f172a;
     --card: #ffffff;
-    --card-foreground: #0f1729;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #0f1729;
-    --primary: #0f1729;
+    --popover-foreground: #0f172a;
+    --primary: #0f172a;
     --primary-foreground: #fafafa;
     --secondary: #f1f5f9;
-    --secondary-foreground: #0f1729;
+    --secondary-foreground: #0f172a;
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
-    --accent: #a51d26;
+    --accent: #a81c24;
     --accent-foreground: #fafafa;
     --destructive: #ef4444;
     --destructive-foreground: #fafafa;
     --border: #e2e8f0;
     --input: #e2e8f0;
-    --ring: #a51d26;
-    --success: #16a249;
+    --ring: #a81c24;
+    --success: #10b981;
     --success-foreground: #fafafa;
-    --warning: #f59f0a;
+    --warning: #f59e0b;
     --warning-foreground: #fafafa;
-    --critical: #a51d26;
+    --critical: #a81c24;
     --critical-foreground: #fafafa;
     --radius: 0.5rem;
     --font-manrope: "Manrope", system-ui, sans-serif;
+    --shadow-default: 0px 2px 4px rgba(15, 23, 42, 0.06);
+    --shadow-hover: 0px 8px 16px rgba(15, 23, 42, 0.1);
+    --card-padding: 20px;
+    --button-height-primary: 40px;
+    --button-height-inline: 32px;
+    --table-row-height: 48px;
+    --table-row-height-comfortable: 56px;
   }
   .dark {
     --background: #0b111e;
@@ -58,6 +65,8 @@
     --warning-foreground: #fafafa;
     --critical: #a51d26;
     --critical-foreground: #fafafa;
+    --shadow-default: 0px 2px 4px rgba(15, 23, 42, 0.06);
+    --shadow-hover: 0px 8px 16px rgba(15, 23, 42, 0.1);
   }
 }
 

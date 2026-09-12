@@ -212,13 +212,13 @@ The intended UI architecture is:
 ## Persistence
 
 - **Auth**: fully owned by Supabase Auth (`auth.users`, sessions, email
-  confirmation via `app/auth/confirm/route.ts` using `verifyOtp`).
-- **Domain data (products/categories)**: not yet modeled. `.env.example`
-  reserves a `DATABASE_URL` "for ORM," implying a typed-migration tool
-  (e.g. Prisma or Drizzle) is anticipated but not yet chosen or wired up.
-  Until a decision is recorded here, **new domain tables should be created
-  as plain Supabase SQL migrations** with RLS policies, not assumed to go
-  through an ORM.
+  confirmation via `app/api/auth/confirm/route.ts` using `verifyOtp`).
+- **Domain data (products/categories)**: modeled in
+  `supabase/migrations/20260912_000000_create_catalog_schema.sql`
+  (`categories`, `products`, `sync_runs` tables with RLS: public
+  read-enabled, server-write). Until an ORM decision is recorded in
+  `MEMORY.md`, **new domain tables should be created as plain Supabase SQL
+  migrations** with RLS policies, not assumed to go through an ORM.
 - **Storage**: none yet. When Amazon S3 is integrated, it should sit behind
   a small `lib/storage/` wrapper (mirroring `lib/supabase/`) so callers
   never touch the AWS SDK directly.
@@ -266,9 +266,9 @@ change.
 
 ## Extension seams
 
-- **New route group**: add under `app/`, following the existing
+- **New route group**: add under `app/[locale]/`, following the existing
   `layout.tsx` + `page.tsx` pattern; wrap client-only islands in
-  `<Suspense>` as done throughout `app/auth/*`.
+  `<Suspense>` as done throughout `app/[locale]/products/page.tsx`.
 - **New Supabase-backed feature**: add a SQL migration + RLS policy, then a
   typed query function colocated with the feature (do not scatter raw
   `.from(...)` calls through components — wrap them).

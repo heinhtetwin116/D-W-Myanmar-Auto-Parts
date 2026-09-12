@@ -8,8 +8,8 @@ import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 
 const antdLocales = {
   my: my_MM,
@@ -42,7 +42,16 @@ export default async function LocaleLayout({
 
   return (
     <AntdRegistry>
-      <ConfigProvider locale={antdLocales[validLocale]}>
+      <ConfigProvider
+        locale={antdLocales[validLocale]}
+        theme={{
+          token: {
+            colorPrimary: "#A81C24",
+            borderRadius: 8,
+            fontFamily: "Manrope, system-ui, sans-serif",
+          },
+        }}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="white"
