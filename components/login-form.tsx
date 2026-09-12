@@ -139,7 +139,7 @@ export function LoginForm({ locale }: LoginFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hex-bloom"
+          className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-2.5 px-4 rounded-md text-sm transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? t("submitting") : t("submit")}
         </button>

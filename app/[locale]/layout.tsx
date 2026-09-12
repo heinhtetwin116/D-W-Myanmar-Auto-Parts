@@ -52,7 +52,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider messages={messages} locale={validLocale}>
             {/* <Header locale={validLocale} /> */}
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 container-custom">{children}</main>
             {/* <Footer locale={validLocale} /> */}
             <Footer />
           </NextIntlClientProvider>
