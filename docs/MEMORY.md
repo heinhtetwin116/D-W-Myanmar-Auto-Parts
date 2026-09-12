@@ -89,6 +89,12 @@ changes (see `AGENTS.md` → Documentation maintenance).
 **Last entry:**
 
 - What changed:
+  - Redesigned the products catalog page to match the
+    reference shopping-catalog layout: compact category rail, catalog
+    masthead, four-column desktop grid, status badges, ratings, and add
+    actions using semantic design tokens
+  - Reset catalog pagination when search, category, stock, or sort filters
+    change
   - Added i18n foundation with Myanmar/English locales (`lib/i18n.ts`, `messages/*.json`, `middleware.ts`/`proxy.ts`)
   - Switched font from Geist to Manrope
   - Added status color tokens (success/warning/critical) and Hex Bloom glow effect
@@ -99,5 +105,5 @@ changes (see `AGENTS.md` → Documentation maintenance).
   - Updated `proxy.ts` for locale-aware auth redirects
   - Removed duplicate `lib/supabase/middleware.ts` and starter-kit scaffold pages
   - Moved i18n-enabled Header/Footer to `components/` root
-- Verified: `make check` passes (lint + typecheck + format), `npm run build` succeeds, both Myanmar and English locales render correctly
+- Verified: `make check` passes (lint + typecheck + format), `git diff --check` passes; lint reports only the existing `app/layout.tsx` custom-font warning
 - Left open: Product detail page, Contact form backend, Admin CRUD, Supabase schema/migration (Phase C)
