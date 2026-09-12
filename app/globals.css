@@ -4,60 +4,60 @@
 
 @layer base {
   :root {
-    --background: 210 20% 96%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 356 70% 38%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 356 70% 38%;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
-    --critical: 356 70% 38%;
-    --critical-foreground: 0 0% 98%;
+    --background: #f3f5f7;
+    --foreground: #0f1729;
+    --card: #ffffff;
+    --card-foreground: #0f1729;
+    --popover: #ffffff;
+    --popover-foreground: #0f1729;
+    --primary: #0f1729;
+    --primary-foreground: #fafafa;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f1729;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #a51d26;
+    --accent-foreground: #fafafa;
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #a51d26;
+    --success: #16a249;
+    --success-foreground: #fafafa;
+    --warning: #f59f0a;
+    --warning-foreground: #fafafa;
+    --critical: #a51d26;
+    --critical-foreground: #fafafa;
     --radius: 0.5rem;
     --font-manrope: "Manrope", system-ui, sans-serif;
   }
   .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 215 84% 55%;
-    --primary-foreground: 222 47% 8%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 24 95% 53%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 215 84% 55%;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
-    --critical: 356 70% 38%;
-    --critical-foreground: 0 0% 98%;
+    --background: #0b111e;
+    --foreground: #f8fafc;
+    --card: #0e1525;
+    --card-foreground: #f8fafc;
+    --popover: #0e1525;
+    --popover-foreground: #f8fafc;
+    --primary: #2c7ced;
+    --primary-foreground: #0b111e;
+    --secondary: #1d283a;
+    --secondary-foreground: #f8fafc;
+    --muted: #1d283a;
+    --muted-foreground: #94a3b8;
+    --accent: #f97015;
+    --accent-foreground: #fafafa;
+    --destructive: #811d1d;
+    --destructive-foreground: #fafafa;
+    --border: #1d283a;
+    --input: #1d283a;
+    --ring: #2c7ced;
+    --success: #16a249;
+    --success-foreground: #fafafa;
+    --warning: #f59f0a;
+    --warning-foreground: #fafafa;
+    --critical: #a51d26;
+    --critical-foreground: #fafafa;
   }
 }
 
@@ -91,8 +91,8 @@
   .hex-bloom:hover,
   .hex-bloom:focus-visible {
     box-shadow:
-      0 0 0 3px hsl(var(--accent) / 0.3),
-      0 8px 24px hsl(var(--accent) / 0.2);
+      0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent),
+      0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent);
     transform: translateY(-1px);
   }
 

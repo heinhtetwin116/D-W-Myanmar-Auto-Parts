@@ -20,9 +20,9 @@ changes (see `AGENTS.md` → Documentation maintenance).
   (security scan) both present and correctly gated (build depends on
   quality).
 - Design tokens for the brand palette (Obsidian / Cool Soft Gray / Crimson
-  Red) are implemented as HSL CSS variables in `app/globals.css` and
-  exposed via `tailwind.config.ts`. They line up with the hex values in
-  `DESIGN_SYSTEM.md`.
+  Red) are implemented as hex CSS variables in `app/globals.css` and
+  exposed directly via `tailwind.config.ts`. They line up with the hex values
+  in `DESIGN_SYSTEM.md`.
 - Status color tokens (success, warning, critical) added to globals.css and tailwind.config.ts.
 - Hex Bloom hover/focus glow effect implemented on primary interactive elements.
 - Manrope font configured via Google Fonts in `app/[locale]/layout.tsx`.
