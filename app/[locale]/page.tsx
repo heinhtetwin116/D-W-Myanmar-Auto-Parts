@@ -3,6 +3,8 @@ import { Truck, Tag, PhoneCall, ShieldCheck } from "lucide-react";
 // import { createClient } from "@/lib/supabase/server";
 import ProductCard, { Product } from "@/components/ProductCard";
 import Hero from "@/components/hero";
+import FAQ from "@/components/FAQ";
+import Testimonials from "@/components/testimonials";
 
 // --- DUMMY DATA ---
 const featuredProducts: Product[] = [
@@ -409,6 +411,10 @@ export default async function HomePage() {
           </div>
         </section>
       </main>
+
+      <FAQ />
+
+      <Testimonials />
     </div>
   );
 }
