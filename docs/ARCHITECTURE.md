@@ -50,7 +50,7 @@ lib/
     server.ts               Server Supabase client (Server Components/Route Handlers), per-request
     proxy.ts                 Current session-refresh helper, used by proxy.ts middleware
   i18n.ts                   next-intl config (locales, defaultLocale, getRequestConfig)
-  utils.ts                  `cn()` class-merge helper, `hasEnvVars` guard
+  utils.ts                  `cn()` class-merge helper
 
 proxy.ts                   Next.js middleware entry point — locale detection + session refresh
 ```

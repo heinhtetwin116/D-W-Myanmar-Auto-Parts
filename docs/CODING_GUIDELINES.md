@@ -12,6 +12,15 @@ Pairs with `ARCHITECTURE.md` (where things live) and `DESIGN_SYSTEM.md`
   component needs event handlers, browser APIs, `useState`/`useEffect`, or
   other React hooks. Every current client component declares this
   explicitly at the top of the file — keep doing so.
+- **Keep Ant Design out of Server Components entirely.** Do not import
+  `@ant-design/icons` in a Server Component (neither build ships
+  `"use client"`, so Turbopack evaluates the icons package in RSC scope and
+  crashes on `React.createContext`). Do not destructure antd subcomponents
+  (`const { Title } = Typography`) or rely on member expressions
+  (`<Typography.Title>`) in a Server Component either — both resolve to
+  `undefined` at render. Put all antd JSX (including `Spin` fallbacks and
+  `Breadcrumb`) inside Client Components; use plain HTML + semantic tokens
+  for server-rendered shells and loading states.
 - Wrap any component that reads dynamic data (`searchParams`, cookies via a
   child, Supabase calls) in `<Suspense>` at the call site, matching the
   existing pattern in `app/[locale]/*/page.tsx`.
@@ -103,9 +112,6 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 
 ## Environment variables
 
-- Guard optional-Supabase-setup UI with `hasEnvVars` (`lib/utils.ts`) —
-  see `EnvVarWarning` usage in `app/protected/layout.tsx` — rather than letting
-  `createClient()` throw when env vars are missing.
 - New required env vars must be added to `.env.example` with no value, and
   to the CI `build` job's `env:` block in `.github/workflows/ci.yml` if the
   build needs them.

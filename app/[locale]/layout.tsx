@@ -10,6 +10,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import QueryProvider from "@/components/query-provider";
 
 const antdLocales = {
   my: my_MM,
@@ -59,11 +60,13 @@ export default async function LocaleLayout({
           // disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={validLocale}>
-            {/* <Header locale={validLocale} /> */}
-            <Header />
-            <main className="flex-1 container-custom">{children}</main>
-            {/* <Footer locale={validLocale} /> */}
-            <Footer />
+            <QueryProvider>
+              {/* <Header locale={validLocale} /> */}
+              <Header />
+              <main className="flex-1 container-custom">{children}</main>
+              {/* <Footer locale={validLocale} /> */}
+              <Footer />
+            </QueryProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </ConfigProvider>
