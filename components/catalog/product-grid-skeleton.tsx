@@ -1,10 +1,7 @@
 "use client";
 
 import { Card, Skeleton } from "antd";
-
-interface ProductGridSkeletonProps {
-  count?: number;
-}
+import type { ProductGridSkeletonProps } from "@/types/index.type";
 
 /**
  * Skeleton placeholder grid mirroring the product card layout.

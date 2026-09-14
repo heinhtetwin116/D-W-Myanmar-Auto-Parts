@@ -5,11 +5,7 @@ import { Button, Card, Form, Input, message } from "antd";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-
-interface ForgotPasswordFormProps {
-  locale: "my" | "en";
-  className?: string;
-}
+import type { ForgotPasswordFormProps } from "@/types/index.type";
 
 export function ForgotPasswordForm({
   locale,

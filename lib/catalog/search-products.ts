@@ -13,32 +13,25 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   getCategories,
+  getCategoryById,
+  getProductById,
   getProductCount,
   getProducts,
-  type ProductSort,
-  type StockFilter,
+  getProductsByCategory,
 } from "@/lib/erpnext/queries";
-import type { Category, Product } from "@/lib/erpnext/types";
+import type {
+  CatalogResult,
+  CatalogSearchParams,
+  ProductDetailResult,
+} from "@/types/index.type";
 import { CATALOG_PAGE_SIZE } from "@/lib/constants";
-import { getDummyCategories, queryDummyProducts } from "./dummy-catalog";
-
-export interface CatalogSearchParams {
-  categoryId?: string;
-  search?: string;
-  stock?: StockFilter;
-  sort?: ProductSort;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface CatalogResult {
-  source: "db" | "dummy";
-  products: Product[];
-  total: number;
-  categories: Category[];
-  page: number;
-  pageSize: number;
-}
+import {
+  getDummyCategories,
+  getDummyCategoryById,
+  getDummyProductById,
+  getDummyRelatedProducts,
+  queryDummyProducts,
+} from "./dummy-catalog";
 
 export async function searchProducts(
   supabase: SupabaseClient,
@@ -96,5 +89,51 @@ export async function searchProducts(
     categories: getDummyCategories(),
     page,
     pageSize,
+  };
+}
+
+/**
+ * Unified product detail — the single entry point for single-product data.
+ * Same source rules as {@link searchProducts}: Supabase first, dummy
+ * fallback when the DB is empty/unreachable. Returns `null` only when the
+ * id exists in neither source.
+ */
+export async function getProductDetail(
+  supabase: SupabaseClient,
+  slug: string,
+): Promise<ProductDetailResult | null> {
+  // ── SOURCE 1: Supabase database ──────────────────────────────────
+  // Comment out this entire try-block to disable DB fetching. When
+  // disabled, every call falls through to the dummy catalog below.
+  try {
+    const product = await getProductById(supabase, slug);
+    if (product) {
+      const [category, related] = await Promise.all([
+        getCategoryById(supabase, product.category_id).catch(() => null),
+        getProductsByCategory(supabase, product.category_id, {
+          limit: 5,
+        }).catch(() => []),
+      ]);
+      return {
+        source: "db",
+        product,
+        category,
+        related: related.filter((item) => item.id !== product.id).slice(0, 4),
+      };
+    }
+  } catch (error) {
+    console.error("Product DB unavailable, using dummy data:", error);
+  }
+
+  // ── SOURCE 2: Bundled dummy data (`data/*.json`) ─────────────────
+  // Comment out this block to disable the dummy fallback. When disabled,
+  // an id missing from the database yields `null` (→ not-found page).
+  const product = getDummyProductById(slug);
+  if (!product) return null;
+  return {
+    source: "dummy",
+    product,
+    category: getDummyCategoryById(product.category_id),
+    related: getDummyRelatedProducts(product.category_id, product.id, 4),
   };
 }

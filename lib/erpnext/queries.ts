@@ -6,10 +6,12 @@
 
 import { SupabaseClient } from "@supabase/supabase-js";
 import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
-import { Category, Product } from "./types";
-import type { StockFilter } from "@/lib/catalog/stock";
-
-export type { StockFilter };
+import type {
+  Category,
+  Product,
+  ProductSort,
+  StockFilter,
+} from "@/types/index.type";
 
 /**
  * Get all enabled categories, ordered by name (English).
@@ -74,11 +76,6 @@ function applyStockFilter<
   }
   return query.eq("stock_quantity", 0);
 }
-
-/**
- * Sort orders supported by the catalog.
- */
-export type ProductSort = "name" | "price_asc" | "price_desc" | "newest";
 
 function applyProductSort<
   T extends {

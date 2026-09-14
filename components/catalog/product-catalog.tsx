@@ -11,37 +11,13 @@ import { Empty, Input, Menu, Pagination, Select, Tag, Typography } from "antd";
 import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
 import ProductCard from "@/components/catalog/product-card";
 import ProductGridSkeleton from "@/components/catalog/product-grid-skeleton";
-import {
-  catalogQueryKey,
-  fetchCatalog,
-  type CatalogFilters,
-} from "@/lib/catalog/client";
+import { catalogQueryKey, fetchCatalog } from "@/lib/catalog/client";
+import type { CatalogFilters, CatalogLabels } from "@/types/index.type";
 import { toProductCardItem } from "@/lib/catalog/product-card-item";
 import { stockBadgeTone } from "@/lib/catalog/stock";
 
 const { Title, Text, Paragraph } = Typography;
 const { CheckableTag } = Tag;
-
-export interface CatalogLabels {
-  searchPlaceholder: string;
-  allCategories: string;
-  allStatus: string;
-  inStock: string;
-  lowStock: string;
-  outOfStock: string;
-  currency: string;
-  viewDetails: string;
-  addToEnquiry: string;
-  noResults: string;
-  filterByCategories: string;
-  stockStatus: string;
-  popular: string;
-  productsFound: string;
-  sortName: string;
-  sortPriceAsc: string;
-  sortPriceDesc: string;
-  sortNewest: string;
-}
 
 interface ProductCatalogProps {
   locale: string;
@@ -126,7 +102,7 @@ export default function ProductCatalog({
       <ProductsBreadcrumb
         locale={locale}
         homeLabel={homeLabel}
-        productsLabel={productsLabel}
+        trail={[{ label: productsLabel }]}
       />
 
       {/* Masthead */}

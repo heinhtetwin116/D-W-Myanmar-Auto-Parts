@@ -3,10 +3,7 @@ import { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/loading-spinner";
-
-interface ForgotPasswordPageProps {
-  params: Promise<{ locale: "my" | "en" }>;
-}
+import type { ForgotPasswordPageProps } from "@/types/index.type";
 
 export async function generateMetadata({
   params,

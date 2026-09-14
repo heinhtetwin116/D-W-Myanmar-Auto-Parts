@@ -111,7 +111,69 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, TanStack Query integration + loading states):**
+**Current session (2026-09-14, contact page wired):**
+
+- What changed (closes gap #1):
+  - New migration `supabase/migrations/20260914_141012_create_enquiries.sql`:
+    `enquiries` table (name/email/phone/product_id FK/message/status +
+    timestamps) with RLS (anon insert allowed, no public read; staff reads
+    via service role until roles land)
+  - New `components/contact/contact-form.tsx` (antd Form, Supabase insert,
+    inline error + toasts + success state) and
+    `components/contact/contact-info.tsx` (address/phone/email/hours card)
+  - New `app/[locale]/contact/page.tsx` (server shell: breadcrumb, h1,
+    3+2 grid, Suspense + LoadingSpinner fallbacks)
+  - Central types: `NewEnquiry`, `ContactFormLabels`, `ContactInfoLabels`,
+    `ContactFormProps`, `ContactInfoProps`, `ContactPageProps`;
+    generalized `ProductsBreadcrumbProps` to a `trail` array (+ new
+    `BreadcrumbTrailItem`) and updated the 2 product call sites
+- Verified: `/my` + `/en` contact → 200 with title, all 4 fields, info card;
+  `make lint` 0 errors; `format:check` passes; `git diff --check` clean;
+  `tsc` shows only the 2 pre-existing `sync.ts` errors. Submit itself not
+  exercised end-to-end (migration not yet applied to any live DB; form
+  surfaces DB errors via its error state by design)
+- Left open: Admin CRUD, sync endpoint auth, scheduled sync, the 2 remaining
+  ERPNext type errors; product-tied enquiries (`product_id` column ready,
+  form has no product picker yet)
+
+**Previous session (2026-09-14, detail page dummy fallback):**
+
+- What changed (detail page had no fallback — dummy cards 404'd):
+  - Added `getDummyProductById` / `getDummyCategoryById` /
+    `getDummyRelatedProducts` to `lib/catalog/dummy-catalog.ts`
+  - Added unified `getProductDetail(supabase, slug)` to
+    `lib/catalog/search-products.ts` with the same comment-toggle SOURCE 1 /
+    SOURCE 2 blocks; added `ProductDetailResult` to `types/index.type.ts`
+  - Rewrote `app/[locale]/products/[slug]/page.tsx` around it (page is now
+    ~30 lines shorter; same island, labels, and `notFound()` behavior)
+- Verified: `/en/products/dummy-001` renders name, MMK price, specs table
+  (Brand: D&W), and related product (Engine Oil Pump); bogus slug renders
+  the not-found page with no product content; `eslint` 0 errors;
+  `format:check` passes; `git diff --check` clean; `tsc` shows only the 2
+  pre-existing `sync.ts` constraint errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  the 2 remaining ERPNext type errors
+
+**Previous session (2026-09-14, centralize types in types/index.type.ts):**
+
+- What changed (all custom types → `@/types/index.type`, one import path):
+  - New `types/index.type.ts` (~40 types: ERPNext domain, catalog, component
+    props, page props, dummy content; re-exports `Locale`; type-only module)
+  - Moved definitions out of 20 files (lib, components, app pages,
+    data/dummy); deleted `lib/erpnext/types.ts`; repointed
+    `lib/erpnext/index.ts` barrel; inlined the single-use `CatalogResponse`
+    alias in the API route
+  - Renamed `Localized` → `LocalizedText` for global clarity
+  - Side effect: the 3 bogus `index.ts` re-export type errors are gone
+    (they were symptoms of non-exported local interfaces); only the 2
+    genuine pre-existing `sync.ts` constraint errors remain
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc` shows only those 2 pre-existing errors; `/my/products` → 200,
+  `/api/products` → `source:dummy` live
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  the 2 remaining ERPNext type errors
+
+**Previous session (2026-09-14, TanStack Query integration + loading states):**
 
 - What changed:
   - Extracted catalog request code into `lib/catalog/client.ts`

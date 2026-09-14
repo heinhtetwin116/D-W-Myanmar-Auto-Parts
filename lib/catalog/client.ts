@@ -7,16 +7,7 @@
  * that affects the response is part of the key).
  */
 
-import type { CatalogResponse } from "@/app/api/products/route";
-
-export interface CatalogFilters {
-  search: string;
-  category: string;
-  stock: string;
-  sort: string;
-  page: number;
-  pageSize: number;
-}
+import type { CatalogFilters, CatalogResult } from "@/types/index.type";
 
 export function catalogQueryKey(filters: CatalogFilters) {
   return [
@@ -45,12 +36,12 @@ export function catalogSearchParams(filters: CatalogFilters): URLSearchParams {
 
 export async function fetchCatalog(
   filters: CatalogFilters,
-): Promise<CatalogResponse> {
+): Promise<CatalogResult> {
   const response = await fetch(
     `/api/products?${catalogSearchParams(filters).toString()}`,
   );
   if (!response.ok) {
     throw new Error(`Catalog request failed: ${response.status}`);
   }
-  return response.json() as Promise<CatalogResponse>;
+  return response.json() as Promise<CatalogResult>;
 }

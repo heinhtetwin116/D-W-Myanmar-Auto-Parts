@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  searchProducts,
-  type CatalogResult,
-  type CatalogSearchParams,
-} from "@/lib/catalog/search-products";
-import type { ProductSort, StockFilter } from "@/lib/erpnext/queries";
+import { searchProducts } from "@/lib/catalog/search-products";
+import type {
+  CatalogResult,
+  CatalogSearchParams,
+  ProductSort,
+  StockFilter,
+} from "@/types/index.type";
 import { CATALOG_PAGE_SIZE, CATALOG_PAGE_SIZE_MAX } from "@/lib/constants";
-
-/** Response shape consumed by `components/catalog/product-catalog.tsx`. */
-export type CatalogResponse = CatalogResult;
 
 const STOCK_VALUES: StockFilter[] = ["in_stock", "low_stock", "out_of_stock"];
 const SORT_VALUES: ProductSort[] = [
@@ -58,5 +56,5 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const supabase = await createClient();
   const result = await searchProducts(supabase, parseParams(searchParams));
-  return NextResponse.json(result satisfies CatalogResponse);
+  return NextResponse.json(result satisfies CatalogResult);
 }
