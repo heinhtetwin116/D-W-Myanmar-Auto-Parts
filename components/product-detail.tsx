@@ -20,6 +20,7 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import type { Product } from "@/lib/erpnext/types";
+import ProductsBreadcrumb from "@/components/products-breadcrumb";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -40,6 +41,9 @@ interface ProductDetailProps {
   categoryName: string;
   related: Product[];
   labels: DetailLabels;
+  homeLabel: string;
+  productsLabel: string;
+  currentLabel: string;
 }
 
 export default function ProductDetail({
@@ -48,6 +52,9 @@ export default function ProductDetail({
   categoryName,
   related,
   labels,
+  homeLabel,
+  productsLabel,
+  currentLabel,
 }: ProductDetailProps) {
   const name = locale === "my" ? product.name_my : product.name_en;
   const description =
@@ -64,6 +71,12 @@ export default function ProductDetail({
 
   return (
     <div>
+      <ProductsBreadcrumb
+        locale={locale}
+        homeLabel={homeLabel}
+        productsLabel={productsLabel}
+        currentLabel={currentLabel}
+      />
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={10}>
           <Card bordered className="overflow-hidden">

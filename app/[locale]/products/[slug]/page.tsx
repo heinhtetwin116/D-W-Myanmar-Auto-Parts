@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { Spin } from "antd";
 import { getMessages } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -8,7 +7,6 @@ import {
   getProductById,
   getProductsByCategory,
 } from "@/lib/erpnext/queries";
-import ProductsBreadcrumb from "@/components/products-breadcrumb";
 import ProductDetail, { type DetailLabels } from "@/components/product-detail";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
 
@@ -66,15 +64,12 @@ export default async function ProductDetailPage({
 
   return (
     <div className="container-custom section-padding !py-10">
-      <ProductsBreadcrumb
-        locale={locale}
-        homeLabel={messages.common.home}
-        productsLabel={messages.common.products}
-        currentLabel={name}
-      />
-
       <Suspense
-        fallback={<Spin size="large" className="flex justify-center py-16" />}
+        fallback={
+          <div className="flex justify-center py-16" aria-label="Loading">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-accent" />
+          </div>
+        }
       >
         <ProductDetail
           locale={locale}
@@ -82,6 +77,9 @@ export default async function ProductDetailPage({
           categoryName={categoryName}
           related={relatedProducts}
           labels={labels}
+          homeLabel={messages.common.home}
+          productsLabel={messages.common.products}
+          currentLabel={name}
         />
       </Suspense>
     </div>

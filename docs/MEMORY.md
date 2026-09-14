@@ -111,7 +111,33 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, unified searchProducts + sort):**
+**Current session (2026-09-14, products 500 root-cause fix):**
+
+- Root cause found (was NOT react-query): `@ant-design/icons@6.3.4` ships no
+  `"use client"` directive in either build, so importing it in a Server
+  Component makes Turbopack evaluate the CJS `lib/` build in RSC scope where
+  `react` resolves to the vendored RSC stub without `createContext` → 500 on
+  `/my/products`. Reproduced on the clean tree, ruling out react-query.
+  Additionally, destructured/member-access antd subcomponents
+  (`const { Title } = Typography`, `<Typography.Title>`) resolve to
+  `undefined` when rendered from a Server Component here.
+- What changed:
+  - New `components/products-breadcrumb.tsx` (client island, was inline in
+    both product pages) and `components/product-detail.tsx` (full detail UI
+    as client island receiving serializable props)
+  - Both product pages are now antd-free Server Components (plain HTML +
+    tokens for shells and Suspense fallbacks); rule recorded in
+    `docs/CODING_GUIDELINES.md`
+  - Restarted the dev server to clear corrupt Turbopack HMR state from the
+    bisect churn
+- Verified: `/my/products` → 200, `/en/products` → 200 (was 500);
+  user confirmed the product grid renders with dummy data in the browser;
+  `eslint` 0 errors; `format:check` passes; `git diff --check` clean;
+  `tsc` shows only the 5 pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors (detail-page dummy fallback noted earlier still applies)
+
+**Previous session (2026-09-14, unified searchProducts + sort):**
 
 - What changed:
   - Added `ProductSort` (`name`/`price_asc`/`price_desc`/`newest`) to

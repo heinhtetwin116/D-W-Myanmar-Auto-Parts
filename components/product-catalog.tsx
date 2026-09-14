@@ -18,6 +18,7 @@ import {
 import { EyeOutlined, PictureOutlined, PlusOutlined } from "@ant-design/icons";
 import type { Category, Product } from "@/lib/erpnext/types";
 import type { CatalogResponse } from "@/app/api/products/route";
+import ProductsBreadcrumb from "@/components/products-breadcrumb";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -46,6 +47,10 @@ interface ProductCatalogProps {
   locale: string;
   labels: CatalogLabels;
   pageSize: number;
+  title: string;
+  subtitle: string;
+  homeLabel: string;
+  productsLabel: string;
 }
 
 async function fetchCatalog(params: URLSearchParams): Promise<CatalogResponse> {
@@ -73,6 +78,10 @@ export default function ProductCatalog({
   locale,
   labels,
   pageSize,
+  title,
+  subtitle,
+  homeLabel,
+  productsLabel,
 }: ProductCatalogProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -135,6 +144,18 @@ export default function ProductCatalog({
 
   return (
     <div>
+      <ProductsBreadcrumb
+        locale={locale}
+        homeLabel={homeLabel}
+        productsLabel={productsLabel}
+      />
+      <Title level={2} className="!mb-1">
+        {title}
+      </Title>
+      <Paragraph type="secondary" className="mb-6">
+        {subtitle}
+      </Paragraph>
+
       <Card className="mb-6" bordered>
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={8}>

@@ -1,13 +1,9 @@
 import { Suspense } from "react";
-import { Spin, Typography } from "antd";
 import { getMessages } from "next-intl/server";
 import ProductCatalog, {
   type CatalogLabels,
 } from "@/components/product-catalog";
-import ProductsBreadcrumb from "@/components/products-breadcrumb";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n";
-
-const { Title, Paragraph } = Typography;
 
 const PAGE_SIZE = 12;
 
@@ -46,22 +42,22 @@ export default async function ProductsPage({ params }: ProductsPageProps) {
 
   return (
     <div className="container-custom section-padding !py-10">
-      <ProductsBreadcrumb
-        locale={locale}
-        homeLabel={messages.common.home}
-        productsLabel={messages.common.products}
-      />
-      <Title level={2} className="!mb-1">
-        {t.title}
-      </Title>
-      <Paragraph type="secondary" className="mb-6">
-        {t.subtitle}
-      </Paragraph>
-
       <Suspense
-        fallback={<Spin size="large" className="flex justify-center py-16" />}
+        fallback={
+          <div className="flex justify-center py-16" aria-label="Loading">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-accent" />
+          </div>
+        }
       >
-        <ProductCatalog locale={locale} labels={labels} pageSize={PAGE_SIZE} />
+        <ProductCatalog
+          locale={locale}
+          labels={labels}
+          pageSize={PAGE_SIZE}
+          title={t.title}
+          subtitle={t.subtitle}
+          homeLabel={messages.common.home}
+          productsLabel={messages.common.products}
+        />
       </Suspense>
     </div>
   );
