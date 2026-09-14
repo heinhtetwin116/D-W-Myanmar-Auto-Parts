@@ -24,6 +24,12 @@ Pairs with `ARCHITECTURE.md` (where things live) and `DESIGN_SYSTEM.md`
 - Wrap any component that reads dynamic data (`searchParams`, cookies via a
   child, Supabase calls) in `<Suspense>` at the call site, matching the
   existing pattern in `app/[locale]/*/page.tsx`.
+- Loading states: route `loading.tsx` files must be server-safe (plain HTML +
+  `animate-pulse` shimmer, no antd imports). Shared `LoadingSpinner`
+  (`components/loading-spinner.tsx`) is the standard `Suspense` fallback.
+  antd `Skeleton` grids (e.g. `components/catalog/product-grid-skeleton.tsx`)
+  live in client islands only, inside an inner `<Suspense>` so filters stay
+  interactive while results reload.
 - Prefer `async function` Server Components over `useEffect` data fetching
   wherever the data doesn't need client-side interactivity.
 

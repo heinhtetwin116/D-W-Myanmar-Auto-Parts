@@ -5,7 +5,11 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
+import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
 import { Category, Product } from "./types";
+import type { StockFilter } from "@/lib/catalog/stock";
+
+export type { StockFilter };
 
 /**
  * Get all enabled categories, ordered by name (English).
@@ -53,12 +57,6 @@ export async function getCategoryById(
   return data;
 }
 
-/**
- * Stock availability buckets used by catalog filters.
- * Thresholds mirror the status badges in `components/product-catalog.tsx`.
- */
-export type StockFilter = "in_stock" | "low_stock" | "out_of_stock";
-
 function applyStockFilter<
   T extends {
     eq: (c: string, v: unknown) => T;
@@ -67,10 +65,12 @@ function applyStockFilter<
   },
 >(query: T, stock: StockFilter): T {
   if (stock === "in_stock") {
-    return query.gte("stock_quantity", 11);
+    return query.gte("stock_quantity", LOW_STOCK_THRESHOLD + 1);
   }
   if (stock === "low_stock") {
-    return query.gte("stock_quantity", 1).lte("stock_quantity", 10);
+    return query
+      .gte("stock_quantity", 1)
+      .lte("stock_quantity", LOW_STOCK_THRESHOLD);
   }
   return query.eq("stock_quantity", 0);
 }

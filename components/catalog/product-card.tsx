@@ -1,15 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { Wrench, ArrowRight } from "lucide-react";
+import type { ProductCardItem } from "@/lib/catalog/product-card-item";
 
-export interface Product {
-  id: number | string;
-  code: string;
-  name: string;
-  desc: string;
-  stock: number;
-  price: string;
-}
+export type { ProductCardItem };
 
 export interface ProductBadge {
   text: string;
@@ -23,7 +17,7 @@ const badgeTones: Record<ProductBadge["tone"], string> = {
 };
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductCardItem;
   badge?: ProductBadge;
   detailsHref?: string;
   detailsLabel?: string;

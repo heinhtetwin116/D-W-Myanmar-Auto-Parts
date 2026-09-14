@@ -22,126 +22,60 @@ import {
   Statistic,
 } from "antd";
 
+import {
+  aboutLocations,
+  aboutStats,
+  aboutTeamMembers,
+  aboutValueKeys,
+} from "@/data/dummy/about";
+
 const { Title, Text, Paragraph } = Typography;
+
+const valueIcons = {
+  integrity: CheckCircleOutlined,
+  quality: StarOutlined,
+  customer: UsergroupAddOutlined,
+  innovation: BulbOutlined,
+} as const;
+
+const statIcons = {
+  years: TrophyOutlined,
+  cities: BuildOutlined,
+  customers: TeamOutlined,
+  products: CheckCircleOutlined,
+} as const;
 
 export default function AboutPage() {
   const params = useParams();
   const locale = params.locale as "my" | "en";
   const t = useTranslations("about");
 
-  const values = [
-    {
-      icon: CheckCircleOutlined,
-      title: t("values.integrity.title"),
-      description: t("values.integrity.description"),
-      color: "text-accent",
-    },
-    {
-      icon: StarOutlined,
-      title: t("values.quality.title"),
-      description: t("values.quality.description"),
-      color: "text-emerald-600",
-    },
-    {
-      icon: UsergroupAddOutlined,
-      title: t("values.customer.title"),
-      description: t("values.customer.description"),
-      color: "text-blue-600",
-    },
-    {
-      icon: BulbOutlined,
-      title: t("values.innovation.title"),
-      description: t("values.innovation.description"),
-      color: "text-amber-600",
-    },
-  ];
+  const values = aboutValueKeys.map((value) => ({
+    icon: valueIcons[value.id],
+    title: t(`values.${value.id}.title`),
+    description: t(`values.${value.id}.description`),
+    color: value.color,
+  }));
 
-  const stats = [
-    {
-      icon: TrophyOutlined,
-      value: "20+",
-      label: locale === "my" ? "နှစ်များ၏ အတွေ့အကြုံ" : "Years Experience",
-      color: "text-accent",
-    },
-    {
-      icon: BuildOutlined,
-      value: "50+",
-      label: locale === "my" ? "မြို့များ၌ ပို့ဆောင်သည်" : "Cities Served",
-      color: "text-emerald-600",
-    },
-    {
-      icon: TeamOutlined,
-      value: "10K+",
-      label: locale === "my" ? "ဝယ်ယူသူများ" : "Happy Customers",
-      color: "text-blue-600",
-    },
-    {
-      icon: CheckCircleOutlined,
-      value: "500+",
-      label: locale === "my" ? "ပစ္စည်းမျိုးများ" : "Product Varieties",
-      color: "text-amber-600",
-    },
-  ];
+  const stats = aboutStats.map((stat) => ({
+    icon: statIcons[stat.id],
+    value: stat.value,
+    label: stat.label[locale],
+    color: stat.color,
+  }));
 
-  const teamMembers = [
-    {
-      name: locale === "my" ? "ဦးသန်းထွေး" : "U Thant Twe",
-      role: locale === "my" ? "ဧရည်ဝန်ကြီး (CEO)" : "Chief Executive Officer",
-      bio:
-        locale === "my"
-          ? "၂၅ နှစ်အထက်အကုန် အုပ်စနစ်စီးပွားရေး တ Industriese Assam trabajadores"
-          : "25+ years in automotive industry leadership",
-    },
-    {
-      name: locale === "my" ? "ဒေါ်စန္ဒာဝင်း" : "Daw Sandar Win",
-      role:
-        locale === "my"
-          ? "မှူးချုပ်စီမံခန့်ခွဲရေး (COO)"
-          : "Chief Operating Officer",
-      bio:
-        locale === "my"
-          ? "စီမံခန့်ခွဲရေး နှင့် ဂျင်းစက်ရုံး ရicules المحور"
-          : "Operations & Supply Chain Management expert",
-    },
-    {
-      name: locale === "my" ? "ဦးကျော်ဇော" : "U Kyaw Zaw",
-      role:
-        locale === "my"
-          ? "ဂျင်ရည်ရွယ်ချက်မှူးချုပ် (CTO)"
-          : "Chief Technical Officer",
-      bio:
-        locale === "my"
-          ? "အုပ်စနစ်အင်ဂျင်နီယာရ/schemas e cathedral"
-          : "Automotive Engineering specialist",
-    },
-  ];
+  const teamMembers = aboutTeamMembers.map((member) => ({
+    name: member.name[locale],
+    role: member.role[locale],
+    bio: member.bio[locale],
+  }));
 
-  const locations = [
-    {
-      city: "Yangon",
-      address:
-        locale === "my"
-          ? "နှစ် ၁၂၃၊ အုပ်စနစ်လမ်းကြောင်း၊ ရန်ကုန်မြို့"
-          : "No. 123, Auto Parts Street, Yangon",
-      phone: "+95 1 234 5678",
-      hours:
-        locale === "my"
-          ? "တနင်္လာ - သောကြာနေ့: ၉:၀၀ - ၆:၀၀"
-          : "Mon - Sat: 9:00 AM - 6:00 PM",
-    },
-    {
-      city: "Mandalay",
-      address:
-        locale === "my"
-          ? "နှစ် ၄၅၆၊ မန္တလေးစျေးဝယ်ရုံ အပတ်မှာ"
-          : "No. 456, Mandalay Market Complex",
-      phone: "+95 2 345 6789",
-      hours:
-        locale === "my"
-          ? "တနင်္လာ - သောကြာနေ့: ၉:၀၀ - ၆:၀၀"
-          : "Mon - Sat: 9:00 AM - 6:00 PM",
-    },
-  ];
+  const locations = aboutLocations.map((location) => ({
+    city: location.city,
+    address: location.address[locale],
+    phone: location.phone,
+    hours: location.hours[locale],
+  }));
 
   return (
     <div className="flex flex-col">

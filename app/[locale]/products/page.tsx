@@ -1,11 +1,11 @@
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 import { getMessages } from "next-intl/server";
 import ProductCatalog, {
   type CatalogLabels,
-} from "@/components/product-catalog";
-import { locales, defaultLocale, type Locale } from "@/lib/i18n";
-
-const PAGE_SIZE = 12;
+} from "@/components/catalog/product-catalog";
+import { parseLocale } from "@/lib/i18n";
+import { CATALOG_PAGE_SIZE } from "@/lib/constants";
 
 interface ProductsPageProps {
   params: Promise<{ locale: string }>;
@@ -13,9 +13,7 @@ interface ProductsPageProps {
 
 export default async function ProductsPage({ params }: ProductsPageProps) {
   const { locale: rawLocale } = await params;
-  const locale: Locale = locales.includes(rawLocale as Locale)
-    ? (rawLocale as Locale)
-    : defaultLocale;
+  const locale = parseLocale(rawLocale);
   const messages = await getMessages({ locale });
 
   const t = messages.products;
@@ -42,17 +40,11 @@ export default async function ProductsPage({ params }: ProductsPageProps) {
 
   return (
     <div className="container-custom section-padding !py-10">
-      <Suspense
-        fallback={
-          <div className="flex justify-center py-16" aria-label="Loading">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-accent" />
-          </div>
-        }
-      >
+      <Suspense fallback={<LoadingSpinner />}>
         <ProductCatalog
           locale={locale}
           labels={labels}
-          pageSize={PAGE_SIZE}
+          pageSize={CATALOG_PAGE_SIZE}
           title={t.title}
           subtitle={t.subtitle}
           homeLabel={messages.common.home}

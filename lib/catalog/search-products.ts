@@ -19,6 +19,7 @@ import {
   type StockFilter,
 } from "@/lib/erpnext/queries";
 import type { Category, Product } from "@/lib/erpnext/types";
+import { CATALOG_PAGE_SIZE } from "@/lib/constants";
 import { getDummyCategories, queryDummyProducts } from "./dummy-catalog";
 
 export interface CatalogSearchParams {
@@ -49,7 +50,7 @@ export async function searchProducts(
     stock,
     sort = "name",
     page = 1,
-    pageSize = 12,
+    pageSize = CATALOG_PAGE_SIZE,
   } = params;
 
   // ── SOURCE 1: Supabase database ──────────────────────────────────

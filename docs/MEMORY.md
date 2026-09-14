@@ -111,7 +111,58 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, catalog uses shared ProductCard):**
+**Current session (2026-09-14, TanStack Query integration + loading states):**
+
+- What changed:
+  - Extracted catalog request code into `lib/catalog/client.ts`
+    (`fetchCatalog`, `catalogQueryKey`, `CatalogFilters`); component now only
+    wires hooks to UI. Kept existing paths (`components/query-provider.tsx`,
+    `lib/catalog/*`) instead of the spec's suggested reorganization.
+  - Split `product-catalog.tsx`: outer shell (breadcrumb/masthead/filters,
+    masthead count via non-suspense `useQuery` on the shared key +
+    `keepPreviousData`) + inner `CatalogResults` (`useSuspenseQuery`) in an
+    inner `<Suspense>` with the skeleton fallback — one network request total.
+  - New `components/loading-spinner.tsx` (server-safe) used by all 6 Suspense
+    fallbacks (4 auth pages + 2 product pages); new antd
+    `components/catalog/product-grid-skeleton.tsx` (client-island only).
+  - New route states `app/[locale]/products/loading.tsx` and
+    `app/[locale]/products/[slug]/loading.tsx` (server-safe shimmer, no antd).
+  - Documented the loading convention in `docs/CODING_GUIDELINES.md`.
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc` shows only the 5 pre-existing ERPNext errors; `/my/products`
+  → 200 with spinner fallback in initial HTML; ERPNext creds confirmed
+  server-only (`ERPNEXT_*`, no `NEXT_PUBLIC_` prefix anywhere).
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors (these still block `make build` typecheck).
+
+**Previous session (2026-09-14, structural cleanup finish):**
+
+- What changed (completed the in-progress reorganization; no redesign):
+  - Fixed 4 broken imports in `app/[locale]/page.tsx` left by the moves
+    (now `@/components/catalog/product-card`, `@/components/marketing/*`)
+  - Moved home page dummy arrays → `data/dummy/home-products.ts`,
+    deleted ~160 lines of dead commented code, replaced hardcoded hex/raw
+    grays (`text-[#A81C24]`, `text-[#0F172A]`, `border-gray-200`,
+    `text-gray-500`, `bg-white`, `shadow-sm`) with semantic tokens
+  - Wired about page `values`/`stats`/`teamMembers`/`locations` to
+    `data/dummy/about.ts` (also fixed raw `text-emerald/blue/amber-600`
+    classes via the data file's token colors); added `as const` to stat ids
+    for the icon lookup typing
+  - Reformatted `product-card-item.ts`, `[slug]/page.tsx`, `dummy-catalog.ts`
+    via Prettier (were flagged by `format:check`)
+  - Updated `ARCHITECTURE.md` module tree to the new folder structure
+    (`components/{auth,catalog,layout,marketing,providers,scaffold}`,
+    `lib/catalog/*`, `lib/constants.ts`, `data/`)
+  - Left untouched per scope: `components/tutorial/*` (now under
+    `components/scaffold/tutorial/`), `supabase-logo.tsx` brand SVG,
+    ERPNext type errors (other workstream)
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc` shows only the 5 pre-existing ERPNext errors (the 4 new
+  TS2307 import errors from the moves are fixed)
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-14, catalog uses shared ProductCard):**
 
 - What changed (per request: use `components/product-card.tsx`, drop inline cards):
   - Extended `ProductCard` contract (defaults keep home page pixel-identical):

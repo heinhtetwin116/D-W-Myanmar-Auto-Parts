@@ -6,8 +6,9 @@ import {
   type CatalogSearchParams,
 } from "@/lib/catalog/search-products";
 import type { ProductSort, StockFilter } from "@/lib/erpnext/queries";
+import { CATALOG_PAGE_SIZE, CATALOG_PAGE_SIZE_MAX } from "@/lib/constants";
 
-/** Response shape consumed by `components/product-catalog.tsx`. */
+/** Response shape consumed by `components/catalog/product-catalog.tsx`. */
 export type CatalogResponse = CatalogResult;
 
 const STOCK_VALUES: StockFilter[] = ["in_stock", "low_stock", "out_of_stock"];
@@ -39,9 +40,16 @@ function parseParams(searchParams: URLSearchParams): CatalogSearchParams {
   const rawPage = Number.parseInt(searchParams.get("page") ?? "1", 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 
-  const rawLimit = Number.parseInt(searchParams.get("limit") ?? "12", 10);
+  const rawLimit = Number.parseInt(
+    searchParams.get("limit") ?? String(CATALOG_PAGE_SIZE),
+    10,
+  );
   const pageSize =
-    Number.isFinite(rawLimit) && rawLimit > 0 && rawLimit <= 48 ? rawLimit : 12;
+    Number.isFinite(rawLimit) &&
+    rawLimit > 0 &&
+    rawLimit <= CATALOG_PAGE_SIZE_MAX
+      ? rawLimit
+      : CATALOG_PAGE_SIZE;
 
   return { categoryId, search, stock, sort, page, pageSize };
 }

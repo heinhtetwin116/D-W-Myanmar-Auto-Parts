@@ -1,7 +1,8 @@
 import { getMessages } from "next-intl/server";
 import { Metadata } from "next";
-import { SignUpForm } from "@/components/sign-up-form";
+import { SignUpForm } from "@/components/auth/sign-up-form";
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 
 interface SignUpPageProps {
   params: Promise<{ locale: "my" | "en" }>;
@@ -26,11 +27,7 @@ export default async function SignUpPage({ params }: SignUpPageProps) {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       {/* <div className="w-full max-w-md"> */}
 
-      <Suspense
-        fallback={
-          <div className="text-center text-muted-foreground">Loading...</div>
-        }
-      >
+      <Suspense fallback={<LoadingSpinner />}>
         <SignUpForm locale={locale} />
       </Suspense>
       {/* </div> */}
