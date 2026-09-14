@@ -64,18 +64,16 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 1. **Contact page** (`app/[locale]/contact/page.tsx`) — scaffold only, form submit not wired.
 2. **Admin area** (`app/[locale]/admin/*`) not yet scaffolded (Phase C).
-3. **`PRD.md` referenced but not created.** `AGENTS.md` instructs reading
-   `docs/PRD.md` before implementation; the file does not exist yet.
-4. **ORM decision undecided.** `.env.example` reserves `DATABASE_URL` "for
+3. **ORM decision undecided.** `.env.example` reserves `DATABASE_URL` "for
    ORM," but no ORM is installed and `ARCHITECTURE.md` currently directs
    new tables to be plain Supabase SQL migrations until this is decided.
-5. **No automated tests.** No test runner is configured (see
+4. **No automated tests.** No test runner is configured (see
    `CODING_GUIDELINES.md` → Testing contracts).
-6. **No pre-push type-check.** Only CI catches TypeScript errors; the
+5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-7. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
-8. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
-9. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
+6. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
+7. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
+8. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
 
 ## Decisions recorded
 
@@ -113,7 +111,22 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-12, kebab-case enforcement):**
+**Current session (2026-09-14, local Manrope fonts):**
+
+- What changed:
+  - Switched Manrope loading from Google Fonts `<link>` to `next/font/local`
+    in `app/layout.tsx`, using the 7 TTF weights in `public/fonts/manrope/`
+    (200–800), exposed as `--font-manrope` on `<html>`; removed the
+    `fonts.googleapis.com`/`gstatic.com` links (no external font requests)
+  - Updated `AGENTS.md` + `docs/DESIGN_SYSTEM.md` font implementation notes
+    (prior Google-Fonts-link mentions in older handoff entries are historical)
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `make build` compiles successfully (local font paths resolve, routes
+  OK) but still fails typecheck on the same 5 pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-12, kebab-case enforcement):**
 
 - What changed:
   - Installed `eslint-plugin-check-file` (dev dep) and added
