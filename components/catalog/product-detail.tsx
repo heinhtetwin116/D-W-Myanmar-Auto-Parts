@@ -20,7 +20,9 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import type { Product } from "@/lib/erpnext/types";
-import ProductsBreadcrumb from "@/components/products-breadcrumb";
+import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
+import { formatPriceMmk } from "@/lib/catalog/product-card-item";
+import { getStockStatus } from "@/lib/catalog/stock";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -60,10 +62,11 @@ export default function ProductDetail({
   const description =
     locale === "my" ? product.description_my : product.description_en;
 
+  const stockStatus = getStockStatus(product.stock_quantity);
   const stockBadge =
-    product.stock_quantity <= 0
+    stockStatus === "out_of_stock"
       ? { status: "error" as const, text: labels.outOfStock }
-      : product.stock_quantity <= 10
+      : stockStatus === "low_stock"
         ? { status: "warning" as const, text: labels.lowStock }
         : { status: "success" as const, text: labels.inStock };
 
@@ -114,7 +117,7 @@ export default function ProductDetail({
 
           <div className="mt-4">
             <Text className="text-3xl font-bold text-accent">
-              {product.price_mmk.toLocaleString()} {labels.currency}
+              {formatPriceMmk(product.price_mmk, labels.currency)}
             </Text>
           </div>
 
@@ -190,7 +193,7 @@ export default function ProductDetail({
                         {itemName}
                       </Title>
                       <Text strong className="text-accent">
-                        {item.price_mmk.toLocaleString()} {labels.currency}
+                        {formatPriceMmk(item.price_mmk, labels.currency)}
                       </Text>
                     </Card>
                   </Link>

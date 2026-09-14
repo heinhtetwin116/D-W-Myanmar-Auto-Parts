@@ -5,10 +5,14 @@ export const defaultLocale = "my" as const;
 
 export type Locale = (typeof locales)[number];
 
-export default getRequestConfig(async ({ locale }) => {
-  const finalLocale = locales.includes(locale as Locale)
-    ? locale
+export function parseLocale(value: unknown): Locale {
+  return typeof value === "string" && locales.includes(value as Locale)
+    ? (value as Locale)
     : defaultLocale;
+}
+
+export default getRequestConfig(async ({ locale }) => {
+  const finalLocale = parseLocale(locale);
 
   return {
     locale: finalLocale as string,

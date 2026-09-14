@@ -30,21 +30,33 @@ app/                      Routes (App Router). Pages + layouts + route handlers.
     page.tsx                Home page
   api/
     auth/confirm/route.ts   Email confirmation (locale-aware redirect)
+    products/route.ts       Catalog API: searchProducts() (Supabase-first, dummy fallback)
+    catalog/sync/route.ts   Manual ERPNext sync trigger (TODO: auth check)
   layout.tsx              Root layout: redirects to /my
   globals.css             Design tokens (CSS variables) + Tailwind layers
 
 components/               Presentational + client-interactive components
-  header.tsx                i18n-ready header with locale switcher
-  footer.tsx                i18n-ready footer
-  product-card.tsx          Product display card
-  login-form.tsx            D&W-specific auth UI (Tailwind, wired to Supabase)
-  sign-up-form.tsx          D&W-specific auth UI (Tailwind, wired to Supabase)
-  forgot-password-form.tsx  Auth UI (antd, wired to Supabase)
-  update-password-form.tsx  Auth UI (antd, wired to Supabase)
-  auth-button.tsx / logout-button.tsx  Session-aware nav controls
-  theme-switcher.tsx        Light/dark/system toggle (next-themes)
+  auth/                   Auth UI: login/sign-up/forgot/update forms, auth buttons
+  catalog/                Catalog UI: product-card, product-catalog, product-detail,
+                          products-breadcrumb (all wired via lib/catalog queries)
+  layout/                 Header, Footer, theme-switcher
+  marketing/              Placeholder marketing UI: hero, faq, testimonials
+                          (content from data/dummy/*, not wired to Supabase)
+  providers/              Client providers (react-query QueryClient)
+  scaffold/               Legacy starter-kit scaffold (tutorial/*, logos, etc.)
+
+data/
+  categories.json / products.json   Bundled fallback catalog (Supabase row shapes)
+  dummy/                  Placeholder marketing content (home-products, faq,
+                          testimonials, about) as typed TS modules
 
 lib/
+  catalog/
+    search-products.ts    Unified searchProducts() (Supabase-first, dummy fallback)
+    dummy-catalog.ts        Dummy filtering/sorting/pagination over data/*.json
+    product-card-item.ts    ProductCardItem display DTO + toProductCardItem adapter
+    stock.ts                Shared stock buckets/thresholds/badge tones
+  constants.ts            Shared app constants (LOW_STOCK_THRESHOLD, page sizes, …)
   supabase/
     client.ts              Browser Supabase client (Client Components)
     server.ts               Server Supabase client (Server Components/Route Handlers), per-request

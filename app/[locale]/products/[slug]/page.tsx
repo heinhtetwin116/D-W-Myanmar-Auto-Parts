@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
@@ -7,8 +8,10 @@ import {
   getProductById,
   getProductsByCategory,
 } from "@/lib/erpnext/queries";
-import ProductDetail, { type DetailLabels } from "@/components/product-detail";
-import { locales, defaultLocale, type Locale } from "@/lib/i18n";
+import ProductDetail, {
+  type DetailLabels,
+} from "@/components/catalog/product-detail";
+import { parseLocale } from "@/lib/i18n";
 
 interface ProductDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -18,9 +21,7 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { locale: rawLocale, slug } = await params;
-  const locale: Locale = locales.includes(rawLocale as Locale)
-    ? (rawLocale as Locale)
-    : defaultLocale;
+  const locale = parseLocale(rawLocale);
   const messages = await getMessages({ locale });
 
   const supabase = await createClient();
@@ -64,13 +65,7 @@ export default async function ProductDetailPage({
 
   return (
     <div className="container-custom section-padding !py-10">
-      <Suspense
-        fallback={
-          <div className="flex justify-center py-16" aria-label="Loading">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-accent" />
-          </div>
-        }
-      >
+      <Suspense fallback={<LoadingSpinner />}>
         <ProductDetail
           locale={locale}
           product={product}

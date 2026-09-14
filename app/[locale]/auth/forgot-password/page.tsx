@@ -1,7 +1,8 @@
 import { getMessages } from "next-intl/server";
 import { Metadata } from "next";
-import { ForgotPasswordForm } from "@/components/forgot-password-form";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 
 interface ForgotPasswordPageProps {
   params: Promise<{ locale: "my" | "en" }>;
@@ -38,11 +39,7 @@ export default async function ForgotPasswordPage({
               "Enter your email to receive a reset link"}
           </p>
         </div>
-        <Suspense
-          fallback={
-            <div className="text-center text-muted-foreground">Loading...</div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner />}>
           <ForgotPasswordForm locale={locale} />
         </Suspense>
       </div>

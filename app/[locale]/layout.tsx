@@ -7,10 +7,10 @@ import { notFound } from "next/navigation";
 import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { locales, defaultLocale, type Locale } from "@/lib/i18n";
+import { locales, parseLocale } from "@/lib/i18n";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import QueryProvider from "@/components/query-provider";
+import QueryProvider from "@/components/providers/query-provider";
 
 const antdLocales = {
   my: my_MM,
@@ -32,9 +32,7 @@ export default async function LocaleLayout({
 }: LocaleLayoutProps) {
   const { locale } = await params;
 
-  const validLocale = locales.includes(locale as Locale)
-    ? (locale as Locale)
-    : defaultLocale;
+  const validLocale = parseLocale(locale);
 
   setRequestLocale(validLocale);
   const messages = await getMessages({ locale: validLocale });

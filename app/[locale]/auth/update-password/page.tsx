@@ -1,7 +1,8 @@
 import { getMessages } from "next-intl/server";
 import { Metadata } from "next";
-import { UpdatePasswordForm } from "@/components/update-password-form";
+import { UpdatePasswordForm } from "@/components/auth/update-password-form";
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 
 interface UpdatePasswordPageProps {
   params: Promise<{ locale: "my" | "en" }>;
@@ -37,11 +38,7 @@ export default async function UpdatePasswordPage({
             {t.auth?.update_password?.subtitle || "Enter your new password"}
           </p>
         </div>
-        <Suspense
-          fallback={
-            <div className="text-center text-muted-foreground">Loading...</div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner />}>
           <UpdatePasswordForm locale={locale} />
         </Suspense>
       </div>

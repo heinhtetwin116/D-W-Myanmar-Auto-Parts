@@ -6,7 +6,8 @@
  */
 
 import type { Category, Product } from "@/lib/erpnext/types";
-import type { ProductSort, StockFilter } from "@/lib/erpnext/queries";
+import type { ProductSort } from "@/lib/erpnext/queries";
+import { matchesStockFilter, type StockFilter } from "@/lib/catalog/stock";
 import dummyCategories from "@/data/categories.json";
 import dummyProducts from "@/data/products.json";
 
@@ -15,12 +16,6 @@ export interface DummyQuery {
   search?: string;
   stock?: StockFilter;
   sort?: ProductSort;
-}
-
-function matchesStock(quantity: number, stock: StockFilter): boolean {
-  if (stock === "in_stock") return quantity > 10;
-  if (stock === "low_stock") return quantity >= 1 && quantity <= 10;
-  return quantity <= 0;
 }
 
 function sortDummy(products: Product[], sort: ProductSort): Product[] {
@@ -61,7 +56,10 @@ export function queryDummyProducts(
     if (query.categoryId && product.category_id !== query.categoryId) {
       return false;
     }
-    if (query.stock && !matchesStock(product.stock_quantity, query.stock)) {
+    if (
+      query.stock &&
+      !matchesStockFilter(product.stock_quantity, query.stock)
+    ) {
       return false;
     }
     if (normalizedSearch) {

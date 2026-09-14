@@ -1,7 +1,8 @@
 import { getMessages } from "next-intl/server";
 import { Metadata } from "next";
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/auth/login-form";
 import { Suspense } from "react";
+import LoadingSpinner from "@/components/loading-spinner";
 
 interface LoginPageProps {
   params: Promise<{ locale: "my" | "en" }>;
@@ -25,11 +26,7 @@ export default async function LoginPage({ params }: LoginPageProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <Suspense
-          fallback={
-            <div className="text-center text-muted-foreground">Loading...</div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner />}>
           <LoginForm locale={locale} />
         </Suspense>
       </div>

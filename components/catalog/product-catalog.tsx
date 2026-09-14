@@ -1,11 +1,23 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Empty, Input, Menu, Pagination, Select, Tag, Typography } from "antd";
-import type { CatalogResponse } from "@/app/api/products/route";
-import ProductsBreadcrumb from "@/components/products-breadcrumb";
-import ProductCard from "@/components/product-card";
+import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
+import ProductCard from "@/components/catalog/product-card";
+import ProductGridSkeleton from "@/components/catalog/product-grid-skeleton";
+import {
+  catalogQueryKey,
+  fetchCatalog,
+  type CatalogFilters,
+} from "@/lib/catalog/client";
+import { toProductCardItem } from "@/lib/catalog/product-card-item";
+import { stockBadgeTone } from "@/lib/catalog/stock";
 
 const { Title, Text, Paragraph } = Typography;
 const { CheckableTag } = Tag;
@@ -41,25 +53,10 @@ interface ProductCatalogProps {
   productsLabel: string;
 }
 
-async function fetchCatalog(params: URLSearchParams): Promise<CatalogResponse> {
-  const response = await fetch(`/api/products?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error(`Catalog request failed: ${response.status}`);
-  }
-  return response.json() as Promise<CatalogResponse>;
-}
-
-function stockBadge(
-  quantity: number,
-  labels: CatalogLabels,
-): { status: "success" | "warning" | "error"; text: string } {
-  if (quantity <= 0) {
-    return { status: "error", text: labels.outOfStock };
-  }
-  if (quantity <= 10) {
-    return { status: "warning", text: labels.lowStock };
-  }
-  return { status: "success", text: labels.inStock };
+function stockBadgeText(quantity: number, labels: CatalogLabels): string {
+  if (quantity <= 0) return labels.outOfStock;
+  if (quantity <= 10) return labels.lowStock;
+  return labels.inStock;
 }
 
 export default function ProductCatalog({
@@ -82,23 +79,25 @@ export default function ProductCatalog({
   const rawPage = Number.parseInt(searchParams.get("page") ?? "1", 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 
-  const queryParams = new URLSearchParams();
-  if (search) queryParams.set("search", search);
-  if (categoryId) queryParams.set("category", categoryId);
-  if (stock) queryParams.set("stock", stock);
-  if (sort) queryParams.set("sort", sort);
-  queryParams.set("page", String(page));
-  queryParams.set("limit", String(pageSize));
+  const filters: CatalogFilters = {
+    search,
+    category: categoryId,
+    stock,
+    sort,
+    page,
+    pageSize,
+  };
 
-  const { data } = useSuspenseQuery({
-    queryKey: [
-      "products",
-      { search, category: categoryId, stock, sort, page, pageSize },
-    ],
-    queryFn: () => fetchCatalog(queryParams),
+  // Shared cache entry with the results below: one network request total.
+  // keepPreviousData keeps the last count/categories visible while refetching.
+  const { data: headerData } = useQuery({
+    queryKey: catalogQueryKey(filters),
+    queryFn: () => fetchCatalog(filters),
+    placeholderData: keepPreviousData,
   });
 
-  const { products, categories, total } = data;
+  const categories = headerData?.categories ?? [];
+  const total = headerData?.total ?? 0;
 
   const pushParams = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams();
@@ -265,59 +264,75 @@ export default function ProductCatalog({
             />
           </div>
 
-          {products.length === 0 ? (
-            <Empty description={labels.noResults} className="py-16" />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {products.map((product) => {
-                  const badge = stockBadge(product.stock_quantity, labels);
-                  const tone =
-                    badge.status === "success"
-                      ? ("success" as const)
-                      : badge.status === "warning"
-                        ? ("warning" as const)
-                        : ("critical" as const);
-                  return (
-                    <ProductCard
-                      key={product.id}
-                      product={{
-                        id: product.id,
-                        code: product.sku,
-                        name:
-                          locale === "my" ? product.name_my : product.name_en,
-                        desc:
-                          (locale === "my"
-                            ? product.description_my
-                            : product.description_en) ?? "",
-                        stock: product.stock_quantity,
-                        price: `${product.price_mmk.toLocaleString()} ${labels.currency}`,
-                      }}
-                      badge={{ text: badge.text, tone }}
-                      detailsHref={`/${locale}/products/${product.id}`}
-                      detailsLabel={labels.viewDetails}
-                    />
-                  );
-                })}
-              </div>
-
-              {total > pageSize && (
-                <div className="mt-8 flex justify-center">
-                  <Pagination
-                    current={page}
-                    pageSize={pageSize}
-                    total={total}
-                    showSizeChanger={false}
-                    onChange={(nextPage) =>
-                      pushParams({ page: String(nextPage) })
-                    }
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <Suspense fallback={<ProductGridSkeleton />}>
+            <CatalogResults locale={locale} labels={labels} filters={filters} />
+          </Suspense>
         </section>
       </div>
     </div>
+  );
+}
+
+function CatalogResults({
+  locale,
+  labels,
+  filters,
+}: {
+  locale: string;
+  labels: CatalogLabels;
+  filters: CatalogFilters;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const { data } = useSuspenseQuery({
+    queryKey: catalogQueryKey(filters),
+    queryFn: () => fetchCatalog(filters),
+  });
+
+  const { products, total } = data;
+
+  if (products.length === 0) {
+    return <Empty description={labels.noResults} className="py-16" />;
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={toProductCardItem(product, locale, labels.currency)}
+            badge={{
+              text: stockBadgeText(product.stock_quantity, labels),
+              tone: stockBadgeTone(product.stock_quantity),
+            }}
+            detailsHref={`/${locale}/products/${product.id}`}
+            detailsLabel={labels.viewDetails}
+          />
+        ))}
+      </div>
+
+      {total > filters.pageSize && (
+        <div className="mt-8 flex justify-center">
+          <Pagination
+            current={filters.page}
+            pageSize={filters.pageSize}
+            total={total}
+            showSizeChanger={false}
+            onChange={(nextPage) => {
+              const params = new URLSearchParams();
+              if (filters.search) params.set("search", filters.search);
+              if (filters.category) params.set("category", filters.category);
+              if (filters.stock) params.set("stock", filters.stock);
+              if (filters.sort) params.set("sort", filters.sort);
+              if (nextPage !== 1) params.set("page", String(nextPage));
+              const query = params.toString();
+              router.push(query ? `${pathname}?${query}` : pathname);
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 }
