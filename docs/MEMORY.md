@@ -72,8 +72,10 @@ changes (see `AGENTS.md` → Documentation maintenance).
 5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
 6. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
-7. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
-8. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
+7. **Catalog mirror cleanup unverified.** The old `categories`/`products`/`sync_runs` migration may never have been applied anywhere — verify before writing a drop migration; do not apply-then-drop blindly.
+8. **No reverse proxy / TLS termination decided.** No Traefik/Nginx (or equivalent) configured yet for routing to either container's public-facing ports. Must be decided before production deploy.
+9. **No ERPNext database backup strategy.** The dockerized MariaDB volume needs a persisted named-volume backup plan — distinct from any Droplet-level backup.
+10. **Single-Droplet shared fate accepted for now.** ERPNext + website on one Droplet is a deliberate simplicity tradeoff at current scale; revisit if HA is ever required.
 
 ## Decisions recorded
 
@@ -94,15 +96,17 @@ changes (see `AGENTS.md` → Documentation maintenance).
   props; their links are locale-agnostic and need an i18n follow-up.
 - PRs target the `development` branch only (not `main` as WORKFLOW.md previously
   stated). Decided in interview 2026-09-12.
-- ERPNext integration decisions: server-only credentials, enabled Items only,
-  actual stock, `Item.image`, numeric MMK prices, ERPNext source IDs, last
-  successful Supabase snapshot on failure, persisted sync logs, and no
-  scheduling or alert delivery until manual sync is verified.
-- ERPNext source mapping decisions: use `Item` and `Item Group`; store
-  normalized bilingual catalog metadata plus source IDs in Supabase; use
-  numeric MMK prices; keep enquiry actions visual-only for the first sync
-  milestone; and defer scheduled execution and alert delivery until the
-  manual sync is verified.
+- ERPNext integration decisions: server-only credentials; catalog reads ERPNext
+  directly on every request (no Supabase mirror) with a 60s route cache;
+  ERPNext down renders the error boundary (no silent dummy data); enabled
+  Items only; Bin-summed actual stock as interim until a warehouse scope is
+  decided; `Item.image`; numeric MMK prices; short ISR cache over always-fresh
+  per request. Decided in Q&A 2026-09-14.
+- ERPNext source mapping decisions: use `Item` and `Item Group`; normalize to
+  the shared `Category` / `Product` shapes in `search-products.ts` (bilingual
+  names with English fallback, ERPNext `name` as id/slug/category key);
+  keep enquiry actions visual-only; sync code (`sync.ts`, sync endpoint,
+  mirror tables) removed rather than kept dormant.
 - Naming convention decision: all new page and component filenames use
   kebab-case; Next.js reserved filenames remain `page.tsx`, `layout.tsx`, and
   `route.ts`; exported React component symbols remain PascalCase. Existing
@@ -111,7 +115,50 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, contact page wired):**
+**Current session (2026-09-14, direct ERPNext reads):**
+
+- What changed (per approved plan: ERPNext-direct, 60s cache, error state, remove sync):
+  - `lib/erpnext/client.ts`: additive `orFilters` support
+  - `lib/catalog/search-products.ts`: rewritten to query ERPNext directly
+    (Item/Item Group lists, Bin-summed stock, `or_filters` search, order_by
+    sort, id-capped counts); `getProductDetail` with 404→null vs throw
+    distinction; `types/index.type.ts` gained `ERPNextBin` (+ `name`, index
+    signature) and `"erpnext"` source values
+  - `app/api/products/route.ts`: `revalidate = 60`, 503 JSON on failure;
+    `app/[locale]/products/[slug]/page.tsx`: `revalidate = 60`, errors now
+    propagate to the boundary instead of collapsing to not-found
+  - New `app/[locale]/products/error.tsx` (antd Result + retry, i18n `retry` key)
+  - Deleted: `lib/erpnext/sync.ts`, `app/api/catalog/sync/route.ts`,
+    `lib/erpnext/queries.ts`, `lib/catalog/dummy-catalog.ts`,
+    `data/categories.json`, `data/products.json`; barrel pruned
+  - Side effect: `tsc` is fully clean (the 2 pre-existing `sync.ts` errors
+    are gone with the file) — `make build` unblocked for the first time
+  - Docs: ARCHITECTURE data-flow/module-tree/persistence/ERPNext section,
+    AGENTS catalog line, CODING_GUIDELINES ERPNext rules, WORKFLOW validation;
+    gaps #7/#8 dissolved, new gap #7 (mirror cleanup verification)
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc --noEmit` exit 0 with zero errors; `/api/products` with empty
+  env returns the designed 503 JSON (error path works end-to-end)
+- Left open: `.env` values (Supabase + ERPNext creds — all empty); field
+  mapping confirmation; warehouse/stock-source decision; mirror-cleanup
+  verification; Contact form backend; Admin CRUD
+
+**Previous session (2026-09-14, deployment topology decision):**
+
+- What changed (documentation-only, no code):
+  - Recorded the self-hosted deployment decision in `docs/ARCHITECTURE.md`
+    ("Deployment topology"): single Droplet, sibling `erpnext` + `website`
+    containers on a shared Docker network, internal-hostname API access, DB
+    separation, one-way Supabase mirror, single-Droplet tradeoff accepted
+  - Clarified `ERPNEXT_BASE_URL` in `.env.example` (internal hostname, never public)
+  - Added gaps #9–11 (reverse proxy, ERPNext DB backups, shared-fate tradeoff);
+    pointed `docs/WORKFLOW.md` release process at the new section
+- Verified: no other doc contradicts the topology (grep for public-URL/docker
+  claims); `git diff` limited to docs + `.env.example` comment
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  the 2 remaining ERPNext type errors, plus new gaps #9–11
+
+**Previous session (2026-09-14, contact page wired):**
 
 - What changed (closes gap #1):
   - New migration `supabase/migrations/20260914_141012_create_enquiries.sql`:

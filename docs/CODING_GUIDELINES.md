@@ -135,11 +135,10 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 - Keep ERPNext API calls behind a typed wrapper; do not scatter raw `fetch`
   calls through pages or components.
 - Request explicit fields and paginate ERPNext `Item` and `Item Group` reads.
-- Treat the manual sync as idempotent: upsert by ERPNext source ID, record a
-  `sync_runs` result, and leave the last successful Supabase snapshot intact
-  when an upstream request fails.
+- Read ERPNext live per request (with route-level caching); do not rebuild
+  a Supabase mirror for catalog data.
 - Do not invent bilingual or stock field names. Confirm them against the
-  target ERPNext instance and document the mapping next to the sync code.
+  target ERPNext instance and document the mapping next to the query code.
 
 ## Linting, formatting, types
 

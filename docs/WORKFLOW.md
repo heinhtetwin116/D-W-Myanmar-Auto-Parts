@@ -104,21 +104,20 @@ form`).
   together, RLS considered explicitly (not left "off by omission").
 - Test both locales (`/my/...` and `/en/...`) for i18n changes.
 
-### ERPNext catalog sync validation
+### ERPNext catalog validation
 
-Before implementing the ERPNext sync, record the target `Item` and `Item
-Group` field mapping, including bilingual fields, enabled status, image URL,
-and the source used for actual stock. The first milestone must be manually
-triggerable and tested against a safe ERPNext environment.
+Before pointing the catalog at a real instance, record the target `Item` and
+`Item Group` field mapping, including bilingual fields, enabled status, image
+URL, and the source used for actual stock. Test against a safe ERPNext
+environment first.
 
-A sync change is not complete until it verifies:
+A catalog change is not complete until it verifies:
 
-- enabled Items and categories are imported with stable ERPNext source IDs;
-- repeated runs are idempotent;
+- enabled Items and categories resolve with stable ERPNext source IDs;
 - bilingual fields, numeric MMK prices, actual stock, and image URLs map as
   expected;
-- successful sync counts and failed sync errors are recorded;
-- a failed run leaves the last successful Supabase catalog available; and
+- list, detail, filters, sort, and pagination behave against live data;
+- ERPNext down returns the error boundary (503 path), not a blank page; and
 - ERPNext credentials are never present in browser bundles or `NEXT_PUBLIC_`
   environment variables.
 
@@ -140,7 +139,9 @@ Mirrors `AGENTS.md`:
 ## Release process
 
 Not yet formalized — there is currently no separate deploy/release
-workflow beyond CI building on `main`/`development`. When a deployment
-target (e.g. Vercel) and release cadence are decided, record them here:
-trigger, environment promotion path (if any), rollback approach, and how
-Supabase migrations are applied in each environment.
+workflow beyond CI building on `main`/`development`. The decided deploy
+topology (self-hosted single Droplet, Docker network layout) lives in
+`ARCHITECTURE.md` → "Deployment topology"; reverse proxy, backups, and HA
+remain open (see `MEMORY.md` → Known gaps). When release cadence is decided,
+record it here: trigger, environment promotion path (if any), rollback
+approach, and how Supabase migrations are applied in each environment.

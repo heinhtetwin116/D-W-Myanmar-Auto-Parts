@@ -89,6 +89,7 @@ export interface ERPNextItemGroup {
   custom_name_my?: string;
   custom_description_my?: string;
   // ... other ERPNext fields
+  [key: string]: unknown;
 }
 
 /**
@@ -107,6 +108,20 @@ export interface ERPNextItem {
   custom_description_my?: string;
   custom_price_mmk?: number;
   // ... other ERPNext fields
+  [key: string]: unknown;
+}
+
+/**
+ * Raw ERPNext Bin row (stock per item per warehouse).
+ * Only `item_code` + `actual_qty` are read; warehouse scoping is open
+ * until the stock source is decided (see MEMORY.md).
+ */
+export interface ERPNextBin {
+  name: string; // Frappe document ID (every DocType has one)
+  item_code: string;
+  warehouse?: string;
+  actual_qty?: number;
+  [key: string]: unknown;
 }
 
 export interface ERPNextClientOptions {
@@ -118,6 +133,7 @@ export interface ERPNextClientOptions {
 export interface ERPNextListParams {
   fields?: string[];
   filters?: Array<[string, string, string | number | boolean]>;
+  orFilters?: Array<[string, string, string | number | boolean]>;
   orderBy?: string;
   limitStart?: number;
   limitPageLength?: number;
@@ -173,7 +189,7 @@ export interface CatalogSearchParams {
 }
 
 export interface CatalogResult {
-  source: "db" | "dummy";
+  source: "db" | "dummy" | "erpnext";
   products: Product[];
   total: number;
   categories: Category[];
@@ -182,7 +198,7 @@ export interface CatalogResult {
 }
 
 export interface ProductDetailResult {
-  source: "db" | "dummy";
+  source: "db" | "dummy" | "erpnext";
   product: Product;
   category: Category | null;
   related: Product[];

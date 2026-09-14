@@ -37,6 +37,10 @@ export class ERPNextClient {
       url.searchParams.set("filters", JSON.stringify(params.filters));
     }
 
+    if (params.orFilters && params.orFilters.length > 0) {
+      url.searchParams.set("or_filters", JSON.stringify(params.orFilters));
+    }
+
     if (params.orderBy) {
       url.searchParams.set("order_by", params.orderBy);
     }
