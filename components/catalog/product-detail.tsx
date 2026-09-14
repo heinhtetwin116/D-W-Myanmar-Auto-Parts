@@ -19,34 +19,12 @@ import {
   PictureOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
-import type { Product } from "@/lib/erpnext/types";
+import type { ProductDetailProps } from "@/types/index.type";
 import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
 import { formatPriceMmk } from "@/lib/catalog/product-card-item";
 import { getStockStatus } from "@/lib/catalog/stock";
 
 const { Title, Text, Paragraph } = Typography;
-
-export interface DetailLabels {
-  enquire: string;
-  backToCatalog: string;
-  specs: string;
-  relatedProducts: string;
-  currency: string;
-  inStock: string;
-  lowStock: string;
-  outOfStock: string;
-}
-
-interface ProductDetailProps {
-  locale: string;
-  product: Product;
-  categoryName: string;
-  related: Product[];
-  labels: DetailLabels;
-  homeLabel: string;
-  productsLabel: string;
-  currentLabel: string;
-}
 
 export default function ProductDetail({
   locale,

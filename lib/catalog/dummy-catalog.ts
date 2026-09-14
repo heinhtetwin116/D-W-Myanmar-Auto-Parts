@@ -5,18 +5,15 @@
  * never need to care which source served the data.
  */
 
-import type { Category, Product } from "@/lib/erpnext/types";
-import type { ProductSort } from "@/lib/erpnext/queries";
-import { matchesStockFilter, type StockFilter } from "@/lib/catalog/stock";
+import type {
+  Category,
+  DummyQuery,
+  Product,
+  ProductSort,
+} from "@/types/index.type";
+import { matchesStockFilter } from "@/lib/catalog/stock";
 import dummyCategories from "@/data/categories.json";
 import dummyProducts from "@/data/products.json";
-
-export interface DummyQuery {
-  categoryId?: string;
-  search?: string;
-  stock?: StockFilter;
-  sort?: ProductSort;
-}
 
 function sortDummy(products: Product[], sort: ProductSort): Product[] {
   const sorted = [...products];
@@ -76,4 +73,40 @@ export function queryDummyProducts(
     products: sorted.slice((page - 1) * pageSize, page * pageSize),
     total: sorted.length,
   };
+}
+
+/**
+ * Single enabled dummy product by id, or `null` when missing/disabled.
+ */
+export function getDummyProductById(id: string): Product | null {
+  const product = (dummyProducts as Product[]).find(
+    (item) => item.id === id && item.enabled,
+  );
+  return product ?? null;
+}
+
+/**
+ * Single enabled dummy category by id, or `null` when missing/disabled.
+ */
+export function getDummyCategoryById(id: string): Category | null {
+  const category = getDummyCategories().find((item) => item.id === id);
+  return category ?? null;
+}
+
+/**
+ * Enabled dummy products in the same category, excluding one id.
+ */
+export function getDummyRelatedProducts(
+  categoryId: string,
+  excludeId: string,
+  limit: number,
+): Product[] {
+  return (dummyProducts as Product[])
+    .filter(
+      (item) =>
+        item.enabled &&
+        item.category_id === categoryId &&
+        item.id !== excludeId,
+    )
+    .slice(0, limit);
 }

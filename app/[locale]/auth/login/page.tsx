@@ -3,10 +3,7 @@ import { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/loading-spinner";
-
-interface LoginPageProps {
-  params: Promise<{ locale: "my" | "en" }>;
-}
+import type { LoginPageProps } from "@/types/index.type";
 
 export async function generateMetadata({
   params,

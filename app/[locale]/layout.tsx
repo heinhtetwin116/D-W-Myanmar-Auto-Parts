@@ -11,16 +11,12 @@ import { locales, parseLocale } from "@/lib/i18n";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import QueryProvider from "@/components/providers/query-provider";
+import type { LocaleLayoutProps } from "@/types/index.type";
 
 const antdLocales = {
   my: my_MM,
   en: en_US,
 };
-
-interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -61,7 +57,7 @@ export default async function LocaleLayout({
             <QueryProvider>
               {/* <Header locale={validLocale} /> */}
               <Header />
-              <main className="flex-1 container-custom">{children}</main>
+              <main className="flex-1">{children}</main>
               {/* <Footer locale={validLocale} /> */}
               <Footer />
             </QueryProvider>

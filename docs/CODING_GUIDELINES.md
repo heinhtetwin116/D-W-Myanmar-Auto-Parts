@@ -96,6 +96,11 @@ Per `ARCHITECTURE.md` → "UI layering," AntD-first is the decided direction:
 - Use PascalCase for exported React component symbols; use kebab-case only
   for their filenames. Next.js reserved route filenames such as `page.tsx`,
   `layout.tsx`, and `route.ts` are exempt.
+- Shared custom types live in one place: `types/index.type.ts` (import via
+  `import type { ... } from "@/types/index.type"`). Do not re-declare a
+  shared shape locally and do not alias it under a second name (e.g. never
+  alias `ProductCardItem` as `Product`). Runtime helpers stay in their
+  feature modules (`lib/catalog/*`, `lib/erpnext/*`).
 - **Enforcement:** kebab-case is locked in by ESLint
   (`eslint-plugin-check-file` in `eslint.config.mjs`), scoped to `app/`,
   `components/`, and `lib/`. The filename rule fails on any non-kebab

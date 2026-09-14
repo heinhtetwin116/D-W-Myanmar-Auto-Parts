@@ -64,6 +64,11 @@ lib/
   i18n.ts                   next-intl config (locales, defaultLocale, getRequestConfig)
   utils.ts                  `cn()` class-merge helper
 
+types/
+  index.type.ts           Central shared types (domain, catalog, props, dummy
+                          content). Type-only module, safe to import anywhere.
+                          Runtime helpers stay in their feature modules.
+
 proxy.ts                   Next.js middleware entry point — locale detection + session refresh
 ```
 

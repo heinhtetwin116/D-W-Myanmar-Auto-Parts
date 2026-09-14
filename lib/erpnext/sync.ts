@@ -6,20 +6,14 @@
 
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ERPNextClient } from "./client";
-import { Category, Product, ERPNextItemGroup, ERPNextItem } from "./types";
-
-interface SyncOptions {
-  pageSize?: number; // Number of items to fetch per paginated request
-}
-
-interface SyncResult {
-  syncRunId: string;
-  status: "success" | "error";
-  categoriesImported: number;
-  productsImported: number;
-  error?: string;
-  durationMs: number;
-}
+import type {
+  Category,
+  ERPNextItem,
+  ERPNextItemGroup,
+  Product,
+  SyncOptions,
+  SyncResult,
+} from "@/types/index.type";
 
 /**
  * Manual sync: fetch enabled Item Groups and Items from ERPNext,
