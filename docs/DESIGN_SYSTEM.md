@@ -69,10 +69,12 @@ Shadows are registered in `tailwind.config.ts` as `shadow-default` /
 ## Typography
 
 - **Font:** Manrope.
-- **Implementation:** `app/layout.tsx` loads `Manrope` via a Google Fonts
-  `<link>`, applied through Tailwind `font-sans` → `--font-manrope` on
-  `<body>`; antd `ConfigProvider` in `app/[locale]/layout.tsx` passes a
-  matching `fontFamily` theme token so antd components render Manrope too.
+- **Implementation:** `app/layout.tsx` loads `Manrope` via
+  `next/font/local` from `public/fonts/manrope/` (weights 200–800), exposed
+  as CSS variable `--font-manrope` on `<html>`, applied through Tailwind
+  `font-manrope`/`font-sans` on `<body>`; antd `ConfigProvider` in
+  `app/[locale]/layout.tsx` passes a matching `fontFamily` theme token so
+  antd components render Manrope too. No external font requests.
 - Headings and primary typography use the Obsidian (`--primary` /
   `--foreground`) token; body copy should default to
   `text-foreground`/`text-muted-foreground` per context.

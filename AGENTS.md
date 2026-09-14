@@ -46,7 +46,7 @@
 - Use `bg-background`, `text-foreground`, `bg-accent`, etc. — **never raw hex or `bg-blue-500`**
 - Status tokens: `--success`, `--warning`, `--critical` (light + dark)
 - Elevation tokens: `shadow-default` / `shadow-hover` (use instead of `shadow-sm`/`shadow-md`)
-- Font: Manrope via Google Fonts `<link>` in `app/layout.tsx`, applied through `font-sans` → `--font-manrope`; antd `ConfigProvider` themed with matching `fontFamily`, `colorPrimary #A81C24`, `borderRadius 8`
+- Font: Manrope via `next/font/local` from `public/fonts/manrope/` in `app/layout.tsx`, exposed as `--font-manrope`, applied through `font-manrope`/`font-sans`; antd `ConfigProvider` themed with matching `fontFamily`, `colorPrimary #A81C24`, `borderRadius 8`
 
 ### Component Structure
 
@@ -68,7 +68,6 @@
 
 - **Always read `docs/MEMORY.md` first** — current status, gaps, handoff
 - Other docs in `docs/` are stable references; update `MEMORY.md` for progress
-- `docs/PRD.md` does not exist (see `MEMORY.md` Known gaps)
 
 ## Definition of Done
 

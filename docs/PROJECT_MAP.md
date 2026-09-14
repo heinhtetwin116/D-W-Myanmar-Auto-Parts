@@ -102,7 +102,6 @@ priorities shift, and log the actual state of each item in `MEMORY.md`.
 
 ## Related documents
 
-- [`PRD.md`](./PRD.md) — requirements and acceptance gates per version (create when the first PRD is written; not yet present).
 - [`MEMORY.md`](./MEMORY.md) — current status, known gaps, session handoff.
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — module boundaries and data flow.
 - [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) — tokens, typography, spacing.

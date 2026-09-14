@@ -127,7 +127,7 @@ A sync change is not complete until it verifies:
 Mirrors `AGENTS.md`:
 
 1. **Start of session**: read `MEMORY.md` first (current status/gaps),
-   then whichever of `PROJECT_MAP.md`, `PRD.md`, `ARCHITECTURE.md`,
+   then whichever of `PROJECT_MAP.md`, `ARCHITECTURE.md`,
    `DESIGN_SYSTEM.md`, `CODING_GUIDELINES.md` are relevant to the task.
 2. **During the session**: keep changes scoped; if a durable rule needs to
    change (e.g. a new design token, a new architectural boundary), edit the

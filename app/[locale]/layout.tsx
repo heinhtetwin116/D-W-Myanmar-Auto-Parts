@@ -56,7 +56,7 @@ export default async function LocaleLayout({
           attribute="class"
           defaultTheme="white"
           enableSystem
-          disableTransitionOnChange
+          // disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={validLocale}>
             {/* <Header locale={validLocale} /> */}
