@@ -111,7 +111,27 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, catalog reverted to original design):**
+**Current session (2026-09-14, catalog uses shared ProductCard):**
+
+- What changed (per request: use `components/product-card.tsx`, drop inline cards):
+  - Extended `ProductCard` contract (defaults keep home page pixel-identical):
+    `id: number | string`, optional `badge {text, tone}` (success/warning/
+    critical → token classes), optional `detailsHref` (renders Next Link,
+    else plain button) + `detailsLabel` (default "View Details")
+  - Catalog grid maps Supabase products through the adapter (sku→code,
+    locale name/desc, formatted MMK price, localized stock badge, detail link)
+  - Removed now-unused imports/helper (`Link`, `Badge`, `Card`, `Image`,
+    antd icons, `categoryName`) from `product-catalog.tsx`
+  - Tradeoffs vs old inline cards: per-card category label row and the
+    (non-functional) "+ Add" action are gone; image cover always shows the
+    wrench placeholder now (dummy rows have no `image_url`)
+- Verified: `/my` + `/en` products → 200 with layout markers; `eslint` 0
+  errors; `format:check` passes; `git diff --check` clean; `tsc` shows only
+  the 5 pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-14, catalog reverted to original design):**
 
 - What changed (per interview: f1692b8 visuals + antd, plumbing untouched):
   - Rebuilt `components/product-catalog.tsx` render as the original layout:

@@ -1,24 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Badge,
-  Card,
-  Empty,
-  Image,
-  Input,
-  Menu,
-  Pagination,
-  Select,
-  Tag,
-  Typography,
-} from "antd";
-import { EyeOutlined, PictureOutlined, PlusOutlined } from "@ant-design/icons";
-import type { Category, Product } from "@/lib/erpnext/types";
+import { Empty, Input, Menu, Pagination, Select, Tag, Typography } from "antd";
 import type { CatalogResponse } from "@/app/api/products/route";
 import ProductsBreadcrumb from "@/components/products-breadcrumb";
+import ProductCard from "@/components/product-card";
 
 const { Title, Text, Paragraph } = Typography;
 const { CheckableTag } = Tag;
@@ -133,14 +120,6 @@ export default function ProductCatalog({
     if (merged.page && merged.page !== "1") params.set("page", merged.page);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
-  };
-
-  const categoryName = (product: Product) => {
-    const category: Category | undefined = categories.find(
-      (c) => c.id === product.category_id,
-    );
-    if (!category) return product.sku;
-    return locale === "my" ? category.name_my : category.name_en;
   };
 
   return (
@@ -293,63 +272,31 @@ export default function ProductCatalog({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {products.map((product) => {
                   const badge = stockBadge(product.stock_quantity, labels);
-                  const name =
-                    locale === "my" ? product.name_my : product.name_en;
+                  const tone =
+                    badge.status === "success"
+                      ? ("success" as const)
+                      : badge.status === "warning"
+                        ? ("warning" as const)
+                        : ("critical" as const);
                   return (
-                    <Link
+                    <ProductCard
                       key={product.id}
-                      href={`/${locale}/products/${product.id}`}
-                    >
-                      <Card
-                        hoverable
-                        className="h-full hex-bloom"
-                        cover={
-                          <div className="flex h-44 items-center justify-center overflow-hidden bg-muted">
-                            {product.image_url ? (
-                              <Image
-                                src={product.image_url}
-                                alt={name}
-                                preview={false}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <PictureOutlined className="text-4xl text-muted-foreground" />
-                            )}
-                          </div>
-                        }
-                        actions={[
-                          <span key="view">
-                            <EyeOutlined /> {labels.viewDetails}
-                          </span>,
-                          <span key="add">
-                            <PlusOutlined /> {labels.addToEnquiry}
-                          </span>,
-                        ]}
-                      >
-                        <div className="mb-1 flex items-center justify-between gap-2">
-                          <Text type="secondary" className="text-xs">
-                            {categoryName(product)}
-                          </Text>
-                          <Badge status={badge.status} text={badge.text} />
-                        </div>
-                        <Title
-                          level={5}
-                          ellipsis={{ rows: 2 }}
-                          className="!mb-1"
-                        >
-                          {name}
-                        </Title>
-                        <Text type="secondary" className="text-xs">
-                          SKU: {product.sku}
-                        </Text>
-                        <div className="mt-2">
-                          <Text strong className="text-base text-accent">
-                            {product.price_mmk.toLocaleString()}{" "}
-                            {labels.currency}
-                          </Text>
-                        </div>
-                      </Card>
-                    </Link>
+                      product={{
+                        id: product.id,
+                        code: product.sku,
+                        name:
+                          locale === "my" ? product.name_my : product.name_en,
+                        desc:
+                          (locale === "my"
+                            ? product.description_my
+                            : product.description_en) ?? "",
+                        stock: product.stock_quantity,
+                        price: `${product.price_mmk.toLocaleString()} ${labels.currency}`,
+                      }}
+                      badge={{ text: badge.text, tone }}
+                      detailsHref={`/${locale}/products/${product.id}`}
+                      detailsLabel={labels.viewDetails}
+                    />
                   );
                 })}
               </div>
