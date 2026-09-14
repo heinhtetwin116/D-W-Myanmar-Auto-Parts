@@ -5,11 +5,7 @@ import { Button, Card, Form, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-
-interface UpdatePasswordFormProps {
-  locale: "my" | "en";
-  className?: string;
-}
+import type { UpdatePasswordFormProps } from "@/types/index.type";
 
 export function UpdatePasswordForm({
   locale,

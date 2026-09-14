@@ -3,10 +3,7 @@ import { Metadata } from "next";
 import { UpdatePasswordForm } from "@/components/auth/update-password-form";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/loading-spinner";
-
-interface UpdatePasswordPageProps {
-  params: Promise<{ locale: "my" | "en" }>;
-}
+import type { UpdatePasswordPageProps } from "@/types/index.type";
 
 export async function generateMetadata({
   params,

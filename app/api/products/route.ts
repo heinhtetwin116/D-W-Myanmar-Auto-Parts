@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import {
-  searchProducts,
-  type CatalogResult,
-  type CatalogSearchParams,
-} from "@/lib/catalog/search-products";
-import type { ProductSort, StockFilter } from "@/lib/erpnext/queries";
+import { searchProducts } from "@/lib/catalog/search-products";
+import type {
+  CatalogResult,
+  CatalogSearchParams,
+  ProductSort,
+  StockFilter,
+} from "@/types/index.type";
 import { CATALOG_PAGE_SIZE, CATALOG_PAGE_SIZE_MAX } from "@/lib/constants";
 
-/** Response shape consumed by `components/catalog/product-catalog.tsx`. */
-export type CatalogResponse = CatalogResult;
+/** Cache catalog responses for 60s (per URL). */
+export const revalidate = 60;
 
 const STOCK_VALUES: StockFilter[] = ["in_stock", "low_stock", "out_of_stock"];
 const SORT_VALUES: ProductSort[] = [
@@ -56,7 +56,13 @@ function parseParams(searchParams: URLSearchParams): CatalogSearchParams {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const supabase = await createClient();
-  const result = await searchProducts(supabase, parseParams(searchParams));
-  return NextResponse.json(result satisfies CatalogResponse);
+  try {
+    const result = await searchProducts(parseParams(searchParams));
+    return NextResponse.json(result satisfies CatalogResult);
+  } catch (error) {
+    console.error("Catalog API failed:", error);
+    const message =
+      error instanceof Error ? error.message : "Catalog unavailable";
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
 }

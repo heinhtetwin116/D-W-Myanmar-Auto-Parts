@@ -96,6 +96,11 @@ Per `ARCHITECTURE.md` → "UI layering," AntD-first is the decided direction:
 - Use PascalCase for exported React component symbols; use kebab-case only
   for their filenames. Next.js reserved route filenames such as `page.tsx`,
   `layout.tsx`, and `route.ts` are exempt.
+- Shared custom types live in one place: `types/index.type.ts` (import via
+  `import type { ... } from "@/types/index.type"`). Do not re-declare a
+  shared shape locally and do not alias it under a second name (e.g. never
+  alias `ProductCardItem` as `Product`). Runtime helpers stay in their
+  feature modules (`lib/catalog/*`, `lib/erpnext/*`).
 - **Enforcement:** kebab-case is locked in by ESLint
   (`eslint-plugin-check-file` in `eslint.config.mjs`), scoped to `app/`,
   `components/`, and `lib/`. The filename rule fails on any non-kebab
@@ -130,11 +135,10 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 - Keep ERPNext API calls behind a typed wrapper; do not scatter raw `fetch`
   calls through pages or components.
 - Request explicit fields and paginate ERPNext `Item` and `Item Group` reads.
-- Treat the manual sync as idempotent: upsert by ERPNext source ID, record a
-  `sync_runs` result, and leave the last successful Supabase snapshot intact
-  when an upstream request fails.
+- Read ERPNext live per request (with route-level caching); do not rebuild
+  a Supabase mirror for catalog data.
 - Do not invent bilingual or stock field names. Confirm them against the
-  target ERPNext instance and document the mapping next to the sync code.
+  target ERPNext instance and document the mapping next to the query code.
 
 ## Linting, formatting, types
 

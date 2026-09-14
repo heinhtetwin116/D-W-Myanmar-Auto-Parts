@@ -4,24 +4,11 @@
  * Never expose ERPNext credentials to the browser.
  */
 
-interface ERPNextClientOptions {
-  baseUrl: string;
-  apiKey: string;
-  apiSecret: string;
-}
-
-interface ERPNextListParams {
-  fields?: string[];
-  filters?: Array<[string, string, string | number | boolean]>;
-  orderBy?: string;
-  limitStart?: number;
-  limitPageLength?: number;
-}
-
-interface ERPNextDocType {
-  name: string;
-  [key: string]: unknown;
-}
+import type {
+  ERPNextClientOptions,
+  ERPNextDocType,
+  ERPNextListParams,
+} from "@/types/index.type";
 
 export class ERPNextClient {
   private baseUrl: string;
@@ -48,6 +35,10 @@ export class ERPNextClient {
 
     if (params.filters && params.filters.length > 0) {
       url.searchParams.set("filters", JSON.stringify(params.filters));
+    }
+
+    if (params.orFilters && params.orFilters.length > 0) {
+      url.searchParams.set("or_filters", JSON.stringify(params.orFilters));
     }
 
     if (params.orderBy) {

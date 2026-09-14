@@ -1,27 +1,13 @@
 import React from "react";
 import Link from "next/link";
 import { Wrench, ArrowRight } from "lucide-react";
-import type { ProductCardItem } from "@/lib/catalog/product-card-item";
-
-export type { ProductCardItem };
-
-export interface ProductBadge {
-  text: string;
-  tone: "success" | "warning" | "critical";
-}
+import type { ProductBadge, ProductCardProps } from "@/types/index.type";
 
 const badgeTones: Record<ProductBadge["tone"], string> = {
   success: "bg-success/10 text-success",
   warning: "bg-warning/10 text-warning",
   critical: "bg-critical/10 text-critical",
 };
-
-interface ProductCardProps {
-  product: ProductCardItem;
-  badge?: ProductBadge;
-  detailsHref?: string;
-  detailsLabel?: string;
-}
 
 const ProductCard = ({
   product,

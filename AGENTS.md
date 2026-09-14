@@ -53,7 +53,7 @@
 - `components/layout/`: `Header`, `Footer` (default exports, no locale prop — links are locale-agnostic and need i18n follow-up)
 - `components/` root: `product-card.tsx`, `product-catalog.tsx`, auth forms (Ant Design + Tailwind, i18n-ready where wired)
 - `app/[locale]/` — all locale-scoped pages (`products/`, `products/[slug]/`, `about/`, `auth/*`)
-- Catalog reads Supabase (`categories`/`products` tables) via typed queries in `lib/erpnext/queries.ts` — never raw `.from(...).select(...)` in components
+- Catalog reads ERPNext directly (`Item`/`Item Group`/`Bin` via `lib/catalog/search-products.ts`, 60s API cache) — never raw `.from(...).select(...)` in components, never ERPNext calls from the browser
 
 ### Naming Convention
 
