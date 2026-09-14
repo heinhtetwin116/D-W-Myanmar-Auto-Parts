@@ -8,29 +8,27 @@ import type { ProductsBreadcrumbProps } from "@/types/index.type";
 export default function ProductsBreadcrumb({
   locale,
   homeLabel,
-  productsLabel,
-  currentLabel,
+  trail,
 }: ProductsBreadcrumbProps) {
-  const items: { title: React.ReactNode }[] = [
-    {
-      title: (
-        <Link href={`/${locale}/`}>
-          <HomeOutlined /> {homeLabel}
-        </Link>
-      ),
-    },
-    {
-      title: currentLabel ? (
-        <Link href={`/${locale}/products`}>{productsLabel}</Link>
-      ) : (
-        productsLabel
-      ),
-    },
-  ];
-
-  if (currentLabel) {
-    items.push({ title: currentLabel });
-  }
-
-  return <Breadcrumb className="mb-4" items={items} />;
+  return (
+    <Breadcrumb
+      className="mb-4"
+      items={[
+        {
+          title: (
+            <Link href={`/${locale}/`}>
+              <HomeOutlined /> {homeLabel}
+            </Link>
+          ),
+        },
+        ...trail.map((item) => ({
+          title: item.href ? (
+            <Link href={item.href}>{item.label}</Link>
+          ) : (
+            item.label
+          ),
+        })),
+      ]}
+    />
+  );
 }

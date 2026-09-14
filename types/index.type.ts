@@ -280,11 +280,15 @@ export interface ProductDetailProps {
   currentLabel: string;
 }
 
+export interface BreadcrumbTrailItem {
+  label: string;
+  href?: string;
+}
+
 export interface ProductsBreadcrumbProps {
   locale: string;
   homeLabel: string;
-  productsLabel: string;
-  currentLabel?: string;
+  trail: BreadcrumbTrailItem[];
 }
 
 export interface ProductGridSkeletonProps {
@@ -294,6 +298,45 @@ export interface ProductGridSkeletonProps {
 export interface LoadingSpinnerProps {
   label?: string;
   className?: string;
+}
+
+export interface NewEnquiry {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}
+
+export interface ContactFormLabels {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  messagePlaceholder: string;
+  submit: string;
+  submitting: string;
+  success: string;
+  error: string;
+}
+
+export interface ContactInfoLabels {
+  title: string;
+  address: string;
+  phone: string;
+  email: string;
+  hours: string;
+}
+
+export interface ContactFormProps {
+  labels: ContactFormLabels;
+}
+
+export interface ContactInfoProps {
+  labels: ContactInfoLabels;
+}
+
+export interface ContactPageProps {
+  params: Promise<{ locale: string }>;
 }
 
 export interface SignUpFormProps {

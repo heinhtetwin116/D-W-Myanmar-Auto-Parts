@@ -102,7 +102,7 @@ export default function ProductCatalog({
       <ProductsBreadcrumb
         locale={locale}
         homeLabel={homeLabel}
-        productsLabel={productsLabel}
+        trail={[{ label: productsLabel }]}
       />
 
       {/* Masthead */}

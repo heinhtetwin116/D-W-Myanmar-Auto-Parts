@@ -55,8 +55,10 @@ export default function ProductDetail({
       <ProductsBreadcrumb
         locale={locale}
         homeLabel={homeLabel}
-        productsLabel={productsLabel}
-        currentLabel={currentLabel}
+        trail={[
+          { label: productsLabel, href: `/${locale}/products` },
+          { label: currentLabel },
+        ]}
       />
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={10}>
