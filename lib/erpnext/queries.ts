@@ -76,6 +76,29 @@ function applyStockFilter<
 }
 
 /**
+ * Sort orders supported by the catalog.
+ */
+export type ProductSort = "name" | "price_asc" | "price_desc" | "newest";
+
+function applyProductSort<
+  T extends {
+    order: (c: string, o?: { ascending?: boolean }) => T;
+  },
+>(query: T, sort: ProductSort): T {
+  switch (sort) {
+    case "price_asc":
+      return query.order("price_mmk", { ascending: true });
+    case "price_desc":
+      return query.order("price_mmk", { ascending: false });
+    case "newest":
+      return query.order("created_at", { ascending: false });
+    case "name":
+    default:
+      return query.order("name_en", { ascending: true });
+  }
+}
+
+/**
  * Get all enabled products with optional filtering and pagination.
  */
 export async function getProducts(
@@ -84,6 +107,7 @@ export async function getProducts(
     categoryId?: string;
     search?: string;
     stock?: StockFilter;
+    sort?: ProductSort;
     limit?: number;
     offset?: number;
   } = {},
@@ -116,7 +140,7 @@ export async function getProducts(
     );
   }
 
-  const { data, error } = await query.order("name_en", { ascending: true });
+  const { data, error } = await applyProductSort(query, options.sort ?? "name");
 
   if (error) {
     console.error("Failed to fetch products:", error);

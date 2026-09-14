@@ -144,6 +144,11 @@
     "all_status": "All Status",
     "price_range": "Price Range",
     "search_placeholder": "Search by part name, number, or keyword...",
+    "sort_by": "Sort by",
+    "sort_name": "Name (A-Z)",
+    "sort_price_asc": "Price: Low to High",
+    "sort_price_desc": "Price: High to Low",
+    "sort_newest": "Newest",
     "table": {
       "image": "Image",
       "name": "Part Name",

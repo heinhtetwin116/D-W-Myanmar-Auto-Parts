@@ -103,9 +103,6 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 
 ## Environment variables
 
-- Guard optional-Supabase-setup UI with `hasEnvVars` (`lib/utils.ts`) —
-  see `EnvVarWarning` usage in `app/protected/layout.tsx` — rather than letting
-  `createClient()` throw when env vars are missing.
 - New required env vars must be added to `.env.example` with no value, and
   to the CI `build` job's `env:` block in `.github/workflows/ci.yml` if the
   build needs them.

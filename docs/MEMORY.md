@@ -111,7 +111,57 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, local Manrope fonts):**
+**Current session (2026-09-14, unified searchProducts + sort):**
+
+- What changed:
+  - Added `ProductSort` (`name`/`price_asc`/`price_desc`/`newest`) to
+    `lib/erpnext/queries.ts` with `applyProductSort` helper; `getProducts`
+    accepts `sort` (default `name`, preserving old behavior)
+  - Added `lib/catalog/dummy-catalog.ts` (dummy filtering/sorting/pagination
+    over `data/*.json`) and unified `lib/catalog/search-products.ts` exposing
+    `searchProducts(supabase, params)` with two independently commentable
+    source blocks (SOURCE 1: Supabase try-block, SOURCE 2: dummy return)
+  - Slimmed `app/api/products/route.ts` to param parsing + `searchProducts`
+    delegation (still exports `CatalogResponse` for the client)
+  - Added sort Select to `components/product-catalog.tsx` (merge-semantics
+    `pushParams` refactor) + `sort_by`/`sort_name`/`sort_price_asc`/
+    `sort_price_desc`/`sort_newest` keys in `messages/en.json` + `messages/my.json`
+- Verified: `eslint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc` shows only the 5 pre-existing ERPNext errors; live smoke
+  tests: `sort=price_desc` → 320000 first, `sort=price_asc` → 15000 first,
+  `category=cat-filters` → 2 items + 8 categories, all `source:dummy`
+- Left open: detail page still queries Supabase directly (dummy ids 404
+  there); the `/my/products` 500 (`createContext`, pre-existing on clean
+  tree — `@ant-design/icons` CJS evaluated in RSC scope) is under
+  investigation; Contact form backend, Admin CRUD, sync endpoint auth,
+  scheduled sync, ERPNext type errors
+
+**Previous session (2026-09-14, react-query catalog + dummy fallback):**
+
+- What changed:
+  - Created `data/categories.json` (8) + `data/products.json` (16) dummy
+    catalog matching Supabase `Category`/`Product` types (the `data/` dir
+    existed but was empty)
+  - Added `components/query-provider.tsx` (`QueryClientProvider`, 30s
+    staleTime, no window-focus refetch) and wired it into
+    `app/[locale]/layout.tsx`
+  - Added `GET app/api/products/route.ts`: tries Supabase first; serves
+    `data/*.json` with identical filtering/pagination when the DB is empty
+    or errors; response includes `source: "db" | "dummy"`
+  - Reworked `components/product-catalog.tsx` to fetch via
+    `useSuspenseQuery` keyed on URL searchParams (shareable URLs kept);
+    slimmed `app/[locale]/products/page.tsx` to server shell
+    (breadcrumb/title/labels + Suspense)
+- Verified: `eslint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc` shows only the 5 pre-existing ERPNext errors (cleared a stale
+  `.next` cache that added 2 phantom `app/protected` errors); live smoke
+  test via dev server: `/api/products` → `source:dummy`, out-of-stock
+  filter → exactly the 2 zero-stock items
+- Left open: detail page still queries Supabase directly (dummy ids 404
+  there); Contact form backend, Admin CRUD, sync endpoint auth, scheduled
+  sync, ERPNext type errors
+
+**Previous session (2026-09-14, local Manrope fonts):**
 
 - What changed:
   - Switched Manrope loading from Google Fonts `<link>` to `next/font/local`

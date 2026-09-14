@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   Badge,
   Card,
@@ -16,6 +17,7 @@ import {
 } from "antd";
 import { EyeOutlined, PictureOutlined, PlusOutlined } from "@ant-design/icons";
 import type { Category, Product } from "@/lib/erpnext/types";
+import type { CatalogResponse } from "@/app/api/products/route";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -33,19 +35,25 @@ export interface CatalogLabels {
   showing: string;
   of: string;
   results: string;
+  sortBy: string;
+  sortName: string;
+  sortPriceAsc: string;
+  sortPriceDesc: string;
+  sortNewest: string;
 }
 
 interface ProductCatalogProps {
   locale: string;
-  products: Product[];
-  categories: Category[];
-  total: number;
-  page: number;
-  pageSize: number;
-  search: string;
-  categoryId: string;
-  stock: string;
   labels: CatalogLabels;
+  pageSize: number;
+}
+
+async function fetchCatalog(params: URLSearchParams): Promise<CatalogResponse> {
+  const response = await fetch(`/api/products?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`Catalog request failed: ${response.status}`);
+  }
+  return response.json() as Promise<CatalogResponse>;
 }
 
 function stockBadge(
@@ -63,31 +71,64 @@ function stockBadge(
 
 export default function ProductCatalog({
   locale,
-  products,
-  categories,
-  total,
-  page,
-  pageSize,
-  search,
-  categoryId,
-  stock,
   labels,
+  pageSize,
 }: ProductCatalogProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get("search") ?? "";
+  const categoryId = searchParams.get("category") ?? "";
+  const stock = searchParams.get("stock") ?? "";
+  const sort = searchParams.get("sort") ?? "";
+  const rawPage = Number.parseInt(searchParams.get("page") ?? "1", 10);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+
+  const queryParams = new URLSearchParams();
+  if (search) queryParams.set("search", search);
+  if (categoryId) queryParams.set("category", categoryId);
+  if (stock) queryParams.set("stock", stock);
+  if (sort) queryParams.set("sort", sort);
+  queryParams.set("page", String(page));
+  queryParams.set("limit", String(pageSize));
+
+  const { data } = useSuspenseQuery({
+    queryKey: [
+      "products",
+      { search, category: categoryId, stock, sort, page, pageSize },
+    ],
+    queryFn: () => fetchCatalog(queryParams),
+  });
+
+  const { products, categories, total } = data;
 
   const pushParams = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams();
-    if (updates.search) params.set("search", updates.search);
-    if (updates.category) params.set("category", updates.category);
-    if (updates.stock) params.set("stock", updates.stock);
-    if (updates.page && updates.page !== "1") params.set("page", updates.page);
+    const merged = {
+      search:
+        updates.search !== undefined ? updates.search : search || undefined,
+      category:
+        updates.category !== undefined
+          ? updates.category
+          : categoryId || undefined,
+      stock: updates.stock !== undefined ? updates.stock : stock || undefined,
+      sort: updates.sort !== undefined ? updates.sort : sort || undefined,
+      page: updates.page,
+    };
+    if (merged.search) params.set("search", merged.search);
+    if (merged.category) params.set("category", merged.category);
+    if (merged.stock) params.set("stock", merged.stock);
+    if (merged.sort) params.set("sort", merged.sort);
+    if (merged.page && merged.page !== "1") params.set("page", merged.page);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
   };
 
   const categoryName = (product: Product) => {
-    const category = categories.find((c) => c.id === product.category_id);
+    const category: Category | undefined = categories.find(
+      (c) => c.id === product.category_id,
+    );
     if (!category) return product.sku;
     return locale === "my" ? category.name_my : category.name_en;
   };
@@ -96,31 +137,25 @@ export default function ProductCatalog({
     <div>
       <Card className="mb-6" bordered>
         <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} md={10}>
+          <Col xs={24} md={8}>
             <Input.Search
               placeholder={labels.searchPlaceholder}
               defaultValue={search}
+              key={search}
               allowClear
               enterButton
               onSearch={(value) =>
-                pushParams({
-                  search: value || undefined,
-                  category: categoryId || undefined,
-                  stock: stock || undefined,
-                  page: "1",
-                })
+                pushParams({ search: value || undefined, page: "1" })
               }
             />
           </Col>
-          <Col xs={12} md={7}>
+          <Col xs={12} md={6}>
             <Select
               className="w-full"
               value={categoryId || "all"}
               onChange={(value) =>
                 pushParams({
-                  search: search || undefined,
                   category: value === "all" ? undefined : value,
-                  stock: stock || undefined,
                   page: "1",
                 })
               }
@@ -133,14 +168,12 @@ export default function ProductCatalog({
               ]}
             />
           </Col>
-          <Col xs={12} md={7}>
+          <Col xs={12} md={5}>
             <Select
               className="w-full"
               value={stock || "all"}
               onChange={(value) =>
                 pushParams({
-                  search: search || undefined,
-                  category: categoryId || undefined,
                   stock: value === "all" ? undefined : value,
                   page: "1",
                 })
@@ -150,6 +183,24 @@ export default function ProductCatalog({
                 { value: "in_stock", label: labels.inStock },
                 { value: "low_stock", label: labels.lowStock },
                 { value: "out_of_stock", label: labels.outOfStock },
+              ]}
+            />
+          </Col>
+          <Col xs={24} md={5}>
+            <Select
+              className="w-full"
+              value={sort || "name"}
+              onChange={(value) =>
+                pushParams({
+                  sort: value === "name" ? undefined : value,
+                  page: "1",
+                })
+              }
+              options={[
+                { value: "name", label: labels.sortName },
+                { value: "price_asc", label: labels.sortPriceAsc },
+                { value: "price_desc", label: labels.sortPriceDesc },
+                { value: "newest", label: labels.sortNewest },
               ]}
             />
           </Col>
@@ -229,14 +280,7 @@ export default function ProductCatalog({
             pageSize={pageSize}
             total={total}
             showSizeChanger={false}
-            onChange={(nextPage) =>
-              pushParams({
-                search: search || undefined,
-                category: categoryId || undefined,
-                stock: stock || undefined,
-                page: String(nextPage),
-              })
-            }
+            onChange={(nextPage) => pushParams({ page: String(nextPage) })}
           />
         </div>
       )}
