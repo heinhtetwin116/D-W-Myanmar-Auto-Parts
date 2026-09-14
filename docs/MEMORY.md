@@ -111,7 +111,26 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 ## Session handoff
 
-**Current session (2026-09-14, products 500 root-cause fix):**
+**Current session (2026-09-14, catalog reverted to original design):**
+
+- What changed (per interview: f1692b8 visuals + antd, plumbing untouched):
+  - Rebuilt `components/product-catalog.tsx` render as the original layout:
+    masthead (title + subtitle + `{total} products found` count), sticky
+    sidebar rail (category Menu + stock-status Menu), toolbar (full-width
+    search, Popular `CheckableTag` pills, sort Select), 1/2/4 grid, antd
+    Pagination + Empty — all antd primitives, zero custom buttons
+  - Kept react-query fetching, `/api/products`, `searchProducts`, dummy
+    fallback, URL searchParams, and i18n plumbing exactly as-is; added
+    `filter_by_categories`/`popular`/`products_found` keys to `en`+`my`
+    messages; dropped the now-unused `showing`/`of`/`results` labels
+- Verified: `/my` + `/en` products → 200 with masthead/sidebar/pills
+  markers in HTML; grid hydrates client-side as before; `eslint` 0 errors;
+  `format:check` passes; `git diff --check` clean; `tsc` shows only the 5
+  pre-existing ERPNext errors
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  ERPNext type errors
+
+**Previous session (2026-09-14, products 500 root-cause fix):**
 
 - Root cause found (was NOT react-query): `@ant-design/icons@6.3.4` ships no
   `"use client"` directive in either build, so importing it in a Server
