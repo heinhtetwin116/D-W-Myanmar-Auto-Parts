@@ -44,7 +44,7 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 **Public pages implemented**
 
-- Home page (`app/[locale]/page.tsx`) — Hero, Features bar, Value Props, Featured Products (from Supabase), Latest Products, Trust Indicators, CTA
+- Home page (`app/[locale]/page.tsx`) — Hero, Features bar, Featured Products (real ERPNext data via `searchProducts()`), Latest Products (same, `newest` sort), FAQ, Testimonials
 - About page (`app/[locale]/about/page.tsx`) — Hero, Company story, Mission/Vision/Values, Team, Locations
 - Products catalog (`app/[locale]/products/page.tsx` + `components/product-catalog.tsx`) — Server Component fetches Supabase via typed queries; client island for search/category/stock filters + pagination (12/page); antd-first, i18n-ready
 - Product detail (`app/[locale]/products/[slug]/page.tsx`, slug = product id) — image, category tag, stock badge, MMK price, specs table, related products, `notFound()` on missing/disabled
@@ -71,9 +71,32 @@ changes (see `AGENTS.md` → Documentation maintenance).
    `CODING_GUIDELINES.md` → Testing contracts).
 5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-6. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
-7. **Sync endpoint lacks authentication.** `/api/catalog/sync` has TODO: require admin role or bearer token before accepting manual trigger.
-8. **No scheduled sync or alert delivery.** Manual trigger only; deferred to next milestone.
+6. **ERPNext content gaps (need ERPNext admin) — mostly resolved 2026-09-23.**
+   No Myanmar name fields (closed decision — ERPNext's native English
+   `name`/`description` is shown as-is, no bilingual custom fields, no
+   translation layer; not revisited — and now doubly moot, see gap #11).
+   `Bin` and `Item Price` are confirmed populated with real data on the live
+   instance (stock and price both render real values). Specs are now limited
+   to `purchase_country` (sourced from the real `country_of_origin` field);
+   OEM-number and vehicle-model specs/search were dropped entirely — their
+   source fields no longer exist (see gap #11). Remaining: per-item coverage
+   of `Bin`/`Item Price` rows is partial (some items still read 0 stock/price
+   until admin adds rows for them) — not a code gap.
+7. **Catalog mirror cleanup unverified.** The old `categories`/`products`/`sync_runs` migration may never have been applied anywhere — verify before writing a drop migration; do not apply-then-drop blindly.
+8. **No reverse proxy / TLS termination decided.** No Traefik/Nginx (or equivalent) configured yet for routing to either container's public-facing ports. Must be decided before production deploy.
+9. **No ERPNext database backup strategy.** The dockerized MariaDB volume needs a persisted named-volume backup plan — distinct from any Droplet-level backup.
+10. **Single-Droplet shared fate accepted for now.** ERPNext + website on one Droplet is a deliberate simplicity tradeoff at current scale; revisit if HA is ever required.
+11. **Resolved 2026-09-23 — was misdiagnosed as a permissions issue.** The
+    previous session's 417 on `custom_oem_no` was not a permission change:
+    the user removed the custom fields (`custom_oem_no`,
+    `custom_purchase_country`, `custom_products`, `custom_name_my`,
+    `custom_description_my`, `custom_price_mmk`) from the `Item` doctype
+    entirely (confirmed via a full `Item` doc dump — none of them appear).
+    Code updated to match: `ITEM_FIELDS`/`buildSpecifications`/`itemFilters`
+    in `lib/catalog/search-products.ts` no longer reference any of them;
+    `country_of_origin` (a real, populated field) replaces
+    `custom_purchase_country` for the purchase-country spec. `/api/products`
+    verified 200 live after the fix (was 503).
 
 ## Decisions recorded
 
@@ -94,24 +117,213 @@ changes (see `AGENTS.md` → Documentation maintenance).
   props; their links are locale-agnostic and need an i18n follow-up.
 - PRs target the `development` branch only (not `main` as WORKFLOW.md previously
   stated). Decided in interview 2026-09-12.
-- ERPNext integration decisions: server-only credentials, enabled Items only,
-  actual stock, `Item.image`, numeric MMK prices, ERPNext source IDs, last
-  successful Supabase snapshot on failure, persisted sync logs, and no
-  scheduling or alert delivery until manual sync is verified.
-- ERPNext source mapping decisions: use `Item` and `Item Group`; store
-  normalized bilingual catalog metadata plus source IDs in Supabase; use
-  numeric MMK prices; keep enquiry actions visual-only for the first sync
-  milestone; and defer scheduled execution and alert delivery until the
-  manual sync is verified.
+- ERPNext integration decisions: server-only credentials; catalog reads ERPNext
+  directly on every request (no Supabase mirror) with a 60s route cache;
+  ERPNext down renders the error boundary (no silent dummy data); enabled
+  Items only; Bin-summed actual stock as interim until a warehouse scope is
+  decided; `Item.image`; numeric MMK prices; short ISR cache over always-fresh
+  per request. Decided in Q&A 2026-09-14.
+- ERPNext source mapping decisions: use `Item` and `Item Group`; normalize to
+  the shared `Category` / `Product` shapes in `search-products.ts` (bilingual
+  names with English fallback, ERPNext `name` as id/slug/category key);
+  keep enquiry actions visual-only; sync code (`sync.ts`, sync endpoint,
+  mirror tables) removed rather than kept dormant.
 - Naming convention decision: all new page and component filenames use
   kebab-case; Next.js reserved filenames remain `page.tsx`, `layout.tsx`, and
   `route.ts`; exported React component symbols remain PascalCase. Existing
   PascalCase component files are legacy exceptions until intentionally renamed
   with their imports.
+- Pricing decision: catalog price reads ERPNext `Item Price` (`selling=1`),
+  not `Item.standard_rate`. Tie-break for multiple matching price-list rows:
+  prefer `price_list === "Standard Selling"`, else most recently `modified`,
+  else first seen; no match → price `0` (never falls back to `standard_rate`,
+  which is stale/incidental data on this instance). `standard_rate` dropped
+  from `ITEM_FIELDS`/sort entirely. Price sort (`price_asc`/`price_desc`) is
+  now resolved in-memory over the full filtered id set (joined price map),
+  not a server-side ERPNext `order_by`, since `Item Price` is a separate
+  doctype with no server-side join via `listDocuments`. Decided + implemented
+  2026-09-23.
+- Myanmar name/description decision (closed): show ERPNext's native English
+  `name`/`description` as-is — no bilingual custom fields, no translation
+  layer. Decided 2026-09-23 (interview), formalizing what the code already
+  did — now moot in practice since the bilingual custom fields were removed
+  from ERPNext entirely (see gap #11).
+- Spec fields decision: OEM-number and vehicle-model specs/search dropped
+  entirely (their ERPNext fields no longer exist); purchase-country spec now
+  sources from the real `country_of_origin` field instead of the removed
+  `custom_purchase_country`. Decided 2026-09-23 (interview).
+- Home page catalog decision: Featured Products and Latest Products both read
+  real ERPNext data via `searchProducts()` (Featured = default `name` sort,
+  Latest = `newest` sort) — no dummy fallback. ERPNext has no "featured"
+  concept yet; the fetch has a marked `TODO` for a future `custom_featured`
+  ERPNext field rather than a speculative filter param built ahead of need.
+  Decided 2026-09-23 (interview).
 
 ## Session handoff
 
-**Current session (2026-09-14, contact page wired):**
+**Current session (2026-09-23, ERPNext schema sync + dummy data removal):**
+
+- What changed (per approved plan):
+  - `types/index.type.ts`: `ERPNextItem` — removed `custom_oem_no`,
+    `custom_purchase_country`, `custom_products`, `custom_name_my`,
+    `custom_description_my`, `custom_price_mmk` (none exist on the live
+    doctype); added `country_of_origin?: string`. Added `HomePageProps`.
+    Narrowed `CatalogResult`/`ProductDetailResult` `source` from
+    `"db" | "dummy" | "erpnext"` to the literal `"erpnext"` (nothing else
+    ever emitted the other two).
+  - `lib/catalog/search-products.ts`: `ITEM_FIELDS` drops the three removed
+    custom fields, adds `"country_of_origin"`; `buildSpecifications` now
+    only emits `purchase_country` (from `country_of_origin`) — `oem_no`/
+    `model` entries removed; `itemFilters`'s `orFilters` drops
+    `custom_oem_no`/`custom_products` (search now matches `item_name`/`name`
+    only); top comment reworded to reflect the now-confirmed field mapping.
+    No changes to `fetchPriceMap`/`fetchStockMap` — those already matched
+    the live `Item Price`/`Bin` shape.
+  - Deleted `data/dummy/home-products.ts` (the only remaining catalog-data
+    dummy source — `about.ts`/`faq.ts`/`testimonials.ts` are marketing copy,
+    kept). `app/[locale]/page.tsx` rewritten to accept `{ params }:
+HomePageProps`, fetch Featured/Latest Products via `searchProducts()`
+    (ERPNext-direct, same function the products catalog already uses),
+    convert via the existing `toProductCardItem`, and badge via the existing
+    `getStockStatus`/`stockBadgeTone` (`lib/catalog/stock.ts`) — same
+    patterns `product-catalog.tsx` already used, no new helpers added. Added
+    `export const revalidate = 60` matching the rest of the catalog's cache
+    convention.
+  - New `app/[locale]/error.tsx` (copies `products/error.tsx`'s pattern) —
+    the home page now fetches ERPNext directly with no boundary above it;
+    without this it would 500 instead of degrading gracefully on an ERPNext
+    outage, the opposite of the "no silent dummy fallback" rule.
+  - Docs: this file, `ARCHITECTURE.md`, `CODING_GUIDELINES.md`.
+- Verified: `make check` (lint + `tsc --noEmit` + format) green; `make build`
+  succeeds, all 23 routes compile; live dev server smoke test —
+  `/api/products` now 200 (was 503 on `custom_oem_no`); a known item
+  (`DW-CH-WB-HY-55A-001`) returns `price_mmk: 7500` and
+  `specifications: { purchase_country: "China" }`; `/my` and `/en` both
+  render Featured/Latest Products with real ERPNext data; confirmed
+  `grep -r "data/dummy/home-products"` returns nothing; confirmed no
+  `oem_no`/`model` keys appear in any specifications payload.
+- Left open: per-item `Bin`/`Item Price` coverage is partial (some items
+  still read 0 stock/price — not every item has rows yet, admin-side, not a
+  code gap); Contact form backend; Admin CRUD; mirror cleanup verification
+  (gap #7); a future `custom_featured` ERPNext field (TODO left in
+  `app/[locale]/page.tsx`).
+
+**Previous session (2026-09-23, Item Price pricing):**
+
+- What changed (per approved plan: switch price source from
+  `Item.standard_rate` to ERPNext `Item Price`):
+  - `types/index.type.ts`: added `ERPNextItemPrice` (`item_code`,
+    `price_list`, `selling`, `price_list_rate`, `modified`)
+  - `lib/catalog/search-products.ts`: added `fetchPriceMap` (mirrors
+    `fetchStockMap`'s chunked `in`-filter/`Promise.all` pattern, queries
+    `Item Price` with `selling=1`) + `isBetterPriceMatch` tie-break helper;
+    extracted shared `CHUNK_SIZE = 100` const; `mapItemToProduct` now takes
+    `price: number` instead of reading `item.standard_rate`; `sortToOrderBy`
+    drops the `price_asc`/`price_desc` → `standard_rate` cases (returns
+    `undefined` for those, letting the in-memory sort below decide order);
+    `searchProducts` builds `stockMap`/`priceMap` in parallel over the full
+    filtered id set, sorts `matchingIds` in-memory by price when
+    `sort` is a price sort (before pagination), and passes price through to
+    both call sites (`searchProducts`, `getProductDetail`, including related
+    products); dropped `"standard_rate"` from `ITEM_FIELDS`
+  - Docs: `ARCHITECTURE.md` (ERPNext catalog integration section — price
+    source, sort behavior), `CODING_GUIDELINES.md` (ERPNext integration —
+    price field rule), `WORKFLOW.md` (ERPNext catalog validation checklist)
+- Verified: `make check` (lint + `tsc --noEmit` + format) — all green;
+  `make build` — succeeds, all routes compile (23/23 static pages)
+- **New blocker found while verifying against live ERPNext** (see Known
+  gaps #11): `/api/products` returns 503 — live instance now rejects
+  `custom_oem_no` in list queries with `DataError: Field not permitted in
+query` (HTTP 417). Confirmed pre-existing/unrelated to this session's diff
+  (field was already requested before this change). This blocks live
+  verification of the Item Price work (steps 2-5 of the plan's verification
+  section) until ERPNext admin restores read permission on `custom_oem_no`.
+  The 503 error boundary itself was confirmed working correctly.
+- Left open: gap #11 (custom_oem_no permission) blocks live verification of
+  this session's price change; once unblocked, still need admin to populate
+  `Item Price` records and confirm the real price list name (replace the
+  `PREFERRED_PRICE_LIST` placeholder); Contact form backend, Admin CRUD,
+  Bin/stock population, mirror cleanup verification
+
+**Previous session (2026-09-14, direct ERPNext reads):**
+
+- What changed (per approved plan: ERPNext-direct, 60s cache, error state, remove sync):
+  - `lib/erpnext/client.ts`: additive `orFilters` support
+  - `lib/catalog/search-products.ts`: rewritten to query ERPNext directly
+    (Item/Item Group lists, Bin-summed stock, `or_filters` search, order_by
+    sort, id-capped counts); `getProductDetail` with 404→null vs throw
+    distinction; `types/index.type.ts` gained `ERPNextBin` (+ `name`, index
+    signature) and `"erpnext"` source values
+  - `app/api/products/route.ts`: `revalidate = 60`, 503 JSON on failure;
+    `app/[locale]/products/[slug]/page.tsx`: `revalidate = 60`, errors now
+    propagate to the boundary instead of collapsing to not-found
+  - New `app/[locale]/products/error.tsx` (antd Result + retry, i18n `retry` key)
+  - Deleted: `lib/erpnext/sync.ts`, `app/api/catalog/sync/route.ts`,
+    `lib/erpnext/queries.ts`, `lib/catalog/dummy-catalog.ts`,
+    `data/categories.json`, `data/products.json`; barrel pruned
+  - Side effect: `tsc` is fully clean (the 2 pre-existing `sync.ts` errors
+    are gone with the file) — `make build` unblocked for the first time
+  - Docs: ARCHITECTURE data-flow/module-tree/persistence/ERPNext section,
+    AGENTS catalog line, CODING_GUIDELINES ERPNext rules, WORKFLOW validation;
+    gaps #7/#8 dissolved, new gap #7 (mirror cleanup verification)
+- Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
+  clean; `tsc --noEmit` exit 0 with zero errors; `/api/products` with empty
+  env returns the designed 503 JSON (error path works end-to-end)
+- Incident note: a `Failed to parse URL from /api/resource/products` 404 was
+  reported, but disk (`lib/catalog/client.ts`) already fetches the correct
+  `/api/products` — stale Turbopack/browser bundle. Resolved by restarting
+  the dev server and clearing `.next`; verified the stale URL no longer
+  appears in served code. No code change needed.
+- Live ERPNext debugging (real `.env`, 2026-09-14) — three failures found
+  and fixed in `lib/catalog/*`:
+  1. `Item Group` has no `disabled` field on this instance → dropped from
+     fields + filters (was Frappe 417). Item `disabled` filter kept.
+  2. `Bin` query with all item codes in one `in` filter → nginx 414.
+     `fetchStockMap` now chunks codes (100/request, `Promise.all`) and
+     passes a real list value; `ERPNextFilterValue` added to central types.
+  3. SSR `fetchCatalog` used a relative URL → `ERR_INVALID_URL`, forced
+     client-only rendering (skeletons in initial HTML). Now absolute on
+     server via `NEXT_PUBLIC_APP_URL`; must use `||` not `??` because an
+     empty-string env value otherwise survives (`.env` ships the key empty).
+- Verified live: `/api/products` → `source:"erpnext"`, total 365, page 1 =
+  12 real Items, 6 real Item Groups; search `Radiator` → 4; detail page 200
+  for `DW-CH-Radiator-001`; bogus slug renders not-found UI; initial HTML
+  now contains real product data (SSR works).
+- Follow-ups: all `stock_quantity` are 0 — confirm against ERPNext Stock
+  Balance (may be genuinely empty/no Bin rows); bogus detail slug returns
+  HTTP 200 with not-found UI instead of 404 — status code needs a look.;
+  `make check` fully green for the first time
+- Live-instance mapping verified 2026-09-14 against
+  inventory.dwmyanmarautoparts.com (item `DW-CH-Radiator-001`): assumed
+  `custom_name_my` / `custom_description_my` / `custom_price_mmk` do NOT
+  exist; real custom fields are `custom_oem_no`, `custom_purchase_country`,
+  `custom_products`; Item `description` exists (HTML, now stripped);
+  Item Group has no `description`/`image`/custom fields (prior 417 cause);
+  `Bin` readable but empty. Code retargeted to verified fields only:
+  OEM/model search, specs from real custom fields, `standard_rate` interim
+  price, English fallback for Myanmar names
+- Left open: `.env` values (Supabase + ERPNext creds — all empty); ERPNext
+  admin actions needed for full catalog quality — add Myanmar name fields,
+  decide real pricing (Item Price DocType vs `standard_rate`), create stock
+  (Bin rows empty → everything reads 0); mirror-cleanup verification
+  verification; Contact form backend; Admin CRUD
+
+**Previous session (2026-09-14, deployment topology decision):**
+
+- What changed (documentation-only, no code):
+  - Recorded the self-hosted deployment decision in `docs/ARCHITECTURE.md`
+    ("Deployment topology"): single Droplet, sibling `erpnext` + `website`
+    containers on a shared Docker network, internal-hostname API access, DB
+    separation, one-way Supabase mirror, single-Droplet tradeoff accepted
+  - Clarified `ERPNEXT_BASE_URL` in `.env.example` (internal hostname, never public)
+  - Added gaps #9–11 (reverse proxy, ERPNext DB backups, shared-fate tradeoff);
+    pointed `docs/WORKFLOW.md` release process at the new section
+- Verified: no other doc contradicts the topology (grep for public-URL/docker
+  claims); `git diff` limited to docs + `.env.example` comment
+- Left open: Contact form backend, Admin CRUD, sync endpoint auth, scheduled sync,
+  the 2 remaining ERPNext type errors, plus new gaps #9–11
+
+**Previous session (2026-09-14, contact page wired):**
 
 - What changed (closes gap #1):
   - New migration `supabase/migrations/20260914_141012_create_enquiries.sql`:

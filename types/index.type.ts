@@ -89,6 +89,7 @@ export interface ERPNextItemGroup {
   custom_name_my?: string;
   custom_description_my?: string;
   // ... other ERPNext fields
+  [key: string]: unknown;
 }
 
 /**
@@ -102,11 +103,41 @@ export interface ERPNextItem {
   description?: string;
   image?: string;
   disabled?: 0 | 1; // 1 = disabled
-  standard_rate?: number; // Price (if available in this field)
-  custom_name_my?: string;
-  custom_description_my?: string;
-  custom_price_mmk?: number;
+  standard_rate?: number; // Standard selling rate — unused (price reads Item Price instead)
+  country_of_origin?: string; // e.g. "China" — used as the purchase-country spec
+  // No custom OEM/vehicle-model or bilingual name/description fields exist
+  // on this instance (verified against the live instance).
   // ... other ERPNext fields
+  [key: string]: unknown;
+}
+
+/**
+ * Raw ERPNext Bin row (stock per item per warehouse).
+ * Only `item_code` + `actual_qty` are read; warehouse scoping is open
+ * until the stock source is decided (see MEMORY.md).
+ */
+export interface ERPNextBin {
+  name: string; // Frappe document ID (every DocType has one)
+  item_code: string;
+  warehouse?: string;
+  actual_qty?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Raw ERPNext Item Price row (selling price per item per price list).
+ * Only `item_code` + `price_list` + `price_list_rate` + `modified` are
+ * read; price list name is not yet confirmed against the live instance
+ * (see MEMORY.md).
+ */
+export interface ERPNextItemPrice {
+  name: string; // Frappe document ID
+  item_code: string;
+  price_list: string;
+  selling?: 0 | 1;
+  price_list_rate?: number;
+  modified?: string;
+  [key: string]: unknown;
 }
 
 export interface ERPNextClientOptions {
@@ -115,9 +146,13 @@ export interface ERPNextClientOptions {
   apiSecret: string;
 }
 
+export type ERPNextFilterValue =
+  string | number | boolean | (string | number)[];
+
 export interface ERPNextListParams {
   fields?: string[];
-  filters?: Array<[string, string, string | number | boolean]>;
+  filters?: Array<[string, string, ERPNextFilterValue]>;
+  orFilters?: Array<[string, string, ERPNextFilterValue]>;
   orderBy?: string;
   limitStart?: number;
   limitPageLength?: number;
@@ -173,7 +208,7 @@ export interface CatalogSearchParams {
 }
 
 export interface CatalogResult {
-  source: "db" | "dummy";
+  source: "erpnext";
   products: Product[];
   total: number;
   categories: Category[];
@@ -182,7 +217,7 @@ export interface CatalogResult {
 }
 
 export interface ProductDetailResult {
-  source: "db" | "dummy";
+  source: "erpnext";
   product: Product;
   category: Category | null;
   related: Product[];
@@ -358,6 +393,10 @@ export interface UpdatePasswordFormProps {
 }
 
 // ── Page props ────────────────────────────────────────────────────
+
+export interface HomePageProps {
+  params: Promise<{ locale: string }>;
+}
 
 export interface ProductsPageProps {
   params: Promise<{ locale: string }>;

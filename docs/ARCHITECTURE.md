@@ -27,11 +27,13 @@ app/                      Routes (App Router). Pages + layouts + route handlers.
     products/               Catalog + detail pages
     about/                  About page
     layout.tsx              Locale layout: providers, Header, Footer
-    page.tsx                Home page
+    page.tsx                Home page: Featured/Latest Products from searchProducts()
+                            direct from ERPNext (60s revalidate, no dummy fallback)
+    error.tsx                Locale segment error boundary (ERPNext failures, etc.)
   api/
     auth/confirm/route.ts   Email confirmation (locale-aware redirect)
-    products/route.ts       Catalog API: searchProducts() (Supabase-first, dummy fallback)
-    catalog/sync/route.ts   Manual ERPNext sync trigger (TODO: auth check)
+    products/route.ts       Catalog API: searchProducts() direct from ERPNext
+                            (60s revalidate, 503 JSON on failure)
   layout.tsx              Root layout: redirects to /my
   globals.css             Design tokens (CSS variables) + Tailwind layers
 
@@ -41,21 +43,24 @@ components/               Presentational + client-interactive components
                           products-breadcrumb (all wired via lib/catalog queries)
   layout/                 Header, Footer, theme-switcher
   marketing/              Placeholder marketing UI: hero, faq, testimonials
-                          (content from data/dummy/*, not wired to Supabase)
+                          (content from data/dummy/*, marketing copy only — not
+                          catalog data, so not wired to ERPNext)
   providers/              Client providers (react-query QueryClient)
   scaffold/               Legacy starter-kit scaffold (tutorial/*, logos, etc.)
 
 data/
-  categories.json / products.json   Bundled fallback catalog (Supabase row shapes)
-  dummy/                  Placeholder marketing content (home-products, faq,
-                          testimonials, about) as typed TS modules
+  dummy/                  Placeholder marketing content only (faq, testimonials,
+                          about) as typed TS modules — no catalog data lives here;
+                          home-products.ts was removed once the home page moved
+                          to real ERPNext data
 
 lib/
   catalog/
-    search-products.ts    Unified searchProducts() (Supabase-first, dummy fallback)
-    dummy-catalog.ts        Dummy filtering/sorting/pagination over data/*.json
+    search-products.ts    Unified searchProducts()/getProductDetail() reading
+                            ERPNext directly (no Supabase mirror)
     product-card-item.ts    ProductCardItem display DTO + toProductCardItem adapter
     stock.ts                Shared stock buckets/thresholds/badge tones
+    client.ts               Client-side fetch layer (fetchCatalog, query keys)
   constants.ts            Shared app constants (LOW_STOCK_THRESHOLD, page sizes, …)
   supabase/
     client.ts              Browser Supabase client (Client Components)
@@ -230,56 +235,117 @@ The intended UI architecture is:
 
 - **Auth**: fully owned by Supabase Auth (`auth.users`, sessions, email
   confirmation via `app/api/auth/confirm/route.ts` using `verifyOtp`).
-- **Domain data (products/categories)**: modeled in
-  `supabase/migrations/20260912_000000_create_catalog_schema.sql`
-  (`categories`, `products`, `sync_runs` tables with RLS: public
-  read-enabled, server-write). Until an ORM decision is recorded in
-  `MEMORY.md`, **new domain tables should be created as plain Supabase SQL
-  migrations** with RLS policies, not assumed to go through an ORM.
+- **Domain data**: user data lives in Supabase (`enquiries` table + auth).
+  Product/catalog data is read live from ERPNext (see above) — the old
+  `categories`/`products`/`sync_runs` mirror tables in
+  `supabase/migrations/20260912_000000_create_catalog_schema.sql` are
+  deprecated; a cleanup migration dropping them is pending verification of
+  whether that migration was ever applied anywhere. Until an ORM decision is
+  recorded in `MEMORY.md`, **new domain tables should be created as plain
+  Supabase SQL migrations** with RLS policies, not assumed to go through
+  an ORM.
 - **Storage**: none yet. When Amazon S3 is integrated, it should sit behind
   a small `lib/storage/` wrapper (mirroring `lib/supabase/`) so callers
   never touch the AWS SDK directly.
 
 ## ERPNext catalog integration
 
-ERPNext is the upstream source for catalog data. The first integration uses
-the standard `Item` and `Item Group` DocTypes and reads them through the
-ERPNext REST API with token authentication. The exact custom field names for
-Myanmar/English content and actual stock must be confirmed against the target
-ERPNext instance before implementation.
+ERPNext is the upstream source for catalog data **and** the direct read
+source — there is no Supabase mirror, no dummy fallback. The integration
+uses the standard `Item` and `Item Group` DocTypes plus `Bin` (stock) and
+`Item Price` (price), read through the ERPNext REST API with token
+authentication. Field mapping is confirmed against the live instance (see
+`MEMORY.md`): the `Item` doctype carries no custom OEM/vehicle-model or
+bilingual name/description fields (removed by the ERPNext admin), so specs
+are limited to `purchase_country` (from the real `country_of_origin` field)
+and English name/description are shown as-is.
 
-The intended data flow is:
+The data flow is:
 
 ```text
-ERPNext Item / Item Group
-        |
-        v
-Server-only manual sync
-        |
-        v
-Supabase catalog mirror + sync_runs
-        |
-        v
-Public products pages
+Browser → product-catalog.tsx (react-query)          app/[locale]/page.tsx (home,
+        |                                              Server Component, revalidate 60s)
+        v                                                          |
+GET /api/products (revalidate 60s)                                 |
+        |                                                          |
+        v                                                          v
+              lib/catalog/search-products.ts
+                          |
+                          v
+   ERPNext Item / Item Group / Bin / Item Price (internal Docker network)
 ```
 
 - ERPNext URL and token are server-only environment variables.
-- The public catalog reads the last successful Supabase snapshot; browser code
-  must never call ERPNext directly.
-- The mirror stores normalized bilingual product/category data, ERPNext source
-  IDs, numeric MMK prices, actual stock, enabled/published state, image URL,
-  and timestamps.
-- Sync writes are privileged server-side operations. Public catalog tables are
-  exposed only with explicit grants and RLS policies for published reads.
-- A failed sync records an error in `sync_runs` and must not replace the last
-  successful catalog snapshot.
-- The first milestone is a manually triggered sync. Scheduling and operator
-  alert delivery are follow-up work.
+- The catalog API caches responses for 60 seconds per URL; browser code
+  talks only to `/api/*` and never calls ERPNext directly. The home page
+  calls `search-products.ts` directly as a Server Component (same ERPNext
+  source, its own 60s `revalidate`) rather than through `/api/products`.
+- ERPNext rows are normalized in `search-products.ts` to the shared
+  `Category` / `Product` shapes (English name/description as-is, numeric MMK
+  prices, Bin-summed stock, enabled state, image URL).
+- Stock is the sum of `Bin.actual_qty` across warehouses until a warehouse
+  scope is decided (see `MEMORY.md`); missing Bin rows mean zero stock.
+- Price is resolved from `Item Price` (`selling=1`), joined client-side by
+  `item_code` (`fetchPriceMap`, mirroring `fetchStockMap`'s chunked `in`-filter
+  pattern) — not `Item.standard_rate`, which is stale/unused on this instance.
+  Ties across multiple price lists prefer `"Standard Selling"`, else the most
+  recently modified row; items with no matching row price at `0`.
+- Sort maps to ERPNext `order_by` for `name`/`newest` (server-side on the
+  `Item` query); `price_asc`/`price_desc` sort in-memory over the full
+  filtered id set using the joined price map, since `Item Price` is a
+  separate doctype with no server-side join available via `listDocuments`.
+  Search maps to `or_filters` across item name/code/Myanmar name; id-list
+  queries are capped (`MAX_LIST_IDS`).
+- A failed ERPNext request throws: the API route returns 503 JSON and the
+  products error boundary (`app/[locale]/products/error.tsx`) renders with
+  retry. Detail lookups return `null` only on genuine 404 (→ not-found page).
+- The old Supabase mirror (`categories`/`products`/`sync_runs` tables, sync
+  endpoint, `lib/erpnext/sync.ts`) was removed; `enquiries` + auth remain in
+  Supabase. If the old catalog migration was ever applied anywhere, a cleanup
+  migration dropping those tables is still pending verification.
 
-The repository currently has no `supabase/` migration directory. When schema
-work begins, use the project's chosen Supabase migration workflow and keep
-catalog tables, indexes, grants, and RLS policies together in the same schema
-change.
+## Deployment topology
+
+Self-hosted single-Droplet topology (DigitalOcean). One Droplet runs Docker
+with two sibling containers on a shared custom Docker network:
+
+```text
+                    DigitalOcean Droplet (Docker)
+                    ┌─────────────────────────────────┐
+                    │      shared Docker network      │
+                    │                                 │
+                    │  erpnext              website   │
+                    │  (Frappe stack +      (Next.js  │
+                    │   MariaDB + Redis)     app)     │
+                    │       ^                    │    │
+                    │       │ internal API       │    │ outbound
+                    │       │ (not public)       │    │ to Supabase
+                    └───────┼────────────────────┼────┘
+                            │                    │
+                            v                    v
+                   ERPNext API            Supabase Postgres
+                   (MariaDB/Redis)        (external, website only)
+```
+
+- The Website container talks to ERPNext over the **internal Docker network**
+  using ERPNext's container hostname (e.g. `http://erpnext-backend:8000`),
+  never a public URL. `ERPNEXT_BASE_URL` on the server is this internal
+  hostname. ERPNext's API port is not exposed publicly.
+- ERPNext's dockerized database (MariaDB + Redis) is entirely separate from
+  and unrelated to Supabase Postgres. ERPNext never talks to Supabase
+  directly — only the Website container's server-side sync code
+  (`lib/erpnext/sync.ts` via `app/api/catalog/sync/route.ts`) reads from
+  ERPNext and writes to Supabase. This is a one-way mirror, matching the
+  read-only ERPNext integration decision.
+- Only the Website container needs outbound internet access (to reach
+  Supabase). ERPNext needs no outbound internet access for this integration.
+- Single-Droplet hosting is a deliberate simplicity tradeoff for current
+  scale: ERPNext and the website share fate (one Droplet down = both down).
+  Recorded as an accepted tradeoff, not an oversight.
+
+Explicitly unresolved (see `MEMORY.md` → Known gaps, do not invent answers):
+reverse-proxy/TLS termination, ERPNext database volume backups, and any
+multi-host or HA evolution.
 
 ## Extension seams
 

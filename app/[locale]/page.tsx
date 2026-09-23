@@ -1,11 +1,56 @@
 import { Truck, Tag, PhoneCall, ShieldCheck } from "lucide-react";
+import { getMessages } from "next-intl/server";
 import ProductCard from "@/components/catalog/product-card";
 import Hero from "@/components/marketing/hero";
 import FAQ from "@/components/marketing/faq";
 import Testimonials from "@/components/marketing/testimonials";
-import { featuredProducts, latestProducts } from "@/data/dummy/home-products";
+import { searchProducts } from "@/lib/catalog/search-products";
+import { toProductCardItem } from "@/lib/catalog/product-card-item";
+import { getStockStatus, stockBadgeTone } from "@/lib/catalog/stock";
+import { parseLocale } from "@/lib/i18n";
+import type { HomePageProps, Product } from "@/types/index.type";
 
-export default async function HomePage() {
+export const revalidate = 60;
+
+const HOME_SECTION_SIZE = 8;
+
+export default async function HomePage({ params }: HomePageProps) {
+  const { locale: rawLocale } = await params;
+  const locale = parseLocale(rawLocale);
+  const messages = await getMessages({ locale });
+  const currency = messages.common.currency;
+  const stockLabels = messages.common.stock;
+
+  // TODO: once ERPNext has a `custom_featured` field on Item, filter this
+  // query by it (extend CatalogSearchParams/itemFilters with a `featured`
+  // param). For now this is just the default-sorted catalog page.
+  const [{ products: featuredRaw }, { products: latestRaw }] =
+    await Promise.all([
+      searchProducts({ pageSize: HOME_SECTION_SIZE }),
+      searchProducts({ pageSize: HOME_SECTION_SIZE, sort: "newest" }),
+    ]);
+
+  function stockBadgeText(quantity: number): string {
+    const status = getStockStatus(quantity);
+    if (status === "out_of_stock") return stockLabels.out_of_stock;
+    if (status === "low_stock") return stockLabels.low_stock;
+    return stockLabels.in_stock;
+  }
+
+  function toCard(product: Product) {
+    return {
+      product: toProductCardItem(product, locale, currency),
+      badge: {
+        text: stockBadgeText(product.stock_quantity),
+        tone: stockBadgeTone(product.stock_quantity),
+      },
+      detailsHref: `/${locale}/products/${product.id}`,
+    };
+  }
+
+  const featuredProducts = featuredRaw.map(toCard);
+  const latestProducts = latestRaw.map(toCard);
+
   return (
     <div className="min-h-screen flex flex-col font-manrope">
       <main className="flex-grow">
@@ -85,8 +130,8 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {featuredProducts.map((card) => (
+              <ProductCard key={card.product.id} {...card} />
             ))}
           </div>
         </section>
@@ -109,8 +154,8 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {latestProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {latestProducts.map((card) => (
+                <ProductCard key={card.product.id} {...card} />
               ))}
             </div>
           </div>

@@ -2,11 +2,13 @@ import { Suspense } from "react";
 import LoadingSpinner from "@/components/loading-spinner";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
 import { getProductDetail } from "@/lib/catalog/search-products";
 import ProductDetail from "@/components/catalog/product-detail";
 import type { DetailLabels, ProductDetailPageProps } from "@/types/index.type";
 import { parseLocale } from "@/lib/i18n";
+
+/** Cache detail pages for 60s (per slug). */
+export const revalidate = 60;
 
 export default async function ProductDetailPage({
   params,
@@ -15,11 +17,7 @@ export default async function ProductDetailPage({
   const locale = parseLocale(rawLocale);
   const messages = await getMessages({ locale });
 
-  const supabase = await createClient();
-  const result = await getProductDetail(supabase, slug).catch((error) => {
-    console.error("Failed to load product:", error);
-    return null;
-  });
+  const result = await getProductDetail(slug);
 
   if (!result) {
     notFound();
