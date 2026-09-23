@@ -27,7 +27,9 @@ app/                      Routes (App Router). Pages + layouts + route handlers.
     products/               Catalog + detail pages
     about/                  About page
     layout.tsx              Locale layout: providers, Header, Footer
-    page.tsx                Home page
+    page.tsx                Home page: Featured/Latest Products from searchProducts()
+                            direct from ERPNext (60s revalidate, no dummy fallback)
+    error.tsx                Locale segment error boundary (ERPNext failures, etc.)
   api/
     auth/confirm/route.ts   Email confirmation (locale-aware redirect)
     products/route.ts       Catalog API: searchProducts() direct from ERPNext
@@ -41,13 +43,16 @@ components/               Presentational + client-interactive components
                           products-breadcrumb (all wired via lib/catalog queries)
   layout/                 Header, Footer, theme-switcher
   marketing/              Placeholder marketing UI: hero, faq, testimonials
-                          (content from data/dummy/*, not wired to Supabase)
+                          (content from data/dummy/*, marketing copy only — not
+                          catalog data, so not wired to ERPNext)
   providers/              Client providers (react-query QueryClient)
   scaffold/               Legacy starter-kit scaffold (tutorial/*, logos, etc.)
 
 data/
-  dummy/                  Placeholder marketing content (home-products, faq,
-                          testimonials, about) as typed TS modules
+  dummy/                  Placeholder marketing content only (faq, testimonials,
+                          about) as typed TS modules — no catalog data lives here;
+                          home-products.ts was removed once the home page moved
+                          to real ERPNext data
 
 lib/
   catalog/
@@ -246,33 +251,38 @@ The intended UI architecture is:
 ## ERPNext catalog integration
 
 ERPNext is the upstream source for catalog data **and** the direct read
-source — there is no Supabase mirror. The integration uses the standard
-`Item` and `Item Group` DocTypes, read through the ERPNext REST API with
-token authentication. The exact custom field names for Myanmar/English
-content and actual stock must be confirmed against the target ERPNext
-instance before this returns real data.
+source — there is no Supabase mirror, no dummy fallback. The integration
+uses the standard `Item` and `Item Group` DocTypes plus `Bin` (stock) and
+`Item Price` (price), read through the ERPNext REST API with token
+authentication. Field mapping is confirmed against the live instance (see
+`MEMORY.md`): the `Item` doctype carries no custom OEM/vehicle-model or
+bilingual name/description fields (removed by the ERPNext admin), so specs
+are limited to `purchase_country` (from the real `country_of_origin` field)
+and English name/description are shown as-is.
 
 The data flow is:
 
 ```text
-Browser → product-catalog.tsx (react-query)
-        |
-        v
-GET /api/products (revalidate 60s)
-        |
-        v
-lib/catalog/search-products.ts
-        |
-        v
-ERPNext Item / Item Group / Bin / Item Price (internal Docker network)
+Browser → product-catalog.tsx (react-query)          app/[locale]/page.tsx (home,
+        |                                              Server Component, revalidate 60s)
+        v                                                          |
+GET /api/products (revalidate 60s)                                 |
+        |                                                          |
+        v                                                          v
+              lib/catalog/search-products.ts
+                          |
+                          v
+   ERPNext Item / Item Group / Bin / Item Price (internal Docker network)
 ```
 
 - ERPNext URL and token are server-only environment variables.
 - The catalog API caches responses for 60 seconds per URL; browser code
-  talks only to `/api/*` and never calls ERPNext directly.
+  talks only to `/api/*` and never calls ERPNext directly. The home page
+  calls `search-products.ts` directly as a Server Component (same ERPNext
+  source, its own 60s `revalidate`) rather than through `/api/products`.
 - ERPNext rows are normalized in `search-products.ts` to the shared
-  `Category` / `Product` shapes (bilingual names with English fallback,
-  numeric MMK prices, Bin-summed stock, enabled state, image URL).
+  `Category` / `Product` shapes (English name/description as-is, numeric MMK
+  prices, Bin-summed stock, enabled state, image URL).
 - Stock is the sum of `Bin.actual_qty` across warehouses until a warehouse
   scope is decided (see `MEMORY.md`); missing Bin rows mean zero stock.
 - Price is resolved from `Item Price` (`selling=1`), joined client-side by

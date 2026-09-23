@@ -138,12 +138,18 @@ Error`, otherwise fall back to a generic message ("An error occurred").
 - Read ERPNext live per request (with route-level caching); do not rebuild
   a Supabase mirror for catalog data.
 - Do not invent bilingual, stock, or price field names. Confirm them against
-  the target ERPNext instance and document the mapping next to the query code.
+  the target ERPNext instance and document the mapping next to the query code
+  — this instance's `Item` doctype has no custom OEM/vehicle-model or
+  bilingual name/description fields (confirmed removed; `ITEM_FIELDS` in
+  `lib/catalog/search-products.ts` only requests fields verified to exist).
 - Price reads `Item Price` (`selling=1`), not `Item.standard_rate` — joined
   client-side by `item_code` in `fetchPriceMap` (`lib/catalog/search-products.ts`),
-  mirroring `fetchStockMap`'s chunked `in`-filter pattern. The `Item Price`
-  price list name (`PREFERRED_PRICE_LIST`) is a placeholder pending
-  confirmation against the live instance — do not treat it as verified.
+  mirroring `fetchStockMap`'s chunked `in`-filter pattern. `PREFERRED_PRICE_LIST`
+  (`"Standard Selling"`) is confirmed against the live instance.
+- Home page reads ERPNext the same way the products catalog does — via
+  `searchProducts()` from `lib/catalog/search-products.ts` — never dummy data.
+  `data/dummy/*` is reserved for marketing copy only (FAQ, testimonials, about
+  page); catalog/product data must never come from `data/dummy/*`.
 
 ## Linting, formatting, types
 

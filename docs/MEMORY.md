@@ -44,7 +44,7 @@ changes (see `AGENTS.md` → Documentation maintenance).
 
 **Public pages implemented**
 
-- Home page (`app/[locale]/page.tsx`) — Hero, Features bar, Value Props, Featured Products (from Supabase), Latest Products, Trust Indicators, CTA
+- Home page (`app/[locale]/page.tsx`) — Hero, Features bar, Featured Products (real ERPNext data via `searchProducts()`), Latest Products (same, `newest` sort), FAQ, Testimonials
 - About page (`app/[locale]/about/page.tsx`) — Hero, Company story, Mission/Vision/Values, Team, Locations
 - Products catalog (`app/[locale]/products/page.tsx` + `components/product-catalog.tsx`) — Server Component fetches Supabase via typed queries; client island for search/category/stock filters + pagination (12/page); antd-first, i18n-ready
 - Product detail (`app/[locale]/products/[slug]/page.tsx`, slug = product id) — image, category tag, stock badge, MMK price, specs table, related products, `notFound()` on missing/disabled
@@ -71,30 +71,32 @@ changes (see `AGENTS.md` → Documentation maintenance).
    `CODING_GUIDELINES.md` → Testing contracts).
 5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-6. **ERPNext content gaps (need ERPNext admin).** No Myanmar name fields
-   (closed decision — ERPNext's native English `name`/`description` is shown
-   as-is, no bilingual custom fields, no translation layer; not revisited).
-   Bin is empty (all stock reads 0) — pending admin population. Price now
-   reads `Item Price` (`selling=1`, see `fetchPriceMap` in
-   `lib/catalog/search-products.ts`) instead of `Item.standard_rate` — code
-   is done, but pending: (a) admin population of `Item Price` records, and
-   (b) confirmation of the real price list name against the live instance
-   (`PREFERRED_PRICE_LIST = "Standard Selling"` is a placeholder).
+6. **ERPNext content gaps (need ERPNext admin) — mostly resolved 2026-09-23.**
+   No Myanmar name fields (closed decision — ERPNext's native English
+   `name`/`description` is shown as-is, no bilingual custom fields, no
+   translation layer; not revisited — and now doubly moot, see gap #11).
+   `Bin` and `Item Price` are confirmed populated with real data on the live
+   instance (stock and price both render real values). Specs are now limited
+   to `purchase_country` (sourced from the real `country_of_origin` field);
+   OEM-number and vehicle-model specs/search were dropped entirely — their
+   source fields no longer exist (see gap #11). Remaining: per-item coverage
+   of `Bin`/`Item Price` rows is partial (some items still read 0 stock/price
+   until admin adds rows for them) — not a code gap.
 7. **Catalog mirror cleanup unverified.** The old `categories`/`products`/`sync_runs` migration may never have been applied anywhere — verify before writing a drop migration; do not apply-then-drop blindly.
 8. **No reverse proxy / TLS termination decided.** No Traefik/Nginx (or equivalent) configured yet for routing to either container's public-facing ports. Must be decided before production deploy.
 9. **No ERPNext database backup strategy.** The dockerized MariaDB volume needs a persisted named-volume backup plan — distinct from any Droplet-level backup.
 10. **Single-Droplet shared fate accepted for now.** ERPNext + website on one Droplet is a deliberate simplicity tradeoff at current scale; revisit if HA is ever required.
-11. **Live ERPNext currently rejects `custom_oem_no` in list queries**
-    (`DataError: Field not permitted in query`, HTTP 417). This blocks the
-    entire catalog (list + detail), not just price — the 503 error boundary
-    renders correctly, but no real data loads. Confirmed unrelated to the
-    Item Price change (the field was already in `ITEM_FIELDS`/`orFilters`
-    before this session; this session's diff doesn't touch it). Root cause
-    is server-side — ERPNext field-level permissions changed on the live
-    instance since the last verified session (2026-09-14 had it working) —
-    needs ERPNext admin to restore read permission on `custom_oem_no` for
-    the API user/role before any further live verification, including the
-    Item Price work above, can proceed.
+11. **Resolved 2026-09-23 — was misdiagnosed as a permissions issue.** The
+    previous session's 417 on `custom_oem_no` was not a permission change:
+    the user removed the custom fields (`custom_oem_no`,
+    `custom_purchase_country`, `custom_products`, `custom_name_my`,
+    `custom_description_my`, `custom_price_mmk`) from the `Item` doctype
+    entirely (confirmed via a full `Item` doc dump — none of them appear).
+    Code updated to match: `ITEM_FIELDS`/`buildSpecifications`/`itemFilters`
+    in `lib/catalog/search-products.ts` no longer reference any of them;
+    `country_of_origin` (a real, populated field) replaces
+    `custom_purchase_country` for the purchase-country spec. `/api/products`
+    verified 200 live after the fix (was 503).
 
 ## Decisions recorded
 
@@ -143,13 +145,70 @@ changes (see `AGENTS.md` → Documentation maintenance).
   2026-09-23.
 - Myanmar name/description decision (closed): show ERPNext's native English
   `name`/`description` as-is — no bilingual custom fields, no translation
-  layer. `custom_name_my`/`custom_description_my`/`custom_price_mmk` remain
-  unused/dead fields on the `ERPNextItem` type; not revisited. Decided
-  2026-09-23 (interview), formalizing what the code already did.
+  layer. Decided 2026-09-23 (interview), formalizing what the code already
+  did — now moot in practice since the bilingual custom fields were removed
+  from ERPNext entirely (see gap #11).
+- Spec fields decision: OEM-number and vehicle-model specs/search dropped
+  entirely (their ERPNext fields no longer exist); purchase-country spec now
+  sources from the real `country_of_origin` field instead of the removed
+  `custom_purchase_country`. Decided 2026-09-23 (interview).
+- Home page catalog decision: Featured Products and Latest Products both read
+  real ERPNext data via `searchProducts()` (Featured = default `name` sort,
+  Latest = `newest` sort) — no dummy fallback. ERPNext has no "featured"
+  concept yet; the fetch has a marked `TODO` for a future `custom_featured`
+  ERPNext field rather than a speculative filter param built ahead of need.
+  Decided 2026-09-23 (interview).
 
 ## Session handoff
 
-**Current session (2026-09-23, Item Price pricing):**
+**Current session (2026-09-23, ERPNext schema sync + dummy data removal):**
+
+- What changed (per approved plan):
+  - `types/index.type.ts`: `ERPNextItem` — removed `custom_oem_no`,
+    `custom_purchase_country`, `custom_products`, `custom_name_my`,
+    `custom_description_my`, `custom_price_mmk` (none exist on the live
+    doctype); added `country_of_origin?: string`. Added `HomePageProps`.
+    Narrowed `CatalogResult`/`ProductDetailResult` `source` from
+    `"db" | "dummy" | "erpnext"` to the literal `"erpnext"` (nothing else
+    ever emitted the other two).
+  - `lib/catalog/search-products.ts`: `ITEM_FIELDS` drops the three removed
+    custom fields, adds `"country_of_origin"`; `buildSpecifications` now
+    only emits `purchase_country` (from `country_of_origin`) — `oem_no`/
+    `model` entries removed; `itemFilters`'s `orFilters` drops
+    `custom_oem_no`/`custom_products` (search now matches `item_name`/`name`
+    only); top comment reworded to reflect the now-confirmed field mapping.
+    No changes to `fetchPriceMap`/`fetchStockMap` — those already matched
+    the live `Item Price`/`Bin` shape.
+  - Deleted `data/dummy/home-products.ts` (the only remaining catalog-data
+    dummy source — `about.ts`/`faq.ts`/`testimonials.ts` are marketing copy,
+    kept). `app/[locale]/page.tsx` rewritten to accept `{ params }:
+HomePageProps`, fetch Featured/Latest Products via `searchProducts()`
+    (ERPNext-direct, same function the products catalog already uses),
+    convert via the existing `toProductCardItem`, and badge via the existing
+    `getStockStatus`/`stockBadgeTone` (`lib/catalog/stock.ts`) — same
+    patterns `product-catalog.tsx` already used, no new helpers added. Added
+    `export const revalidate = 60` matching the rest of the catalog's cache
+    convention.
+  - New `app/[locale]/error.tsx` (copies `products/error.tsx`'s pattern) —
+    the home page now fetches ERPNext directly with no boundary above it;
+    without this it would 500 instead of degrading gracefully on an ERPNext
+    outage, the opposite of the "no silent dummy fallback" rule.
+  - Docs: this file, `ARCHITECTURE.md`, `CODING_GUIDELINES.md`.
+- Verified: `make check` (lint + `tsc --noEmit` + format) green; `make build`
+  succeeds, all 23 routes compile; live dev server smoke test —
+  `/api/products` now 200 (was 503 on `custom_oem_no`); a known item
+  (`DW-CH-WB-HY-55A-001`) returns `price_mmk: 7500` and
+  `specifications: { purchase_country: "China" }`; `/my` and `/en` both
+  render Featured/Latest Products with real ERPNext data; confirmed
+  `grep -r "data/dummy/home-products"` returns nothing; confirmed no
+  `oem_no`/`model` keys appear in any specifications payload.
+- Left open: per-item `Bin`/`Item Price` coverage is partial (some items
+  still read 0 stock/price — not every item has rows yet, admin-side, not a
+  code gap); Contact form backend; Admin CRUD; mirror cleanup verification
+  (gap #7); a future `custom_featured` ERPNext field (TODO left in
+  `app/[locale]/page.tsx`).
+
+**Previous session (2026-09-23, Item Price pricing):**
 
 - What changed (per approved plan: switch price source from
   `Item.standard_rate` to ERPNext `Item Price`):

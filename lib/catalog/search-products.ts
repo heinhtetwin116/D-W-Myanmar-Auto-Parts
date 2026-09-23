@@ -1,12 +1,16 @@
 /**
  * Unified catalog search — the single entry point for product listing data.
  *
- * Reads ERPNext directly (no Supabase mirror): `Item` / `Item Group` list
- * queries for the catalog, `Bin` rows summed per item for stock. Responses
- * keep the `CatalogResult` shape so callers never care about the source.
+ * Reads ERPNext directly (no Supabase mirror, no dummy fallback): `Item` /
+ * `Item Group` list queries for the catalog, `Bin` rows summed per item for
+ * stock, `Item Price` for selling price. Responses keep the `CatalogResult`
+ * shape so callers never care about the source.
  *
- * ERPNext field mapping (custom fields + stock source) must be confirmed
- * against the target instance before this returns real data — see MEMORY.md.
+ * Confirmed against the live instance: stock (`Bin`) and price
+ * (`Item Price`, `Standard Selling`) are populated; the Item doctype has no
+ * custom OEM/vehicle-model fields (removed) and no bilingual name/description
+ * fields (never added — English is shown as-is by design, see MEMORY.md).
+ * Specs are limited to `country_of_origin`.
  */
 
 import { createERPNextClient, type ERPNextClient } from "@/lib/erpnext/client";
@@ -61,9 +65,7 @@ const ITEM_FIELDS = [
   "description",
   "image",
   "disabled",
-  "custom_oem_no",
-  "custom_purchase_country",
-  "custom_products",
+  "country_of_origin",
 ];
 
 /** Strip Frappe Text Editor HTML down to plain text. */
@@ -78,10 +80,7 @@ function buildSpecifications(
   item: ERPNextItem,
 ): Record<string, unknown> | null {
   const specs: Record<string, unknown> = {};
-  if (item.custom_oem_no) specs.oem_no = item.custom_oem_no;
-  if (item.custom_purchase_country)
-    specs.purchase_country = item.custom_purchase_country;
-  if (item.custom_products) specs.model = item.custom_products;
+  if (item.country_of_origin) specs.purchase_country = item.country_of_origin;
   return Object.keys(specs).length > 0 ? specs : null;
 }
 
@@ -154,8 +153,6 @@ function itemFilters(
     orFilters: [
       ["item_name", "like", like],
       ["name", "like", like],
-      ["custom_oem_no", "like", like],
-      ["custom_products", "like", like],
     ],
   };
 }
@@ -195,8 +192,7 @@ async function fetchStockMap(
 }
 
 /** Preferred price list when an item has multiple selling `Item Price`
- * rows. Not yet confirmed against the live instance — revisit once the
- * real price list name is known (see MEMORY.md). */
+ * rows. Confirmed against the live instance (see MEMORY.md). */
 const PREFERRED_PRICE_LIST = "Standard Selling";
 
 function isBetterPriceMatch(

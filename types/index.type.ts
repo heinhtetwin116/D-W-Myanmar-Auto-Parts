@@ -103,13 +103,10 @@ export interface ERPNextItem {
   description?: string;
   image?: string;
   disabled?: 0 | 1; // 1 = disabled
-  standard_rate?: number; // Standard selling rate (interim display price)
-  custom_name_my?: string;
-  custom_description_my?: string;
-  custom_price_mmk?: number;
-  custom_oem_no?: string; // OEM part number (verified on live instance)
-  custom_purchase_country?: string; // Verified on live instance
-  custom_products?: string; // Vehicle model, e.g. "R124" (verified)
+  standard_rate?: number; // Standard selling rate — unused (price reads Item Price instead)
+  country_of_origin?: string; // e.g. "China" — used as the purchase-country spec
+  // No custom OEM/vehicle-model or bilingual name/description fields exist
+  // on this instance (verified against the live instance).
   // ... other ERPNext fields
   [key: string]: unknown;
 }
@@ -211,7 +208,7 @@ export interface CatalogSearchParams {
 }
 
 export interface CatalogResult {
-  source: "db" | "dummy" | "erpnext";
+  source: "erpnext";
   products: Product[];
   total: number;
   categories: Category[];
@@ -220,7 +217,7 @@ export interface CatalogResult {
 }
 
 export interface ProductDetailResult {
-  source: "db" | "dummy" | "erpnext";
+  source: "erpnext";
   product: Product;
   category: Category | null;
   related: Product[];
@@ -396,6 +393,10 @@ export interface UpdatePasswordFormProps {
 }
 
 // ── Page props ────────────────────────────────────────────────────
+
+export interface HomePageProps {
+  params: Promise<{ locale: string }>;
+}
 
 export interface ProductsPageProps {
   params: Promise<{ locale: string }>;
