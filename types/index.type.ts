@@ -127,6 +127,22 @@ export interface ERPNextBin {
   [key: string]: unknown;
 }
 
+/**
+ * Raw ERPNext Item Price row (selling price per item per price list).
+ * Only `item_code` + `price_list` + `price_list_rate` + `modified` are
+ * read; price list name is not yet confirmed against the live instance
+ * (see MEMORY.md).
+ */
+export interface ERPNextItemPrice {
+  name: string; // Frappe document ID
+  item_code: string;
+  price_list: string;
+  selling?: 0 | 1;
+  price_list_rate?: number;
+  modified?: string;
+  [key: string]: unknown;
+}
+
 export interface ERPNextClientOptions {
   baseUrl: string;
   apiKey: string;

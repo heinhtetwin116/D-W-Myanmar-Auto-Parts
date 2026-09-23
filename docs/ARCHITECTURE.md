@@ -264,7 +264,7 @@ GET /api/products (revalidate 60s)
 lib/catalog/search-products.ts
         |
         v
-ERPNext Item / Item Group / Bin (internal Docker network)
+ERPNext Item / Item Group / Bin / Item Price (internal Docker network)
 ```
 
 - ERPNext URL and token are server-only environment variables.
@@ -275,8 +275,17 @@ ERPNext Item / Item Group / Bin (internal Docker network)
   numeric MMK prices, Bin-summed stock, enabled state, image URL).
 - Stock is the sum of `Bin.actual_qty` across warehouses until a warehouse
   scope is decided (see `MEMORY.md`); missing Bin rows mean zero stock.
-- Sort maps to ERPNext `order_by`; search maps to `or_filters` across item
-  name/code/Myanmar name; id-list queries are capped (`MAX_LIST_IDS`).
+- Price is resolved from `Item Price` (`selling=1`), joined client-side by
+  `item_code` (`fetchPriceMap`, mirroring `fetchStockMap`'s chunked `in`-filter
+  pattern) — not `Item.standard_rate`, which is stale/unused on this instance.
+  Ties across multiple price lists prefer `"Standard Selling"`, else the most
+  recently modified row; items with no matching row price at `0`.
+- Sort maps to ERPNext `order_by` for `name`/`newest` (server-side on the
+  `Item` query); `price_asc`/`price_desc` sort in-memory over the full
+  filtered id set using the joined price map, since `Item Price` is a
+  separate doctype with no server-side join available via `listDocuments`.
+  Search maps to `or_filters` across item name/code/Myanmar name; id-list
+  queries are capped (`MAX_LIST_IDS`).
 - A failed ERPNext request throws: the API route returns 503 JSON and the
   products error boundary (`app/[locale]/products/error.tsx`) renders with
   retry. Detail lookups return `null` only on genuine 404 (→ not-found page).

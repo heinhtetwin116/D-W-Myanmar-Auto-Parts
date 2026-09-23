@@ -18,21 +18,33 @@ import type {
   ERPNextFilterValue,
   ERPNextItem,
   ERPNextItemGroup,
+  ERPNextItemPrice,
   Product,
   ProductDetailResult,
 } from "@/types/index.type";
 
-/** Upper bound for the id-list queries behind counts and stock joins. */
+/** Upper bound for the id-list queries behind counts and stock/price joins. */
 const MAX_LIST_IDS = 10000;
 
-function sortToOrderBy(sort: NonNullable<CatalogSearchParams["sort"]>): string {
+/** Chunk size for `in`-filter queries (Bin, Item Price): avoids exceeding
+ * the reverse proxy's URI limit (nginx 414) on large item-code lists. */
+const CHUNK_SIZE = 100;
+
+/**
+ * ERPNext `order_by` for sorts that stay server-side on the `Item` query.
+ * `price_asc`/`price_desc` are resolved in-memory instead (see
+ * `searchProducts`) since price now lives in a separate `Item Price`
+ * doctype with no server-side join available via `listDocuments`.
+ */
+function sortToOrderBy(
+  sort: NonNullable<CatalogSearchParams["sort"]>,
+): string | undefined {
   switch (sort) {
-    case "price_asc":
-      return "standard_rate asc";
-    case "price_desc":
-      return "standard_rate desc";
     case "newest":
       return "creation desc";
+    case "price_asc":
+    case "price_desc":
+      return undefined;
     case "name":
     default:
       return "item_name";
@@ -49,7 +61,6 @@ const ITEM_FIELDS = [
   "description",
   "image",
   "disabled",
-  "standard_rate",
   "custom_oem_no",
   "custom_purchase_country",
   "custom_products",
@@ -94,7 +105,11 @@ function mapGroupToCategory(group: ERPNextItemGroup): Category {
   };
 }
 
-function mapItemToProduct(item: ERPNextItem, stock: number): Product {
+function mapItemToProduct(
+  item: ERPNextItem,
+  stock: number,
+  price: number,
+): Product {
   const now = new Date().toISOString();
   return {
     id: item.name,
@@ -107,9 +122,7 @@ function mapItemToProduct(item: ERPNextItem, stock: number): Product {
     description_en: item.description ? stripHtml(item.description) : null,
     description_my: null,
     specifications: buildSpecifications(item),
-    // No usable price field on Item yet (standard_rate is 0) — revisit
-    // with the Item Price DocType once pricing is decided.
-    price_mmk: item.standard_rate ?? 0,
+    price_mmk: price,
     stock_quantity: stock,
     enabled: item.disabled !== 1,
     image_url: item.image ?? null,
@@ -157,7 +170,6 @@ async function fetchStockMap(
   // Chunk the `in` filter: thousands of codes in one query string exceed
   // the reverse proxy's URI limit (nginx 414). Frappe expects a real list
   // for `in`, not a comma-joined string.
-  const CHUNK_SIZE = 100;
   const chunks: string[][] = [];
   for (let i = 0; i < itemCodes.length; i += CHUNK_SIZE) {
     chunks.push(itemCodes.slice(i, i + CHUNK_SIZE));
@@ -180,6 +192,65 @@ async function fetchStockMap(
     }
   }
   return stock;
+}
+
+/** Preferred price list when an item has multiple selling `Item Price`
+ * rows. Not yet confirmed against the live instance — revisit once the
+ * real price list name is known (see MEMORY.md). */
+const PREFERRED_PRICE_LIST = "Standard Selling";
+
+function isBetterPriceMatch(
+  candidate: ERPNextItemPrice,
+  current: ERPNextItemPrice,
+): boolean {
+  const candidatePreferred = candidate.price_list === PREFERRED_PRICE_LIST;
+  const currentPreferred = current.price_list === PREFERRED_PRICE_LIST;
+  if (candidatePreferred !== currentPreferred) return candidatePreferred;
+  return (candidate.modified ?? "") > (current.modified ?? "");
+}
+
+/**
+ * Resolve one selling price per item code from `Item Price` (`selling=1`).
+ * Ties (multiple price lists) prefer `PREFERRED_PRICE_LIST`, else the most
+ * recently modified row. Items with no matching row are absent from the
+ * map (callers fall back to 0) — never falls back to `Item.standard_rate`,
+ * which is stale/incidental data on this instance.
+ */
+async function fetchPriceMap(
+  erpnext: ERPNextClient,
+  itemCodes: string[],
+): Promise<Map<string, number>> {
+  const prices = new Map<string, ERPNextItemPrice>();
+  if (itemCodes.length === 0) return new Map();
+  const chunks: string[][] = [];
+  for (let i = 0; i < itemCodes.length; i += CHUNK_SIZE) {
+    chunks.push(itemCodes.slice(i, i + CHUNK_SIZE));
+  }
+  const pages = await Promise.all(
+    chunks.map((codes) =>
+      erpnext.listDocuments<ERPNextItemPrice>("Item Price", {
+        fields: ["item_code", "price_list", "price_list_rate", "modified"],
+        filters: [
+          ["item_code", "in", codes],
+          ["selling", "=", 1],
+        ],
+        limitPageLength: MAX_LIST_IDS,
+      }),
+    ),
+  );
+  for (const rows of pages) {
+    for (const row of rows) {
+      const existing = prices.get(row.item_code);
+      if (!existing || isBetterPriceMatch(row, existing)) {
+        prices.set(row.item_code, row);
+      }
+    }
+  }
+  const result = new Map<string, number>();
+  for (const [code, row] of prices) {
+    result.set(code, row.price_list_rate ?? 0);
+  }
+  return result;
 }
 
 function matchesStock(
@@ -222,15 +293,20 @@ export async function searchProducts(
   ]);
 
   const categories = groups.map(mapGroupToCategory);
-  const stockMap = await fetchStockMap(
-    erpnext,
-    names.map((item) => item.name),
+  const allNames = names.map((item) => item.name);
+  const [stockMap, priceMap] = await Promise.all([
+    fetchStockMap(erpnext, allNames),
+    fetchPriceMap(erpnext, allNames),
+  ]);
+  let matchingIds = allNames.filter((name) =>
+    stock ? matchesStock(stockMap.get(name) ?? 0, stock) : true,
   );
-  const matchingIds = names
-    .map((item) => item.name)
-    .filter((name) =>
-      stock ? matchesStock(stockMap.get(name) ?? 0, stock) : true,
+  if (sort === "price_asc" || sort === "price_desc") {
+    const direction = sort === "price_asc" ? 1 : -1;
+    matchingIds = [...matchingIds].sort(
+      (a, b) => direction * ((priceMap.get(a) ?? 0) - (priceMap.get(b) ?? 0)),
     );
+  }
   const total = matchingIds.length;
   const pageIds = matchingIds.slice((page - 1) * pageSize, page * pageSize);
 
@@ -245,7 +321,9 @@ export async function searchProducts(
   const byId = new Map(items.map((item) => [item.name, item]));
   const products = pageIds.flatMap((id) => {
     const item = byId.get(id);
-    return item ? [mapItemToProduct(item, stockMap.get(id) ?? 0)] : [];
+    return item
+      ? [mapItemToProduct(item, stockMap.get(id) ?? 0, priceMap.get(id) ?? 0)]
+      : [];
   });
 
   return { source: "erpnext", products, total, categories, page, pageSize };
@@ -274,7 +352,7 @@ export async function getProductDetail(
   }
   if (item.disabled === 1) return null;
 
-  const [group, related, stockMap] = await Promise.all([
+  const [group, related, stockMap, priceMap] = await Promise.all([
     erpnext
       .getDocument<ERPNextItemGroup>("Item Group", item.item_group)
       .catch(() => null),
@@ -289,21 +367,37 @@ export async function getProductDetail(
       })
       .catch(() => []),
     fetchStockMap(erpnext, [item.name]),
+    fetchPriceMap(erpnext, [item.name]),
   ]);
 
   const relatedIds = related
     .filter((entry) => entry.name !== item.name)
     .slice(0, 4)
     .map((entry) => entry.name);
-  const relatedStock = await fetchStockMap(erpnext, relatedIds);
+  const [relatedStock, relatedPrice] = await Promise.all([
+    fetchStockMap(erpnext, relatedIds),
+    fetchPriceMap(erpnext, relatedIds),
+  ]);
   const relatedProducts = relatedIds.flatMap((id) => {
     const entry = related.find((candidate) => candidate.name === id);
-    return entry ? [mapItemToProduct(entry, relatedStock.get(id) ?? 0)] : [];
+    return entry
+      ? [
+          mapItemToProduct(
+            entry,
+            relatedStock.get(id) ?? 0,
+            relatedPrice.get(id) ?? 0,
+          ),
+        ]
+      : [];
   });
 
   return {
     source: "erpnext",
-    product: mapItemToProduct(item, stockMap.get(item.name) ?? 0),
+    product: mapItemToProduct(
+      item,
+      stockMap.get(item.name) ?? 0,
+      priceMap.get(item.name) ?? 0,
+    ),
     category: group ? mapGroupToCategory(group) : null,
     related: relatedProducts,
   };

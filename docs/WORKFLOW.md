@@ -108,15 +108,17 @@ form`).
 
 Before pointing the catalog at a real instance, record the target `Item` and
 `Item Group` field mapping, including bilingual fields, enabled status, image
-URL, and the source used for actual stock. Test against a safe ERPNext
-environment first.
+URL, the source used for actual stock, and the `Item Price` price list name
+used for selling price. Test against a safe ERPNext environment first.
 
 A catalog change is not complete until it verifies:
 
 - enabled Items and categories resolve with stable ERPNext source IDs;
-- bilingual fields, numeric MMK prices, actual stock, and image URLs map as
-  expected;
-- list, detail, filters, sort, and pagination behave against live data;
+- bilingual fields, actual stock, and image URLs map as expected;
+- numeric MMK prices resolve from `Item Price` (`selling=1`) once records
+  exist for at least one Item — not always `0`;
+- list, detail, filters, sort (including price sort across multiple pages),
+  and pagination behave against live data;
 - ERPNext down returns the error boundary (503 path), not a blank page; and
 - ERPNext credentials are never present in browser bundles or `NEXT_PUBLIC_`
   environment variables.

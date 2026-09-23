@@ -71,15 +71,30 @@ changes (see `AGENTS.md` → Documentation maintenance).
    `CODING_GUIDELINES.md` → Testing contracts).
 5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-6. **ERPNext content gaps (need ERPNext admin).** Field mapping itself is now
-   verified against the live instance — but it confirmed absences, not presences:
-   no Myanmar name fields (catalog falls back to English), no usable price field
-   (`standard_rate` is 0; proper fix is the Item Price DocType), and Bin is empty
-   (all stock reads 0). None of these are code blockers.
+6. **ERPNext content gaps (need ERPNext admin).** No Myanmar name fields
+   (closed decision — ERPNext's native English `name`/`description` is shown
+   as-is, no bilingual custom fields, no translation layer; not revisited).
+   Bin is empty (all stock reads 0) — pending admin population. Price now
+   reads `Item Price` (`selling=1`, see `fetchPriceMap` in
+   `lib/catalog/search-products.ts`) instead of `Item.standard_rate` — code
+   is done, but pending: (a) admin population of `Item Price` records, and
+   (b) confirmation of the real price list name against the live instance
+   (`PREFERRED_PRICE_LIST = "Standard Selling"` is a placeholder).
 7. **Catalog mirror cleanup unverified.** The old `categories`/`products`/`sync_runs` migration may never have been applied anywhere — verify before writing a drop migration; do not apply-then-drop blindly.
 8. **No reverse proxy / TLS termination decided.** No Traefik/Nginx (or equivalent) configured yet for routing to either container's public-facing ports. Must be decided before production deploy.
 9. **No ERPNext database backup strategy.** The dockerized MariaDB volume needs a persisted named-volume backup plan — distinct from any Droplet-level backup.
 10. **Single-Droplet shared fate accepted for now.** ERPNext + website on one Droplet is a deliberate simplicity tradeoff at current scale; revisit if HA is ever required.
+11. **Live ERPNext currently rejects `custom_oem_no` in list queries**
+    (`DataError: Field not permitted in query`, HTTP 417). This blocks the
+    entire catalog (list + detail), not just price — the 503 error boundary
+    renders correctly, but no real data loads. Confirmed unrelated to the
+    Item Price change (the field was already in `ITEM_FIELDS`/`orFilters`
+    before this session; this session's diff doesn't touch it). Root cause
+    is server-side — ERPNext field-level permissions changed on the live
+    instance since the last verified session (2026-09-14 had it working) —
+    needs ERPNext admin to restore read permission on `custom_oem_no` for
+    the API user/role before any further live verification, including the
+    Item Price work above, can proceed.
 
 ## Decisions recorded
 
@@ -116,10 +131,62 @@ changes (see `AGENTS.md` → Documentation maintenance).
   `route.ts`; exported React component symbols remain PascalCase. Existing
   PascalCase component files are legacy exceptions until intentionally renamed
   with their imports.
+- Pricing decision: catalog price reads ERPNext `Item Price` (`selling=1`),
+  not `Item.standard_rate`. Tie-break for multiple matching price-list rows:
+  prefer `price_list === "Standard Selling"`, else most recently `modified`,
+  else first seen; no match → price `0` (never falls back to `standard_rate`,
+  which is stale/incidental data on this instance). `standard_rate` dropped
+  from `ITEM_FIELDS`/sort entirely. Price sort (`price_asc`/`price_desc`) is
+  now resolved in-memory over the full filtered id set (joined price map),
+  not a server-side ERPNext `order_by`, since `Item Price` is a separate
+  doctype with no server-side join via `listDocuments`. Decided + implemented
+  2026-09-23.
+- Myanmar name/description decision (closed): show ERPNext's native English
+  `name`/`description` as-is — no bilingual custom fields, no translation
+  layer. `custom_name_my`/`custom_description_my`/`custom_price_mmk` remain
+  unused/dead fields on the `ERPNextItem` type; not revisited. Decided
+  2026-09-23 (interview), formalizing what the code already did.
 
 ## Session handoff
 
-**Current session (2026-09-14, direct ERPNext reads):**
+**Current session (2026-09-23, Item Price pricing):**
+
+- What changed (per approved plan: switch price source from
+  `Item.standard_rate` to ERPNext `Item Price`):
+  - `types/index.type.ts`: added `ERPNextItemPrice` (`item_code`,
+    `price_list`, `selling`, `price_list_rate`, `modified`)
+  - `lib/catalog/search-products.ts`: added `fetchPriceMap` (mirrors
+    `fetchStockMap`'s chunked `in`-filter/`Promise.all` pattern, queries
+    `Item Price` with `selling=1`) + `isBetterPriceMatch` tie-break helper;
+    extracted shared `CHUNK_SIZE = 100` const; `mapItemToProduct` now takes
+    `price: number` instead of reading `item.standard_rate`; `sortToOrderBy`
+    drops the `price_asc`/`price_desc` → `standard_rate` cases (returns
+    `undefined` for those, letting the in-memory sort below decide order);
+    `searchProducts` builds `stockMap`/`priceMap` in parallel over the full
+    filtered id set, sorts `matchingIds` in-memory by price when
+    `sort` is a price sort (before pagination), and passes price through to
+    both call sites (`searchProducts`, `getProductDetail`, including related
+    products); dropped `"standard_rate"` from `ITEM_FIELDS`
+  - Docs: `ARCHITECTURE.md` (ERPNext catalog integration section — price
+    source, sort behavior), `CODING_GUIDELINES.md` (ERPNext integration —
+    price field rule), `WORKFLOW.md` (ERPNext catalog validation checklist)
+- Verified: `make check` (lint + `tsc --noEmit` + format) — all green;
+  `make build` — succeeds, all routes compile (23/23 static pages)
+- **New blocker found while verifying against live ERPNext** (see Known
+  gaps #11): `/api/products` returns 503 — live instance now rejects
+  `custom_oem_no` in list queries with `DataError: Field not permitted in
+query` (HTTP 417). Confirmed pre-existing/unrelated to this session's diff
+  (field was already requested before this change). This blocks live
+  verification of the Item Price work (steps 2-5 of the plan's verification
+  section) until ERPNext admin restores read permission on `custom_oem_no`.
+  The 503 error boundary itself was confirmed working correctly.
+- Left open: gap #11 (custom_oem_no permission) blocks live verification of
+  this session's price change; once unblocked, still need admin to populate
+  `Item Price` records and confirm the real price list name (replace the
+  `PREFERRED_PRICE_LIST` placeholder); Contact form backend, Admin CRUD,
+  Bin/stock population, mirror cleanup verification
+
+**Previous session (2026-09-14, direct ERPNext reads):**
 
 - What changed (per approved plan: ERPNext-direct, 60s cache, error state, remove sync):
   - `lib/erpnext/client.ts`: additive `orFilters` support
