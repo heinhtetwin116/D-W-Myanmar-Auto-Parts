@@ -103,10 +103,13 @@ export interface ERPNextItem {
   description?: string;
   image?: string;
   disabled?: 0 | 1; // 1 = disabled
-  standard_rate?: number; // Price (if available in this field)
+  standard_rate?: number; // Standard selling rate (interim display price)
   custom_name_my?: string;
   custom_description_my?: string;
   custom_price_mmk?: number;
+  custom_oem_no?: string; // OEM part number (verified on live instance)
+  custom_purchase_country?: string; // Verified on live instance
+  custom_products?: string; // Vehicle model, e.g. "R124" (verified)
   // ... other ERPNext fields
   [key: string]: unknown;
 }
@@ -130,10 +133,13 @@ export interface ERPNextClientOptions {
   apiSecret: string;
 }
 
+export type ERPNextFilterValue =
+  string | number | boolean | (string | number)[];
+
 export interface ERPNextListParams {
   fields?: string[];
-  filters?: Array<[string, string, string | number | boolean]>;
-  orFilters?: Array<[string, string, string | number | boolean]>;
+  filters?: Array<[string, string, ERPNextFilterValue]>;
+  orFilters?: Array<[string, string, ERPNextFilterValue]>;
   orderBy?: string;
   limitStart?: number;
   limitPageLength?: number;

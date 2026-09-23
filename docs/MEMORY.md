@@ -71,7 +71,11 @@ changes (see `AGENTS.md` → Documentation maintenance).
    `CODING_GUIDELINES.md` → Testing contracts).
 5. **No pre-push type-check.** Only CI catches TypeScript errors; the
    pre-commit hook runs lint-staged only (lint + format), not `tsc`.
-6. **ERPNext field mapping not confirmed.** Custom field names for bilingual content (`custom_name_my`, etc.) and stock source (warehouse/quantity field) must be verified against target ERPNext instance.
+6. **ERPNext content gaps (need ERPNext admin).** Field mapping itself is now
+   verified against the live instance — but it confirmed absences, not presences:
+   no Myanmar name fields (catalog falls back to English), no usable price field
+   (`standard_rate` is 0; proper fix is the Item Price DocType), and Bin is empty
+   (all stock reads 0). None of these are code blockers.
 7. **Catalog mirror cleanup unverified.** The old `categories`/`products`/`sync_runs` migration may never have been applied anywhere — verify before writing a drop migration; do not apply-then-drop blindly.
 8. **No reverse proxy / TLS termination decided.** No Traefik/Nginx (or equivalent) configured yet for routing to either container's public-facing ports. Must be decided before production deploy.
 9. **No ERPNext database backup strategy.** The dockerized MariaDB volume needs a persisted named-volume backup plan — distinct from any Droplet-level backup.
@@ -139,8 +143,43 @@ changes (see `AGENTS.md` → Documentation maintenance).
 - Verified: `make lint` 0 errors; `format:check` passes; `git diff --check`
   clean; `tsc --noEmit` exit 0 with zero errors; `/api/products` with empty
   env returns the designed 503 JSON (error path works end-to-end)
-- Left open: `.env` values (Supabase + ERPNext creds — all empty); field
-  mapping confirmation; warehouse/stock-source decision; mirror-cleanup
+- Incident note: a `Failed to parse URL from /api/resource/products` 404 was
+  reported, but disk (`lib/catalog/client.ts`) already fetches the correct
+  `/api/products` — stale Turbopack/browser bundle. Resolved by restarting
+  the dev server and clearing `.next`; verified the stale URL no longer
+  appears in served code. No code change needed.
+- Live ERPNext debugging (real `.env`, 2026-09-14) — three failures found
+  and fixed in `lib/catalog/*`:
+  1. `Item Group` has no `disabled` field on this instance → dropped from
+     fields + filters (was Frappe 417). Item `disabled` filter kept.
+  2. `Bin` query with all item codes in one `in` filter → nginx 414.
+     `fetchStockMap` now chunks codes (100/request, `Promise.all`) and
+     passes a real list value; `ERPNextFilterValue` added to central types.
+  3. SSR `fetchCatalog` used a relative URL → `ERR_INVALID_URL`, forced
+     client-only rendering (skeletons in initial HTML). Now absolute on
+     server via `NEXT_PUBLIC_APP_URL`; must use `||` not `??` because an
+     empty-string env value otherwise survives (`.env` ships the key empty).
+- Verified live: `/api/products` → `source:"erpnext"`, total 365, page 1 =
+  12 real Items, 6 real Item Groups; search `Radiator` → 4; detail page 200
+  for `DW-CH-Radiator-001`; bogus slug renders not-found UI; initial HTML
+  now contains real product data (SSR works).
+- Follow-ups: all `stock_quantity` are 0 — confirm against ERPNext Stock
+  Balance (may be genuinely empty/no Bin rows); bogus detail slug returns
+  HTTP 200 with not-found UI instead of 404 — status code needs a look.;
+  `make check` fully green for the first time
+- Live-instance mapping verified 2026-09-14 against
+  inventory.dwmyanmarautoparts.com (item `DW-CH-Radiator-001`): assumed
+  `custom_name_my` / `custom_description_my` / `custom_price_mmk` do NOT
+  exist; real custom fields are `custom_oem_no`, `custom_purchase_country`,
+  `custom_products`; Item `description` exists (HTML, now stripped);
+  Item Group has no `description`/`image`/custom fields (prior 417 cause);
+  `Bin` readable but empty. Code retargeted to verified fields only:
+  OEM/model search, specs from real custom fields, `standard_rate` interim
+  price, English fallback for Myanmar names
+- Left open: `.env` values (Supabase + ERPNext creds — all empty); ERPNext
+  admin actions needed for full catalog quality — add Myanmar name fields,
+  decide real pricing (Item Price DocType vs `standard_rate`), create stock
+  (Bin rows empty → everything reads 0); mirror-cleanup verification
   verification; Contact form backend; Admin CRUD
 
 **Previous session (2026-09-14, deployment topology decision):**

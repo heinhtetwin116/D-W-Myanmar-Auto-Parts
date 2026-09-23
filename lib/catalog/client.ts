@@ -37,9 +37,15 @@ export function catalogSearchParams(filters: CatalogFilters): URLSearchParams {
 export async function fetchCatalog(
   filters: CatalogFilters,
 ): Promise<CatalogResult> {
-  const response = await fetch(
-    `/api/products?${catalogSearchParams(filters).toString()}`,
-  );
+  // Relative URLs work in the browser but Node's fetch (SSR / prerender)
+  // requires an absolute URL — prefix with the app origin on the server.
+  // NOTE: use `||` (not `??`) so an empty-string env value still falls back.
+  const path = `/api/products?${catalogSearchParams(filters).toString()}`;
+  const baseUrl =
+    (process.env.NEXT_PUBLIC_APP_URL || "").trim() || "http://localhost:3000";
+  const url =
+    typeof window === "undefined" ? new URL(path, baseUrl).toString() : path;
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Catalog request failed: ${response.status}`);
   }
