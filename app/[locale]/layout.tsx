@@ -50,7 +50,7 @@ export default async function LocaleLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="white"
-          enableSystem
+          // enableSystem
           // disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={validLocale}>

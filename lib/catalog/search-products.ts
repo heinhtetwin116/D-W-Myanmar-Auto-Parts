@@ -278,8 +278,6 @@ export async function searchProducts(
 
   const [groups, names] = await Promise.all([
     erpnext.listDocuments<ERPNextItemGroup>("Item Group", {
-      // NOTE: Item Group has no `disabled` field on this instance — do not
-      // request or filter by it (Frappe rejects the whole query with 417).
       fields: ["name", "item_group_name", "parent_item_group"],
       orderBy: "item_group_name",
       limitPageLength: MAX_LIST_IDS,
