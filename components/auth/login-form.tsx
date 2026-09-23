@@ -7,10 +7,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { message } from "antd";
-
-interface LoginFormProps {
-  locale: "my" | "en";
-}
+import type { LoginFormProps } from "@/types/index.type";
 
 export function LoginForm({ locale }: LoginFormProps) {
   const t = useTranslations("auth.login");

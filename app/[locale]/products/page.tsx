@@ -1,15 +1,10 @@
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/loading-spinner";
 import { getMessages } from "next-intl/server";
-import ProductCatalog, {
-  type CatalogLabels,
-} from "@/components/catalog/product-catalog";
+import ProductCatalog from "@/components/catalog/product-catalog";
+import type { CatalogLabels, ProductsPageProps } from "@/types/index.type";
 import { parseLocale } from "@/lib/i18n";
 import { CATALOG_PAGE_SIZE } from "@/lib/constants";
-
-interface ProductsPageProps {
-  params: Promise<{ locale: string }>;
-}
 
 export default async function ProductsPage({ params }: ProductsPageProps) {
   const { locale: rawLocale } = await params;

@@ -1,18 +1,4 @@
-import type { Locale } from "@/lib/i18n";
-import type { Product } from "@/lib/erpnext/types";
-
-/**
- * Display DTO for `ProductCard`. Distinct from the Supabase `Product` row
- * in `lib/erpnext/types.ts` — never alias this as `Product`.
- */
-export interface ProductCardItem {
-  id: number | string;
-  code: string;
-  name: string;
-  desc: string;
-  stock: number;
-  price: string;
-}
+import type { Locale, Product, ProductCardItem } from "@/types/index.type";
 
 export function formatPriceMmk(amount: number, currencyLabel: string): string {
   return `${amount.toLocaleString()} ${currencyLabel}`;

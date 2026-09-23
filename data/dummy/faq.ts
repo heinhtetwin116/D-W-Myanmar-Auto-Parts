@@ -1,8 +1,4 @@
-export interface FaqItem {
-  id: number;
-  question: string;
-  answer: string;
-}
+import type { FaqItem } from "@/types/index.type";
 
 export const faqItems: FaqItem[] = [
   {

@@ -1,122 +1,21 @@
-  ## FIX TYPOGRAPHY
-  const fs = require("fs");
-const path = require("path");
-
-const filePath = path.join(__dirname, "app/[locale]/page.tsx");
-let content = fs.readFileSync(filePath, "utf8");
-
-// Restore original content from git first to avoid double replacement mess
-const { execSync } = require("child_process");
-execSync("git checkout -- app/[locale]/page.tsx");
-content = fs.readFileSync(filePath, "utf8");
-
-// Remove Typography import and destructuring
-content = content.replace(/, Typography/, "");
-content = content.replace(
-  /const \{ Title, Text, Paragraph \} = Typography;\n/,
-  "",
-);
-
-// Replace <Title level={X} ...>...</Title>
-// We can use a regex loop
-while (/<Title[^>]*level=\{([1-6])\}[^>]*>([\s\S]*?)<\/Title>/.test(content)) {
-  content = content.replace(
-    /<Title([^>]*)level=\{([1-6])\}([^>]*)>([\s\S]*?)<\/Title>/g,
-    (match, before, level, after, inner) => {
-      return `<h${level}${before}${after}>${inner}</h${level}>`;
-    },
-  );
-}
-
-// Replace <Paragraph ...>...</Paragraph>
-content = content.replace(
-  /<Paragraph([^>]*)>([\s\S]*?)<\/Paragraph>/g,
-  "<p$1>$2</p>",
-);
-
-// Replace <Text ...>...</Text>
-content = content.replace(
-  /<Text([^>]*)>([\s\S]*?)<\/Text>/g,
-  "<span$1>$2</span>",
-);
-
-fs.writeFileSync(filePath, content);
-console.log("Fixed Typography in page.tsx");
-
-  
-## CODE QUALITY CHECK CI WORKFLOW
-  Only one hook. Here's the full picture:
-  ──────
-  ## What happens before and after git commit + git push
-  ### git commit
-
-    You run: git commit -m "feat: add something"
-
-  Husky intercepts → fires .husky/pre-commit → runs lint-staged
-  lint-staged looks at only your staged files (not the whole codebase) and runs:
-    *.{ts,tsx,js,mjs}          → eslint --fix   (auto-fixes lint issues, re-stages the file)
-    *.{ts,tsx,js,mjs,json,css,md} → prettier --write  (auto-formats, re-stages the file)
-   Outcome                                                                            | What happens
-  ------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------
-   ✅ All pass                                                                        | Commit is created
-   ❌ ESLint finds unfixable errors                                                   | Commit is aborted — you must fix manually
-   ❌ Prettier fails (unlikely with --write)                                          | Commit is aborted
-  │ There is no typecheck in the pre-commit hook — TypeScript errors won't block a commit locally.
-  ──────
-  ### git push
-
-  Nothing runs locally — no pre-push hook exists.
-
-  The push lands on GitHub and triggers two CI workflows in parallel:
-  #### ci.yml — triggered on every push to main / develop
-
-    quality job
-      ├── npm ci
-      ├── eslint .              ← full codebase, not just staged files
-      ├── tsc --noEmit          ← TypeScript check (first time errors are caught!)
-      └── prettier --check .    ← format verification (read-only)
-    
-    build job  (only runs if quality passes)
-      ├── npm ci
-      └── next build            ← full production build with Supabase env vars injected
-  #### codeql.yml — triggered on push to main / develop (if TS/JS files changed)
-
-    analyze job
-      ├── npm ci
-      ├── autobuild             ← CodeQL traces the build
-      └── CodeQL analyze        ← scans for security vulnerabilities
-          reports → GitHub Security tab
-  ──────
-  ### Full timeline
-
-    git commit
+ERPNext (Item / Item Group)
+        │  REST API, token auth
+        ▼
+lib/erpnext/client.ts   (ERPNextClient — raw HTTP wrapper)
         │
-        └─► pre-commit (husky)
-                └─► lint-staged (staged files only)
-                        ├─ ESLint --fix
-                        └─ Prettier --write
-                                │
-                        ✅ commit created  /  ❌ aborted
-
-    git push
+        ▼
+lib/erpnext/sync.ts     (syncCatalogFromERPNext — transform + upsert)
         │
-        └─► GitHub Actions (ci.yml)
-                ├─► quality: ESLint + tsc + Prettier check
-                └─► build:   next build  (needs quality ✅)
+        ▼
+Supabase (categories, products, sync_runs tables)
+        │
+        ▼
+lib/erpnext/queries.ts  (typed Supabase reads — getProducts, getCategories, etc.)
+        │
+        ▼
+app/[locale]/products/page.tsx  (Server Components, never touch ERPNext directly)
 
-        └─► GitHub Actions (codeql.yml)
-                └─► security scan → GitHub Security tab
-  ──────
-  ### Notable gap
-
-  TypeScript errors can slip into a commit because tsc --noEmit only runs in CI, not in the pre-commit hook. If you want to catch them locally before push, you can add a
-  commit-msg or pre-push hook:
-
-    # .husky/pre-push
-    npx tsc --noEmit
-
-
-
+---------------------------------------------------------------------------------------------------------------------------
     
 ## CODE QUALITY CHECK CI
 

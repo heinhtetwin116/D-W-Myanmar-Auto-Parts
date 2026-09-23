@@ -3,19 +3,10 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getCategoryById,
-  getProductById,
-  getProductsByCategory,
-} from "@/lib/erpnext/queries";
-import ProductDetail, {
-  type DetailLabels,
-} from "@/components/catalog/product-detail";
+import { getProductDetail } from "@/lib/catalog/search-products";
+import ProductDetail from "@/components/catalog/product-detail";
+import type { DetailLabels, ProductDetailPageProps } from "@/types/index.type";
 import { parseLocale } from "@/lib/i18n";
-
-interface ProductDetailPageProps {
-  params: Promise<{ locale: string; slug: string }>;
-}
 
 export default async function ProductDetailPage({
   params,
@@ -25,24 +16,16 @@ export default async function ProductDetailPage({
   const messages = await getMessages({ locale });
 
   const supabase = await createClient();
-  const product = await getProductById(supabase, slug).catch((error) => {
+  const result = await getProductDetail(supabase, slug).catch((error) => {
     console.error("Failed to load product:", error);
     return null;
   });
 
-  if (!product) {
+  if (!result) {
     notFound();
   }
 
-  const [category, related] = await Promise.all([
-    getCategoryById(supabase, product.category_id).catch(() => null),
-    getProductsByCategory(supabase, product.category_id, { limit: 5 }).catch(
-      () => [],
-    ),
-  ]);
-  const relatedProducts = related
-    .filter((item) => item.id !== product.id)
-    .slice(0, 4);
+  const { product, category, related: relatedProducts } = result;
 
   const t = messages.products.detail;
   const name = locale === "my" ? product.name_my : product.name_en;

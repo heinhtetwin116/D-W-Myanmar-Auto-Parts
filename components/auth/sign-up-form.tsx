@@ -7,10 +7,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { message } from "antd";
-
-interface SignUpFormProps {
-  locale: "my" | "en";
-}
+import type { SignUpFormProps } from "@/types/index.type";
 
 export function SignUpForm({ locale }: SignUpFormProps) {
   const t = useTranslations("auth.signup");

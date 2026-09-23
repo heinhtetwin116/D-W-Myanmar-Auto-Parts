@@ -1,17 +1,7 @@
 import { getMessages } from "next-intl/server";
 import { Card } from "antd";
 import { Suspense } from "react";
-
-interface AuthErrorPageProps {
-  params: Promise<{ locale: "my" | "en" }>;
-  searchParams: Promise<{ error?: string }>;
-}
-
-interface ErrorMessages {
-  title: string;
-  code_error: string;
-  unspecified: string;
-}
+import type { AuthErrorPageProps, ErrorMessages } from "@/types/index.type";
 
 async function ErrorContent({
   searchParams,

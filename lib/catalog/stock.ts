@@ -1,9 +1,5 @@
 import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
-
-/**
- * Stock availability buckets used by catalog filters and status badges.
- */
-export type StockFilter = "in_stock" | "low_stock" | "out_of_stock";
+import type { StockBadgeTone, StockFilter } from "@/types/index.type";
 
 export function getStockStatus(quantity: number): StockFilter {
   if (quantity <= 0) return "out_of_stock";
@@ -17,8 +13,6 @@ export function matchesStockFilter(
 ): boolean {
   return getStockStatus(quantity) === stock;
 }
-
-export type StockBadgeTone = "success" | "warning" | "critical";
 
 export function stockBadgeTone(quantity: number): StockBadgeTone {
   const status = getStockStatus(quantity);

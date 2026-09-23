@@ -3,7 +3,7 @@
  */
 
 export { ERPNextClient, createERPNextClient } from "./client";
-export type { ERPNextListParams, ERPNextDocType } from "./client";
+export type { ERPNextListParams, ERPNextDocType } from "@/types/index.type";
 
 export type {
   Category,
@@ -11,7 +11,7 @@ export type {
   SyncRun,
   ERPNextItemGroup,
   ERPNextItem,
-} from "./types";
+} from "@/types/index.type";
 
 export {
   getCategories,
@@ -23,4 +23,4 @@ export {
 } from "./queries";
 
 export { syncCatalogFromERPNext } from "./sync";
-export type { SyncResult } from "./sync";
+export type { SyncResult } from "@/types/index.type";

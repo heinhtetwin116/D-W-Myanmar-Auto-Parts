@@ -1,4 +1,4 @@
-import type { ProductCardItem } from "@/lib/catalog/product-card-item";
+import type { ProductCardItem } from "@/types/index.type";
 
 export const featuredProducts: ProductCardItem[] = [
   {

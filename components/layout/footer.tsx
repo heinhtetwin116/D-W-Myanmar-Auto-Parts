@@ -146,7 +146,7 @@ const Footer = () => {
         </div>
 
         {/* BOTTOM SECTION: Contact Info (Moved to its own row for better spacing) */}
-        <div className="border-t border-primary-foreground/10 pt-8 pb-10">
+        <div className="pt-8 pb-10">
           <h4 className="font-bold mb-4 text-primary-foreground">
             Contact Info
           </h4>

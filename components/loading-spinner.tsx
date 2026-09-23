@@ -1,7 +1,4 @@
-interface LoadingSpinnerProps {
-  label?: string;
-  className?: string;
-}
+import type { LoadingSpinnerProps } from "@/types/index.type";
 
 /**
  * Server-safe loading spinner (plain HTML + semantic tokens, no antd).
