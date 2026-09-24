@@ -332,5 +332,25 @@
   "value_props": {
     "title": "Why Choose D&W Auto Parts?",
     "subtitle": "We combine carefully curated products with exceptional service to keep your vehicle running at its best with confidence and peace of mind."
+  },
+  "header": {
+    "about": "About Us",
+    "contacts": "Contacts",
+    "howToOrder": "How to order",
+    "tagline": "Auto Parts for Cars",
+    "home": "Home",
+    "catalog": "Catalog",
+    "categories": "Categories",
+    "blogs": "Blogs",
+    "myAccount": "My Account",
+    "shopByCategory": "Shop by Category",
+    "viewAll": "View all products",
+    "loadError": "Couldn't load categories.",
+    "empty": "No categories available.",
+    "language": "Language",
+    "searchPlaceholder": "Search by OEM No, Brand, Category, Car Name",
+    "search": "Search",
+    "logoAlt": "D&W Auto Parts Logo",
+    "homeLabel": "D and W Auto Parts Home"
   }
 }
