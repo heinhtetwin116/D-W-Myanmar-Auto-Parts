@@ -102,39 +102,104 @@
     "copyright": "© 2024 D&W Myanmar Auto Parts. All rights reserved."
   },
   "about": {
-    "hero_title": "About D&W Myanmar Auto Parts",
-    "hero_subtitle": "Over 20 years of excellence in providing premium auto parts solutions",
-    "story_title": "Our Story",
-    "story_description": "D&W Myanmar Auto Parts was founded in 2004 in Yangon with a vision to provide premium quality auto parts to the Myanmar market. Starting at a time when quality parts were scarce, we recognized the critical importance of reliable components for vehicle safety and performance.",
-    "story_description2": "Today, we stand as one of Myanmar's leading auto parts suppliers, partnering with renowned manufacturers and serving customers nationwide with an extensive catalog of genuine and OEM parts.",
-    "mission_title": "Our Mission",
-    "mission_description": "To provide Myanmar's automotive community with premium quality parts at competitive prices, backed by exceptional service.",
-    "vision_title": "Our Vision",
-    "vision_description": "To become Myanmar's premier auto parts destination, serving over 80% of the country's automotive parts market.",
-    "values_title": "Our Values",
-    "values_description": "Our core values guide every decision we make and every interaction we have.",
-    "values": {
-      "integrity": {
-        "title": "Integrity",
-        "description": "Upholding honesty and ethical practices in all business dealings"
+    "hero": {
+      "eyebrow": "ABOUT D&W",
+      "title": "Over 30 Years of Experience in Automotive Spare Parts",
+      "subtitle": "D&W has been serving Myanmar's automotive spare parts industry since 1995, building expertise in <p>OEM spare parts</p>, vehicle compatibility, reliable sourcing, and <c>customer service</c>.",
+      "since": "Since",
+      "sinceYear": "1995",
+      "spec_oem": "OEM No.",
+      "spec_fit": "Fitment",
+      "spec_stock": "Stock"
+    },
+    "intro": {
+      "title": "Built on Experience. Moving Forward with Technology.",
+      "p1": "D&W began its operations in 1995, initially as a pen-related business before transitioning into the automotive spare parts industry. Over the years, the company developed a strong understanding of automotive spare parts, OEM information, product compatibility, and sourcing.",
+      "p2": "Today, D&W combines decades of industry experience with modern technology to make automotive spare-parts sourcing more accurate, transparent, and efficient.",
+      "stat_years": "Years in the industry",
+      "stat_countries": "Sourcing countries",
+      "stat_since": "Operating since"
+    },
+    "story": {
+      "title": "Our Story",
+      "label": "Company timeline",
+      "m1": {
+        "year": "1995",
+        "title": "The Beginning",
+        "p1": "D&W began its operations in 1995, initially as a pen-related business before transitioning into the automotive spare parts industry. The company entered the market with air filter color-changing machinery and gradually expanded its product range, with a strong focus on valve cover gaskets and brake shoes.",
+        "p2": "Over the years, D&W built a reliable supplier network across Taiwan, China, South Korea, and Japan."
       },
-      "quality": {
-        "title": "Quality",
-        "description": "Delivering consistent excellence in every product we supply"
+      "m2": {
+        "year": "2006",
+        "title": "Expanding Automotive Expertise",
+        "p1": "In 2006, one of D&W's founders returned to Myanmar and became fully involved in the company's operations.",
+        "p2": "During this period, D&W also imported and sold selected Japanese vehicles, allowing the company to develop a deeper understanding of OEM numbers, vehicle compatibility, and spare-parts applications."
       },
-      "customer": {
-        "title": "Customer Focus",
-        "description": "Putting our customers' needs at the heart of everything we do"
-      },
-      "innovation": {
-        "title": "Innovation",
-        "description": "Embracing new technologies and continuous improvement"
+      "m3": {
+        "year": "2026",
+        "title": "Moving Into the Digital Era",
+        "p1": "In 2026, D&W entered a new stage of growth by developing a <p>Digital B2B Platform</p> together with an integrated ERP inventory management system.",
+        "p2": "This transformation aims to improve inventory accuracy, streamline order processing, strengthen customer service, and provide more efficient and reliable delivery timelines for customers across Myanmar."
       }
     },
-    "team_title": "Our Team",
-    "team_description": "Our team comprises experienced automotive engineers and sales professionals dedicated to helping you find the right parts.",
-    "location_title": "Our Locations",
-    "location_description": "With showrooms in Yangon and Mandalay, plus nationwide delivery, we're always within reach."
+    "vision": {
+      "eyebrow": "OUR VISION",
+      "title": "To become Myanmar's most trusted OEM spare parts supplier.",
+      "statement": "To become Myanmar's most trusted OEM spare parts supplier by providing accurate, reliable products with the shortest possible delivery time."
+    },
+    "principles": {
+      "title": "How We Operate",
+      "subtitle": "The principles behind how D&W serves customers and manages its business.",
+      "oem": {
+        "title": "OEM Accuracy",
+        "description": "We ensure that customers receive the right spare parts with accurate OEM information and vehicle compatibility."
+      },
+      "supply": {
+        "title": "Reliable Supply",
+        "description": "We build strong relationships with trusted suppliers to maintain consistent product quality and availability."
+      },
+      "time": {
+        "title": "Minimum Waiting Time",
+        "description": "We continuously improve our inventory, logistics, and ordering systems to reduce delivery times and get products to customers as quickly as possible."
+      },
+      "transparency": {
+        "title": "Transparency",
+        "description": "We provide clear product information, pricing, availability, and realistic delivery timelines."
+      },
+      "customer": {
+        "title": "Customer First",
+        "description": "We focus on understanding our customers' needs and building long-term relationships through dependable service."
+      },
+      "improvement": {
+        "title": "Continuous Improvement",
+        "description": "We use technology, ERP systems, and better inventory planning to make our operations faster, more accurate, and more efficient."
+      }
+    },
+    "suppliers": {
+      "title": "A Reliable Supplier Network",
+      "text": "D&W has developed supplier relationships across key automotive parts markets in Asia, including Taiwan, China, South Korea, and Japan.",
+      "list_label": "Supplier countries",
+      "taiwan": "Taiwan",
+      "china": "China",
+      "korea": "South Korea",
+      "japan": "Japan"
+    },
+    "digital": {
+      "title": "From Industry Experience to Digital B2B",
+      "text1": "In 2026, D&W began developing a <p>Digital B2B Platform</p> integrated with an ERP inventory management system.",
+      "text2": "The goal is to connect D&W's industry knowledge with better technology, product information, order processing, <c>customer service</c>, and delivery planning.",
+      "flow_label": "How the transformation connects",
+      "step1": "Industry Experience",
+      "step2": "ERP Inventory",
+      "step3": "Digital B2B Platform",
+      "step4": "Better Customer Experience"
+    },
+    "cta": {
+      "title": "Looking for the Right Spare Parts?",
+      "text": "Explore our automotive spare parts catalog or get in touch with D&W for assistance.",
+      "products": "Explore Products",
+      "contact": "Contact Us"
+    }
   },
   "products": {
     "title": "Auto Parts Catalog",
