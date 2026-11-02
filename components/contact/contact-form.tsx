@@ -27,9 +27,9 @@ export default function ContactForm({ labels }: ContactFormProps) {
       setSuccess(true);
       form.resetFields();
       message.success(labels.success);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : labels.error;
+        err instanceof Error ? err.message : labels.error;
       setError(errorMessage);
       message.error(errorMessage);
     } finally {
@@ -39,35 +39,44 @@ export default function ContactForm({ labels }: ContactFormProps) {
 
   if (success) {
     return (
-      <Card>
-        <p className="text-success">{labels.success}</p>
+      <Card className="shadow-sm">
+        <div className="py-8 text-center space-y-4">
+          <p className="text-success font-medium text-base">{labels.success}</p>
+          <Button type="default" onClick={() => setSuccess(false)}>
+            {labels.submit}
+          </Button>
+        </div>
       </Card>
     );
   }
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <Form form={form} onFinish={handleSubmit} layout="vertical">
-        <Form.Item
-          name="name"
-          label={labels.name}
-          rules={[{ required: true, message: labels.name }]}
-        >
-          <Input placeholder={labels.name} />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label={labels.email}
-          rules={[
-            { required: true, message: labels.email },
-            { type: "email", message: labels.email },
-          ]}
-        >
-          <Input placeholder={labels.email} type="email" />
-        </Form.Item>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+          <Form.Item
+            name="name"
+            label={labels.name}
+            rules={[{ required: true, message: labels.name }]}
+          >
+            <Input placeholder={labels.name} />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label={labels.email}
+            rules={[
+              { required: true, message: labels.email },
+              { type: "email", message: labels.email },
+            ]}
+          >
+            <Input placeholder={labels.email} type="email" />
+          </Form.Item>
+        </div>
+
         <Form.Item name="phone" label={labels.phone}>
           <Input placeholder={labels.phone} type="tel" />
         </Form.Item>
+
         <Form.Item
           name="message"
           label={labels.message}
@@ -75,18 +84,20 @@ export default function ContactForm({ labels }: ContactFormProps) {
         >
           <Input.TextArea placeholder={labels.messagePlaceholder} rows={5} />
         </Form.Item>
+
         {error && (
           <p role="alert" className="mb-4 text-sm text-destructive">
             {error}
           </p>
         )}
+
         <Form.Item className="!mb-0">
           <Button
             type="primary"
             htmlType="submit"
             block
             loading={isLoading}
-            className="hex-bloom"
+            className="hex-bloom h-10 font-semibold"
           >
             {isLoading ? labels.submitting : labels.submit}
           </Button>

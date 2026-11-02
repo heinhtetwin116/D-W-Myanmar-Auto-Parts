@@ -246,6 +246,7 @@ export interface ProductCardItem {
   desc: string;
   stock: number;
   price: string;
+  image_url: string | null;
 }
 
 export interface ProductBadge {

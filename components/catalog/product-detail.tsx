@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
-  Badge,
   Button,
   Card,
   Col,
   Descriptions,
-  Divider,
   Empty,
   Image,
   Row,
@@ -17,14 +16,24 @@ import {
 import {
   ArrowLeftOutlined,
   PictureOutlined,
-  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import type { ProductDetailProps } from "@/types/index.type";
 import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
 import { formatPriceMmk } from "@/lib/catalog/product-card-item";
-import { getStockStatus } from "@/lib/catalog/stock";
+import AddToCartButton from "@/components/cart/add-to-cart-button";
 
 const { Title, Text, Paragraph } = Typography;
+
+function resolveImageUrl(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_ERPNEXT_BASE_URL ||
+    process.env.ERPNEXT_BASE_URL ||
+    ""
+  ).replace(/\/$/, "");
+  return `${baseUrl}${url.startsWith("/") ? url : `/${url}`}`;
+}
 
 export default function ProductDetail({
   locale,
@@ -36,22 +45,52 @@ export default function ProductDetail({
   productsLabel,
   currentLabel,
 }: ProductDetailProps) {
-  const name = locale === "my" ? product.name_my : product.name_en;
+  const tDetail = useTranslations("products.detail");
+  // ERPNext currently provides English item names/descriptions only for many
+  // products. Fall back to English instead of leaving the Myanmar page blank.
+  const name =
+    (locale === "my" ? product.name_my : product.name_en) ||
+    product.name_en ||
+    product.name_my ||
+    product.sku;
   const description =
-    locale === "my" ? product.description_my : product.description_en;
+    (locale === "my" ? product.description_my : product.description_en) ||
+    product.description_en ||
+    product.description_my ||
+    "";
 
-  const stockStatus = getStockStatus(product.stock_quantity);
-  const stockBadge =
-    stockStatus === "out_of_stock"
-      ? { status: "error" as const, text: labels.outOfStock }
-      : stockStatus === "low_stock"
-        ? { status: "warning" as const, text: labels.lowStock }
-        : { status: "success" as const, text: labels.inStock };
+  const isMyanmar = locale === "my";
+
+  const specLabel = (key: string) => {
+    if (!isMyanmar) {
+      return key.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    const normalized = key.replace(/[._-]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+    const translations: Record<string, string> = {
+      "purchase country": "ဝယ်ယူသည့်နိုင်ငံ",
+      "country of origin": "မူရင်းနိုင်ငံ",
+      "blade or refill": "Blade အမျိုးအစား",
+      "products": "အမျိုးအစား",
+      "size": "အရွယ်အစား",
+      "weight": "အလေးချိန်",
+      "material": "ပစ္စည်းအမျိုးအစား",
+      "brand": "အမှတ်တံဆိပ်",
+      "model": "မော်ဒယ်",
+      "vehicle model": "ကားမော်ဒယ်",
+      "car name": "ကားအမည်",
+      "length": "အလျား",
+      "width": "အနံ",
+      "height": "အမြင့်",
+    };
+    return translations[normalized] ?? key.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+  };
 
   const specEntries = Object.entries(product.specifications ?? {});
+  const mainImageUrl = resolveImageUrl(product.image_url);
 
   return (
-    <div>
+    <div className="space-y-6 pb-8">
       <ProductsBreadcrumb
         locale={locale}
         homeLabel={homeLabel}
@@ -60,15 +99,15 @@ export default function ProductDetail({
           { label: currentLabel },
         ]}
       />
-      <Row gutter={[24, 24]}>
-        <Col xs={24} lg={10}>
-          <Card bordered className="overflow-hidden">
-            <div className="flex min-h-80 items-center justify-center bg-muted">
-              {product.image_url ? (
+      <Row gutter={[28, 28]} align="top">
+        <Col xs={24} lg={11}>
+          <Card variant="outlined" className="overflow-hidden !rounded-2xl !border-border !shadow-sm">
+            <div className="flex min-h-[320px] items-center justify-center rounded-xl bg-white p-5 sm:min-h-[420px]">
+              {mainImageUrl ? (
                 <Image
-                  src={product.image_url}
+                  src={mainImageUrl}
                   alt={name}
-                  className="max-h-96 w-full object-contain"
+                  className="max-h-[390px] w-full object-contain"
                 />
               ) : (
                 <Empty
@@ -83,37 +122,46 @@ export default function ProductDetail({
           </Card>
         </Col>
 
-        <Col xs={24} lg={14}>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
+        <Col xs={24} lg={13}>
+          <Card variant="outlined" className="!rounded-2xl !border-border !shadow-sm">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <Link href={`/${locale}/products?category=${product.category_id}`}>
               <Tag color="red">{categoryName}</Tag>
             </Link>
-            <Badge status={stockBadge.status} text={stockBadge.text} />
           </div>
-          <Title level={2} className="!mb-1">
+          <Title level={2} className="!mb-2 !text-2xl sm:!text-3xl">
             {name}
           </Title>
-          <Text type="secondary">SKU: {product.sku}</Text>
 
-          <div className="mt-4">
-            <Text className="text-3xl font-bold text-accent">
+          <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <Text className="text-xl font-bold text-accent sm:text-2xl">
               {formatPriceMmk(product.price_mmk, labels.currency)}
+            </Text>
+            <Text type="secondary" className="text-xs sm:text-sm">
+              {tDetail("price_notice")}
             </Text>
           </div>
 
           {description && (
-            <Paragraph className="mt-4 text-base">{description}</Paragraph>
+            <Paragraph className="mt-4 text-base leading-7 text-foreground/80">
+              {description}
+            </Paragraph>
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
+            <AddToCartButton
+              product={{
+                id: String(product.id),
+                code: product.sku,
+                name,
+                price: product.price_mmk,
+                imageUrl: product.image_url ?? undefined,
+              }}
+              label={isMyanmar ? "ခြင်းထဲထည့်ရန်" : "Add to cart"}
+              size="large"
+            />
             <Link href={`/${locale}/contact`}>
-              <Button
-                type="primary"
-                size="large"
-                icon={<ShoppingCartOutlined />}
-                className="hex-bloom"
-                disabled={product.stock_quantity <= 0}
-              >
+              <Button size="large">
                 {labels.enquire}
               </Button>
             </Link>
@@ -125,43 +173,54 @@ export default function ProductDetail({
           </div>
 
           {specEntries.length > 0 && (
-            <>
-              <Divider />
-              <Title level={4}>{labels.specs}</Title>
-              <Descriptions bordered column={{ xs: 1, sm: 2 }} size="small">
+            <div className="mt-7 border-t border-border pt-5">
+              <Title level={4} className="!mb-4">{labels.specs}</Title>
+              <Descriptions
+                bordered
+                column={{ xs: 1, sm: 1, md: 2 }}
+                size="middle"
+                className="product-specifications"
+              >
                 {specEntries.map(([key, value]) => (
-                  <Descriptions.Item key={key} label={key}>
+                  <Descriptions.Item key={key} label={specLabel(key)}>
                     {String(value)}
                   </Descriptions.Item>
                 ))}
               </Descriptions>
-            </>
+            </div>
           )}
+          </Card>
         </Col>
       </Row>
 
       {related.length > 0 && (
-        <div className="mt-12">
-          <Title level={3} className="mb-6">
+        <div className="mt-6">
+          <Title level={3} className="!mb-5">
             {labels.relatedProducts}
           </Title>
           <Row gutter={[16, 16]}>
             {related.map((item) => {
-              const itemName = locale === "my" ? item.name_my : item.name_en;
+              const itemName =
+                (locale === "my" ? item.name_my : item.name_en) ||
+                item.name_en ||
+                item.name_my ||
+                item.sku;
+              const relatedImageUrl = resolveImageUrl(item.image_url);
+
               return (
                 <Col key={item.id} xs={24} sm={12} lg={6}>
                   <Link href={`/${locale}/products/${item.id}`}>
                     <Card
                       hoverable
-                      className="h-full hex-bloom"
+                      className="h-full !overflow-hidden !rounded-xl !border-border hex-bloom"
                       cover={
-                        <div className="flex h-40 items-center justify-center overflow-hidden bg-muted">
-                          {item.image_url ? (
+                        <div className="flex h-44 items-center justify-center overflow-hidden bg-white p-3">
+                          {relatedImageUrl ? (
                             <Image
-                              src={item.image_url}
+                              src={relatedImageUrl}
                               alt={itemName}
                               preview={false}
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-contain transition-transform duration-300 hover:scale-105"
                             />
                           ) : (
                             <PictureOutlined className="text-4xl text-muted-foreground" />
@@ -169,7 +228,7 @@ export default function ProductDetail({
                         </div>
                       }
                     >
-                      <Title level={5} ellipsis={{ rows: 2 }} className="!mb-1">
+                      <Title level={5} ellipsis={{ rows: 2 }} className="!mb-2">
                         {itemName}
                       </Title>
                       <Text strong className="text-accent">

@@ -95,11 +95,13 @@
     "quick_links": "Quick Links",
     "contact_info": "Contact Information",
     "address": "No. 123, Auto Parts Street, Yangon, Myanmar",
-    "phone": "+95 1 234 5678",
-    "email": "info@dwautoparts.com.mm",
+    "phone": "09765006774 / 09455096809",
+    "email": "admin@dwmyanmarautoparts.com",
     "follow_us": "Follow Us",
-    "hours": "Mon - Sat: 9:00 AM - 6:00 PM",
-    "copyright": "© 2024 D&W Myanmar Auto Parts. All rights reserved."
+    "hours": "Mon - Fri: 10:00 AM - 4:45 PM",
+    "copyright": "© 2024 D&W Myanmar Auto Parts. All rights reserved.",
+    "viber_phone": "Viber / Phone",
+    "phone_call_only": "Phone calls only"
   },
   "about": {
     "hero": {
@@ -113,12 +115,12 @@
       "spec_stock": "Stock"
     },
     "intro": {
-      "title": "Built on Experience. Moving Forward with Technology.",
-      "p1": "D&W began its operations in 1995, initially as a pen-related business before transitioning into the automotive spare parts industry. Over the years, the company developed a strong understanding of automotive spare parts, OEM information, product compatibility, and sourcing.",
-      "p2": "Today, D&W combines decades of industry experience with modern technology to make automotive spare-parts sourcing more accurate, transparent, and efficient.",
-      "stat_years": "Years in the industry",
-      "stat_countries": "Sourcing countries",
-      "stat_since": "Operating since"
+      "title": "Built on Experience. Moving Forward with Technology",
+      "p1": "Founded in 1995, D&W began its journey in the stationery business before expanding into the automotive spare parts industry. Through years of experience, we have built strong expertise in OEM parts, product compatibility, and reliable sourcing.",
+      "p2": "Today, we combine our extensive industry knowledge with modern technology to deliver a more accurate, transparent, and efficient automotive spare parts sourcing experience for our customers.",
+      "stat_years": "Years of Experience",
+      "stat_countries": "Sourcing Countries",
+      "stat_since": "Established Since"
     },
     "story": {
       "title": "Our Story",
@@ -145,7 +147,7 @@
     "vision": {
       "eyebrow": "OUR VISION",
       "title": "To become Myanmar's most trusted OEM spare parts supplier.",
-      "statement": "To become Myanmar's most trusted OEM spare parts supplier by providing accurate, reliable products with the shortest possible delivery time."
+      "statement": "We aim to earn our customers' trust through high-quality OEM spare parts, competitive pricing, and fast, reliable delivery."
     },
     "principles": {
       "title": "How We Operate",
@@ -160,11 +162,11 @@
       },
       "time": {
         "title": "Minimum Waiting Time",
-        "description": "We continuously improve our inventory, logistics, and ordering systems to reduce delivery times and get products to customers as quickly as possible."
+        "description": "Within 1-2 business days in Yangon, and 1-2 days drop-off at highway bus terminals for regional deliveries."
       },
       "transparency": {
         "title": "Transparency",
-        "description": "We provide clear product information, pricing, availability, and realistic delivery timelines."
+        "description": "We provide accurate product details, transparent pricing, real-time availability, and reliable delivery information to help customers shop with confidence."
       },
       "customer": {
         "title": "Customer First",
@@ -231,7 +233,8 @@
       "description": "Description",
       "enquire": "Enquire to Buy",
       "back_to_catalog": "Back to Catalog",
-      "related_products": "Related Products"
+      "related_products": "Related Products",
+      "price_notice": "Prices are subject to change."
     },
     "no_results": "No products found matching your criteria"
   },
@@ -254,9 +257,9 @@
     "info": {
       "title": "Contact Information",
       "address": "No. 123, Auto Parts Street, Yangon, Myanmar",
-      "phone": "+95 1 234 5678",
-      "email": "info@dwautoparts.com.mm",
-      "hours": "Mon - Sat: 9:00 AM - 6:00 PM"
+      "phone": "09765006774 / 09455096809",
+      "email": "admin@dwmyanmarautoparts.com",
+      "hours": "Mon - Fri: 10:00 AM - 4:45 PM"
     }
   },
   "admin": {
@@ -370,13 +373,13 @@
   },
   "features": {
     "fast_delivery": "Fast Delivery",
-    "fast_delivery_desc": "Delivery within 1-3 days across Myanmar",
-    "support": "24/7 Support",
-    "support_desc": "Premium customer service and technical assistance",
-    "easy_returns": "Easy Returns",
-    "easy_returns_desc": "Free 30-day returns on all orders",
-    "best_price": "Best Price",
-    "best_price_desc": "Direct from manufacturer - lowest prices guaranteed"
+    "fast_delivery_desc": "1-2 days in Yangon, 1-2 days to bus terminals for other cities",
+    "support": "Customer Support",
+    "support_desc": "Expert advice on parts matching and inquiries",
+    "warranty": "Quality Assured",
+    "warranty_desc": "Genuine parts meeting international standards",
+    "best_price": "Competitive Pricing",
+    "best_price_desc": "Fair and transparent pricing direct from suppliers"
   },
   "categories": {
     "all": "All",
@@ -401,12 +404,12 @@
   "header": {
     "about": "About Us",
     "contacts": "Contacts",
-    "howToOrder": "How to order",
-    "tagline": "Auto Parts for Cars",
+    "addToCart": "Add to Cart",
+    "tagline": "Auto Parts for Cars | 🇹🇼 🇨🇳 🇰🇷 🇯🇵 🇲🇲",
     "home": "Home",
     "catalog": "Catalog",
     "categories": "Categories",
-    "blogs": "Blogs",
+
     "myAccount": "My Account",
     "shopByCategory": "Shop by Category",
     "viewAll": "View all products",
@@ -417,5 +420,34 @@
     "search": "Search",
     "logoAlt": "D&W Auto Parts Logo",
     "homeLabel": "D and W Auto Parts Home"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about our auto parts and services.",
+    "items": [
+      {
+        "question": "How do I know if a part is compatible with my vehicle?",
+        "answer": "Check the OEM part number and your vehicle's make, model, and year. If you are unsure, contact our team for assistance."
+      },
+      {
+        "question": "What is your return and warranty policy?",
+        "answer": "Return and warranty conditions may vary by product. Please contact our team with your order details to confirm the applicable policy."
+      },
+      {
+        "question": "How long does delivery take within Myanmar?",
+        "answer": "Delivery within Yangon typically takes 1–2 days. For other cities, delivery to highway bus terminals typically takes 1–2 days, depending on the arrangement."
+      },
+      {
+        "question": "Do you offer bulk pricing for auto repair shops?",
+        "answer": "Please contact our team with your required products and quantities to discuss bulk orders and applicable pricing."
+      },
+      {
+        "question": "Are your auto parts genuine OEM or aftermarket?",
+        "answer": "Our catalog may include different types of auto parts. Please check each product's details or contact our team to confirm its origin and specifications."
+      }
+    ],
+    "label": "Support",
+    "contactPrompt": "Still have questions?",
+    "contactLink": "Contact our support team"
   }
 }

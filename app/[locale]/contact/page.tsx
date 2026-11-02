@@ -51,7 +51,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
       </h1>
       <p className="mt-2 mb-8 text-muted-foreground">{t.subtitle}</p>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5 items-stretch">
         <div className="lg:col-span-3">
           <Suspense fallback={<LoadingSpinner />}>
             <ContactForm labels={formLabels} />
@@ -62,6 +62,20 @@ export default async function ContactPage({ params }: ContactPageProps) {
             <ContactInfo labels={infoLabels} />
           </Suspense>
         </div>
+      </div>
+
+      {/* Location Map Section */}
+      <div className="mt-10 rounded-xl overflow-hidden border border-border h-80 w-full shadow-sm">
+        <iframe
+          title="Location Map"
+          src="https://maps.google.com/maps?q=16.858502,96.106782&z=16&output=embed"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
       </div>
     </div>
   );
