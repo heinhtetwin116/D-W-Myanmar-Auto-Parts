@@ -13,7 +13,6 @@
  * Specs are limited to `country_of_origin`.
  */
 
-
 import { createERPNextClient, type ERPNextClient } from "@/lib/erpnext/client";
 import type {
   CatalogResult,
@@ -388,17 +387,16 @@ export async function searchProducts(
   // If the search matched Item Specification, validate those item codes
   // against the same Item filters before adding them to the result set.
   if (specItemCodes.length > 0) {
-    const specMatchedItems = await erpnext.listDocuments<Pick<ERPNextItem, "name">>(
-      "Item",
-      {
-        fields: ["name"],
-        filters: [
-          ...baseFilters,
-          ["name", "in", specItemCodes.slice(0, MAX_LIST_IDS)],
-        ],
-        limitPageLength: MAX_LIST_IDS,
-      },
-    );
+    const specMatchedItems = await erpnext.listDocuments<
+      Pick<ERPNextItem, "name">
+    >("Item", {
+      fields: ["name"],
+      filters: [
+        ...baseFilters,
+        ["name", "in", specItemCodes.slice(0, MAX_LIST_IDS)],
+      ],
+      limitPageLength: MAX_LIST_IDS,
+    });
 
     allNames = [
       ...new Set([

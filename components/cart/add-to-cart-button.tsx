@@ -41,7 +41,10 @@ export default function AddToCartButton({
       !Number.isFinite(product.price) ||
       product.price < 0
     ) {
-      setNotice({ type: "error", text: "This product cannot be added to the cart." });
+      setNotice({
+        type: "error",
+        text: "This product cannot be added to the cart.",
+      });
       return;
     }
 
@@ -51,14 +54,19 @@ export default function AddToCartButton({
       setNotice({ type: "success", text: `${product.name} added to cart.` });
     } catch (error) {
       console.error("Failed to add product to cart:", error);
-      setNotice({ type: "error", text: "Failed to add product to cart. Please try again." });
+      setNotice({
+        type: "error",
+        text: "Failed to add product to cart. Please try again.",
+      });
     } finally {
       setAdding(false);
     }
   };
 
   return (
-    <div className={block ? "w-full" : "inline-flex flex-col items-start gap-2"}>
+    <div
+      className={block ? "w-full" : "inline-flex flex-col items-start gap-2"}
+    >
       <Button
         type="primary"
         size={size}

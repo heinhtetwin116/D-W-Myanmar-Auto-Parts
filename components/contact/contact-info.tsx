@@ -40,8 +40,12 @@ export default function ContactInfo({ labels }: ContactInfoProps) {
             <EnvironmentOutlined className="text-base" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Address</p>
-            <Text className="whitespace-pre-line text-sm leading-6 text-gray-800">{labels.address}</Text>
+            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+              Address
+            </p>
+            <Text className="whitespace-pre-line text-sm leading-6 text-gray-800">
+              {labels.address}
+            </Text>
           </div>
         </div>
 
@@ -50,9 +54,14 @@ export default function ContactInfo({ labels }: ContactInfoProps) {
             <PhoneOutlined className="text-base" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Phone & Viber</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+              Phone & Viber
+            </p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <a href={`tel:${toTelLink(primaryPhone)}`} className="text-sm font-semibold text-gray-900 transition-colors hover:text-[#a92920]">
+              <a
+                href={`tel:${toTelLink(primaryPhone)}`}
+                className="text-sm font-semibold text-gray-900 transition-colors hover:text-[#a92920]"
+              >
                 {primaryPhone}
               </a>
               <a
@@ -63,7 +72,10 @@ export default function ContactInfo({ labels }: ContactInfoProps) {
               </a>
             </div>
             <p className="mb-0 mt-2 text-xs text-gray-500">Phone calls only</p>
-            <a href={`tel:${toTelLink(secondaryPhone)}`} className="text-sm font-medium text-gray-800 transition-colors hover:text-[#a92920]">
+            <a
+              href={`tel:${toTelLink(secondaryPhone)}`}
+              className="text-sm font-medium text-gray-800 transition-colors hover:text-[#a92920]"
+            >
               {secondaryPhone}
             </a>
           </div>
@@ -74,8 +86,13 @@ export default function ContactInfo({ labels }: ContactInfoProps) {
             <MailOutlined className="text-base" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Email</p>
-            <a href={`mailto:${labels.email}`} className="break-all text-sm leading-6 text-gray-800 transition-colors hover:text-[#a92920]">
+            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+              Email
+            </p>
+            <a
+              href={`mailto:${labels.email}`}
+              className="break-all text-sm leading-6 text-gray-800 transition-colors hover:text-[#a92920]"
+            >
               {labels.email}
             </a>
           </div>
@@ -86,8 +103,12 @@ export default function ContactInfo({ labels }: ContactInfoProps) {
             <ClockCircleOutlined className="text-base" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Opening hours</p>
-            <Text className="text-sm leading-6 text-gray-800">{labels.hours}</Text>
+            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+              Opening hours
+            </p>
+            <Text className="text-sm leading-6 text-gray-800">
+              {labels.hours}
+            </Text>
           </div>
         </div>
       </div>

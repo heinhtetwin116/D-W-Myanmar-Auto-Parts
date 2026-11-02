@@ -47,28 +47,26 @@ export default async function LocaleLayout({
           },
         }}
       >
-       
-          <ConfigProvider
-            locale={antdLocales[validLocale]}
-            theme={{
-              token: {
-                colorPrimary: "#A81C24",
-                borderRadius: 8,
-                fontFamily: "Manrope, system-ui, sans-serif",
-              },
-            }}
-          >
-            <NextIntlClientProvider messages={messages} locale={validLocale}>
-              <QueryProvider>
-                <CartProvider>
-                  <Header />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                </CartProvider>
-              </QueryProvider>
-            </NextIntlClientProvider>
-          </ConfigProvider>
-       
+        <ConfigProvider
+          locale={antdLocales[validLocale]}
+          theme={{
+            token: {
+              colorPrimary: "#A81C24",
+              borderRadius: 8,
+              fontFamily: "Manrope, system-ui, sans-serif",
+            },
+          }}
+        >
+          <NextIntlClientProvider messages={messages} locale={validLocale}>
+            <QueryProvider>
+              <CartProvider>
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </CartProvider>
+            </QueryProvider>
+          </NextIntlClientProvider>
+        </ConfigProvider>
       </ConfigProvider>
     </AntdRegistry>
   );

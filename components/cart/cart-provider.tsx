@@ -77,8 +77,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existing) {
         return current.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: Math.min(999, item.quantity + safeQuantity), name: product.name, code: product.code, price: product.price, imageUrl: product.imageUrl }
-            : item
+            ? {
+                ...item,
+                quantity: Math.min(999, item.quantity + safeQuantity),
+                name: product.name,
+                code: product.code,
+                price: product.price,
+                imageUrl: product.imageUrl,
+              }
+            : item,
         );
       }
       return [...current, { ...product, quantity: safeQuantity }];
@@ -94,8 +101,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     setItems((current) =>
       current.map((item) =>
-        item.id === id ? { ...item, quantity: Math.min(999, safeQuantity) } : item
-      )
+        item.id === id
+          ? { ...item, quantity: Math.min(999, safeQuantity) }
+          : item,
+      ),
     );
   }, []);
 
@@ -115,7 +124,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       clearCart,
     }),
-    [items, ready, addItem, setQuantity, removeItem, clearCart]
+    [items, ready, addItem, setQuantity, removeItem, clearCart],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

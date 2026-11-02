@@ -13,10 +13,7 @@ import {
   Tag,
   Typography,
 } from "antd";
-import {
-  ArrowLeftOutlined,
-  PictureOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, PictureOutlined } from "@ant-design/icons";
 import type { ProductDetailProps } from "@/types/index.type";
 import ProductsBreadcrumb from "@/components/catalog/products-breadcrumb";
 import { formatPriceMmk } from "@/lib/catalog/product-card-item";
@@ -66,24 +63,31 @@ export default function ProductDetail({
       return key.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
     }
 
-    const normalized = key.replace(/[._-]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+    const normalized = key
+      .replace(/[._-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
     const translations: Record<string, string> = {
       "purchase country": "ဝယ်ယူသည့်နိုင်ငံ",
       "country of origin": "မူရင်းနိုင်ငံ",
       "blade or refill": "Blade အမျိုးအစား",
-      "products": "အမျိုးအစား",
-      "size": "အရွယ်အစား",
-      "weight": "အလေးချိန်",
-      "material": "ပစ္စည်းအမျိုးအစား",
-      "brand": "အမှတ်တံဆိပ်",
-      "model": "မော်ဒယ်",
+      products: "အမျိုးအစား",
+      size: "အရွယ်အစား",
+      weight: "အလေးချိန်",
+      material: "ပစ္စည်းအမျိုးအစား",
+      brand: "အမှတ်တံဆိပ်",
+      model: "မော်ဒယ်",
       "vehicle model": "ကားမော်ဒယ်",
       "car name": "ကားအမည်",
-      "length": "အလျား",
-      "width": "အနံ",
-      "height": "အမြင့်",
+      length: "အလျား",
+      width: "အနံ",
+      height: "အမြင့်",
     };
-    return translations[normalized] ?? key.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+    return (
+      translations[normalized] ??
+      key.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim()
+    );
   };
 
   const specEntries = Object.entries(product.specifications ?? {});
@@ -101,7 +105,10 @@ export default function ProductDetail({
       />
       <Row gutter={[28, 28]} align="top">
         <Col xs={24} lg={11}>
-          <Card variant="outlined" className="overflow-hidden !rounded-2xl !border-border !shadow-sm">
+          <Card
+            variant="outlined"
+            className="overflow-hidden !rounded-2xl !border-border !shadow-sm"
+          >
             <div className="flex min-h-[320px] items-center justify-center rounded-xl bg-white p-5 sm:min-h-[420px]">
               {mainImageUrl ? (
                 <Image
@@ -123,72 +130,77 @@ export default function ProductDetail({
         </Col>
 
         <Col xs={24} lg={13}>
-          <Card variant="outlined" className="!rounded-2xl !border-border !shadow-sm">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Link href={`/${locale}/products?category=${product.category_id}`}>
-              <Tag color="red">{categoryName}</Tag>
-            </Link>
-          </div>
-          <Title level={2} className="!mb-2 !text-2xl sm:!text-3xl">
-            {name}
-          </Title>
-
-          <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <Text className="text-xl font-bold text-accent sm:text-2xl">
-              {formatPriceMmk(product.price_mmk, labels.currency)}
-            </Text>
-            <Text type="secondary" className="text-xs sm:text-sm">
-              {tDetail("price_notice")}
-            </Text>
-          </div>
-
-          {description && (
-            <Paragraph className="mt-4 text-base leading-7 text-foreground/80">
-              {description}
-            </Paragraph>
-          )}
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <AddToCartButton
-              product={{
-                id: String(product.id),
-                code: product.sku,
-                name,
-                price: product.price_mmk,
-                imageUrl: product.image_url ?? undefined,
-              }}
-              label={isMyanmar ? "ခြင်းထဲထည့်ရန်" : "Add to cart"}
-              size="large"
-            />
-            <Link href={`/${locale}/contact`}>
-              <Button size="large">
-                {labels.enquire}
-              </Button>
-            </Link>
-            <Link href={`/${locale}/products`}>
-              <Button size="large" icon={<ArrowLeftOutlined />}>
-                {labels.backToCatalog}
-              </Button>
-            </Link>
-          </div>
-
-          {specEntries.length > 0 && (
-            <div className="mt-7 border-t border-border pt-5">
-              <Title level={4} className="!mb-4">{labels.specs}</Title>
-              <Descriptions
-                bordered
-                column={{ xs: 1, sm: 1, md: 2 }}
-                size="middle"
-                className="product-specifications"
+          <Card
+            variant="outlined"
+            className="!rounded-2xl !border-border !shadow-sm"
+          >
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <Link
+                href={`/${locale}/products?category=${product.category_id}`}
               >
-                {specEntries.map(([key, value]) => (
-                  <Descriptions.Item key={key} label={specLabel(key)}>
-                    {String(value)}
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
+                <Tag color="red">{categoryName}</Tag>
+              </Link>
             </div>
-          )}
+            <Title level={2} className="!mb-2 !text-2xl sm:!text-3xl">
+              {name}
+            </Title>
+
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <Text className="text-xl font-bold text-accent sm:text-2xl">
+                {formatPriceMmk(product.price_mmk, labels.currency)}
+              </Text>
+              <Text type="secondary" className="text-xs sm:text-sm">
+                {tDetail("price_notice")}
+              </Text>
+            </div>
+
+            {description && (
+              <Paragraph className="mt-4 text-base leading-7 text-foreground/80">
+                {description}
+              </Paragraph>
+            )}
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <AddToCartButton
+                product={{
+                  id: String(product.id),
+                  code: product.sku,
+                  name,
+                  price: product.price_mmk,
+                  imageUrl: product.image_url ?? undefined,
+                }}
+                label={isMyanmar ? "ခြင်းထဲထည့်ရန်" : "Add to cart"}
+                size="large"
+              />
+              <Link href={`/${locale}/contact`}>
+                <Button size="large">{labels.enquire}</Button>
+              </Link>
+              <Link href={`/${locale}/products`}>
+                <Button size="large" icon={<ArrowLeftOutlined />}>
+                  {labels.backToCatalog}
+                </Button>
+              </Link>
+            </div>
+
+            {specEntries.length > 0 && (
+              <div className="mt-7 border-t border-border pt-5">
+                <Title level={4} className="!mb-4">
+                  {labels.specs}
+                </Title>
+                <Descriptions
+                  bordered
+                  column={{ xs: 1, sm: 1, md: 2 }}
+                  size="middle"
+                  className="product-specifications"
+                >
+                  {specEntries.map(([key, value]) => (
+                    <Descriptions.Item key={key} label={specLabel(key)}>
+                      {String(value)}
+                    </Descriptions.Item>
+                  ))}
+                </Descriptions>
+              </div>
+            )}
           </Card>
         </Col>
       </Row>

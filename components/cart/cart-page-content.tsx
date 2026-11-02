@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -11,10 +10,7 @@ import {
   Typography,
   message,
 } from "antd";
-import {
-  DeleteOutlined,
-  MessageOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, MessageOutlined } from "@ant-design/icons";
 import { useCart } from "@/components/cart/cart-provider";
 
 const { Title, Text } = Typography;
@@ -31,14 +27,14 @@ function formatPrice(amount: number, currencyLabel: string) {
 function buildOrderMessage(
   items: ReturnType<typeof useCart>["items"],
   total: number,
-  currencyLabel: string
+  currencyLabel: string,
 ) {
   return [
     "D&W Myanmar Auto Parts — Order Request",
     "",
     ...items.map(
       (item, index) =>
-        `${index + 1}. ${item.name}\nItem Code: ${item.code}\nQty: ${item.quantity}\nUnit Price: ${formatPrice(item.price, currencyLabel)}\nSubtotal: ${formatPrice(item.price * item.quantity, currencyLabel)}`
+        `${index + 1}. ${item.name}\nItem Code: ${item.code}\nQty: ${item.quantity}\nUnit Price: ${formatPrice(item.price, currencyLabel)}\nSubtotal: ${formatPrice(item.price * item.quantity, currencyLabel)}`,
     ),
     "",
     `Estimated Total: ${formatPrice(total, currencyLabel)}`,
@@ -55,7 +51,7 @@ export default function CartPageContent({
 
   const total = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    0,
   );
 
   const handleOrder = async () => {
@@ -123,7 +119,6 @@ export default function CartPageContent({
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8 pb-10">
-
       {/* Breadcrumb */}
       <div className="mb-8 flex items-center gap-2 text-sm">
         <Link
@@ -160,32 +155,23 @@ export default function CartPageContent({
         <Card className="!rounded-2xl">
           <Empty description="Your cart is empty">
             <Link href={`/${locale}/products`}>
-              <Button type="primary">
-                Browse products
-              </Button>
+              <Button type="primary">Browse products</Button>
             </Link>
           </Empty>
         </Card>
       ) : (
         <div className="space-y-4">
-
           {/* Cart Items */}
           <div className="space-y-3">
             {items.map((item) => (
-              <Card
-                key={item.id}
-                className="!rounded-2xl"
-              >
+              <Card key={item.id} className="!rounded-2xl">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
                   <div className="min-w-0">
                     <Text strong className="block">
                       {item.name}
                     </Text>
 
-                    <Text type="secondary">
-                      Item Code: {item.code}
-                    </Text>
+                    <Text type="secondary">Item Code: {item.code}</Text>
 
                     <div className="mt-1">
                       {formatPrice(item.price, currencyLabel)} each
@@ -205,10 +191,7 @@ export default function CartPageContent({
                     />
 
                     <Text strong>
-                      {formatPrice(
-                        item.price * item.quantity,
-                        currencyLabel
-                      )}
+                      {formatPrice(item.price * item.quantity, currencyLabel)}
                     </Text>
 
                     <Button
@@ -218,7 +201,6 @@ export default function CartPageContent({
                       onClick={() => removeItem(item.id)}
                     />
                   </Space>
-
                 </div>
               </Card>
             ))}
@@ -227,9 +209,7 @@ export default function CartPageContent({
           {/* Order Summary */}
           <Card className="!rounded-2xl">
             <div className="flex items-center justify-between gap-4">
-              <Text type="secondary">
-                Estimated total
-              </Text>
+              <Text type="secondary">Estimated total</Text>
 
               <Title level={3} className="!mb-0">
                 {formatPrice(total, currencyLabel)}
@@ -237,9 +217,8 @@ export default function CartPageContent({
             </div>
 
             <Text type="secondary" className="mt-2 block">
-              This is an order request, not a confirmed sale.
-              Our team will verify current prices, stock, and
-              delivery charges.
+              This is an order request, not a confirmed sale. Our team will
+              verify current prices, stock, and delivery charges.
             </Text>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -253,16 +232,11 @@ export default function CartPageContent({
                 Order via Viber
               </Button>
 
-              <Button
-                size="large"
-                block
-                onClick={clearCart}
-              >
+              <Button size="large" block onClick={clearCart}>
                 Clear cart
               </Button>
             </div>
           </Card>
-
         </div>
       )}
     </div>

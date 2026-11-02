@@ -26,12 +26,10 @@ const ProductCard = ({
             <Wrench size={40} />
           </div>
         )}
-
       </div>
 
       {/* Product Information */}
       <div className="space-y-1 flex-grow">
-
         {/* Product Name */}
         <h3 className="font-semibold text-foreground text-lg truncate">
           {product.name}
@@ -46,9 +44,7 @@ const ProductCard = ({
       {/* Price + Details */}
       <div className="flex items-center justify-between pt-3 mt-3 border-t border-border">
         {/* Price */}
-        <span className="font-bold text-accent">
-          {product.price}
-        </span>
+        <span className="font-bold text-accent">{product.price}</span>
 
         {/* Details Link */}
         {detailsHref ? (

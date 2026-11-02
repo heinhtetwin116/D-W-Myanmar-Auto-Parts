@@ -28,8 +28,7 @@ export default function ContactForm({ labels }: ContactFormProps) {
       form.resetFields();
       message.success(labels.success);
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : labels.error;
+      const errorMessage = err instanceof Error ? err.message : labels.error;
       setError(errorMessage);
       message.error(errorMessage);
     } finally {

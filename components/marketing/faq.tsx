@@ -51,9 +51,7 @@ export default function FAQ() {
               >
                 <button
                   type="button"
-                  onClick={() =>
-                    setOpenId(isOpen ? null : index)
-                  }
+                  onClick={() => setOpenId(isOpen ? null : index)}
                   aria-expanded={isOpen}
                   className="w-full flex items-center justify-between p-6 text-left focus:outline-none cursor-pointer group"
                 >
@@ -80,9 +78,7 @@ export default function FAQ() {
 
                 <div
                   className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen
-                      ? "max-h-96 pb-6 opacity-100"
-                      : "max-h-0 opacity-0"
+                    isOpen ? "max-h-96 pb-6 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
                   <p className="text-muted-foreground text-sm leading-relaxed border-t border-border pt-4">

@@ -137,7 +137,8 @@ export default function ProductCatalog({
                   selectedKeys={[categoryId || "all"]}
                   onSelect={(info) =>
                     pushParams({
-                      category: info.key === "all" ? undefined : String(info.key),
+                      category:
+                        info.key === "all" ? undefined : String(info.key),
                       page: "1",
                     })
                   }
