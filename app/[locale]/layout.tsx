@@ -1,5 +1,5 @@
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { App, ConfigProvider } from "antd";
+import { ConfigProvider } from "antd";
 import my_MM from "antd/es/locale/my_MM";
 import en_US from "antd/es/locale/en_US";
 // import { ThemeProvider } from "next-themes";
