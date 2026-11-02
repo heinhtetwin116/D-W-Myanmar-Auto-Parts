@@ -17,5 +17,6 @@ export function toProductCardItem(
     desc: (isMyanmar ? product.description_my : product.description_en) ?? "",
     stock: product.stock_quantity,
     price: formatPriceMmk(product.price_mmk, currencyLabel),
+    image_url: product.image_url,
   };
 }

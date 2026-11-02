@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import localFont from "next/font/local";
 import "@/app/globals.css";
+import { CartProvider } from "@/components/cart/cart-provider";
 
 const manrope = localFont({
   src: [
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className={manrope.variable}>
       <body className="font-manrope antialiased flex min-h-screen flex-col">
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

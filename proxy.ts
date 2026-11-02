@@ -1,34 +1,25 @@
-// import { updateSession } from "@/lib/supabase/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n";
 
-export async function proxy(request: NextRequest) {
+/** Public storefront locale routing. Customer authentication is not required. */
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
   const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );
 
   if (!pathnameHasLocale) {
-    const locale = defaultLocale;
-    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
+    return NextResponse.redirect(url);
   }
 
-  // Run supabase auth session update
-  // return await updateSession(request);
+  // Always return a response for locale-prefixed requests.
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * - api (API routes)
-     * Feel free to modify this pattern to include more paths.
-     */
     "/((?!_next/static|_next/image|api|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

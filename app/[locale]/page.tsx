@@ -60,48 +60,63 @@ export default async function HomePage({ params }: HomePageProps) {
         {/* Features Bar */}
         <section className="border-b border-border py-6">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Delivery */}
             <div className="flex items-center gap-4">
               <div className="text-accent">
                 <Truck size={32} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-bold text-foreground text-sm">
-                  Example Feature
+                  {messages.features.fast_delivery}
                 </h4>
-                <p className="text-xs text-muted-foreground">Sentence</p>
+                <p className="text-xs text-muted-foreground">
+                  {messages.features.fast_delivery_desc}
+                </p>
               </div>
             </div>
+
+            {/* Support */}
             <div className="flex items-center gap-4">
               <div className="text-accent">
                 <PhoneCall size={32} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-bold text-foreground text-sm">
-                  Example Feature
+                  {messages.features.support}
                 </h4>
-                <p className="text-xs text-muted-foreground">Sentence</p>
+                <p className="text-xs text-muted-foreground">
+                  {messages.features.support_desc}
+                </p>
               </div>
             </div>
+
+            {/* Quality / Warranty */}
             <div className="flex items-center gap-4">
               <div className="text-accent">
                 <ShieldCheck size={32} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-bold text-foreground text-sm">
-                  Example Feature
+                  {messages.features.warranty}
                 </h4>
-                <p className="text-xs text-muted-foreground">Sentence</p>
+                <p className="text-xs text-muted-foreground">
+                  {messages.features.warranty_desc}
+                </p>
               </div>
             </div>
+
+            {/* Price */}
             <div className="flex items-center gap-4">
               <div className="text-accent">
                 <Tag size={32} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-bold text-foreground text-sm">
-                  Example Feature
+                  {messages.features.best_price}
                 </h4>
-                <p className="text-xs text-muted-foreground">Sentence</p>
+                <p className="text-xs text-muted-foreground">
+                  {messages.features.best_price_desc}
+                </p>
               </div>
             </div>
           </div>

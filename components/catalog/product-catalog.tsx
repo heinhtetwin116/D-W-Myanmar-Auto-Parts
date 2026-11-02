@@ -131,23 +131,26 @@ export default function ProductCatalog({
               <Title level={4} className="!mb-2 pb-2 border-b border-border">
                 {labels.filterByCategories}
               </Title>
-              <Menu
-                mode="inline"
-                selectedKeys={[categoryId || "all"]}
-                onSelect={(info) =>
-                  pushParams({
-                    category: info.key === "all" ? undefined : String(info.key),
-                    page: "1",
-                  })
-                }
-                items={[
-                  { key: "all", label: labels.allCategories },
-                  ...categories.map((c) => ({
-                    key: c.id,
-                    label: locale === "my" ? c.name_my : c.name_en,
-                  })),
-                ]}
-              />
+              <div className="max-h-[50vh] overflow-y-auto pr-1">
+                <Menu
+                  mode="inline"
+                  selectedKeys={[categoryId || "all"]}
+                  onSelect={(info) =>
+                    pushParams({
+                      category:
+                        info.key === "all" ? undefined : String(info.key),
+                      page: "1",
+                    })
+                  }
+                  items={[
+                    { key: "all", label: labels.allCategories },
+                    ...categories.map((c) => ({
+                      key: c.id,
+                      label: locale === "my" ? c.name_my : c.name_en,
+                    })),
+                  ]}
+                />
+              </div>
             </div>
             <div>
               <Title level={4} className="!mb-2 pb-2 border-b border-border">
@@ -190,7 +193,7 @@ export default function ProductCatalog({
           </div>
 
           <div className="mb-6 flex flex-col items-start justify-between gap-4 pb-5 sm:flex-row sm:items-center border-b border-border">
-            <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
+            <div className="flex w-full min-w-0 flex-wrap items-center gap-2">
               <Text
                 strong
                 type="secondary"
@@ -223,6 +226,7 @@ export default function ProductCatalog({
               })}
             </div>
             <Select
+              className="shrink-0"
               value={sort || "name"}
               style={{ width: 160 }}
               onChange={(value) =>
