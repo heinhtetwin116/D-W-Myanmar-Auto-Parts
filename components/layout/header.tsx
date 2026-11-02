@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -45,7 +45,6 @@ const Header = () => {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { itemCount } = useCart();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -131,15 +130,20 @@ const Header = () => {
 
   const switchLocale = (next: Locale) => {
     setLangOpen(false);
+
     if (next === locale) return;
+
     const segments = pathname.split("/");
+
     if ((locales as readonly string[]).includes(segments[1])) {
       segments[1] = next;
     } else {
       segments.splice(1, 0, next);
     }
-    const query = searchParams.toString();
-    router.replace(segments.join("/") + (query ? `?${query}` : ""));
+
+    const query = window.location.search;
+
+    router.replace(segments.join("/") + query);
   };
 
   const categoryLabel = (category: (typeof categories)[number]) =>
