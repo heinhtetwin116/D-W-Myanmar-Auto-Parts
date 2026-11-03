@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Button,
-  Card,
-  Empty,
-  InputNumber,
-  Space,
-  Typography,
-  message,
-} from "antd";
+import { Button, Card, Empty, InputNumber, Space, Typography } from "antd";
 import { DeleteOutlined, MessageOutlined } from "@ant-design/icons";
 import { useCart } from "@/components/cart/cart-provider";
 
@@ -56,7 +48,7 @@ export default function CartPageContent({
 
   const handleOrder = async () => {
     if (items.length === 0) {
-      message.warning("Your cart is empty.");
+      window.alert("Your cart is empty.");
       return;
     }
 
@@ -99,11 +91,11 @@ export default function CartPageContent({
     }
 
     if (!copied) {
-      message.error("Unable to copy order details. Please try again.");
+      window.alert("Unable to copy order details. Please try again.");
       return;
     }
 
-    message.success("Order details copied. Opening Viber...");
+    window.alert("Order details copied. Opening Viber...");
 
     // Open D&W Viber Chat
     window.location.href = "viber://chat?number=%2B959765006774";
