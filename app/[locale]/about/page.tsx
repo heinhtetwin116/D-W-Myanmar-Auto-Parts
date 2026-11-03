@@ -286,7 +286,7 @@ export default async function AboutPage({
             <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
               {t("cta.title")}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl">{t("cta.text")}</p>
+            <p className="mx-auto mt-4 max-w-xl">{t.rich("cta.text", rich)}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href={`/${locale}/products`}
